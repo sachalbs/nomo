@@ -4,10 +4,17 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+interface Source {
+  article_number: string;
+  code_name: string;
+  source_url: string;
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  sources?: Source[];
   created_at: string;
 }
 
@@ -94,11 +101,12 @@ export default function ChatPage() {
         window.dispatchEvent(new Event("conversationCreated"));
       }
 
-      // Add assistant message
+      // Add assistant message with sources
       const assistantMsg: Message = {
         id: "temp-assistant-" + Date.now(),
         role: "assistant",
         content: data.response,
+        sources: data.sources,
         created_at: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
@@ -136,14 +144,47 @@ export default function ChatPage() {
                 key={msg.id}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <div
-                  className={`max-w-[85%] px-4 py-3 rounded-lg ${
-                    msg.role === "user"
-                      ? "bg-surface text-text"
-                      : "bg-white border border-border text-text"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                <div className={`max-w-[85%] ${msg.role === "user" ? "" : "space-y-3"}`}>
+                  <div
+                    className={`px-4 py-3 rounded-lg ${
+                      msg.role === "user"
+                        ? "bg-surface text-text"
+                        : "bg-white border border-border text-text"
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+
+                  {/* Sources for assistant messages */}
+                  {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {msg.sources.map((source, index) => (
+                        <a
+                          key={index}
+                          href={source.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-border rounded-lg text-[13px] text-text-secondary hover:text-text hover:border-text-secondary transition-colors"
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                          {source.article_number}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

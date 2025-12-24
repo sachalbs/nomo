@@ -1,12 +1,43 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { generateEmbedding } from "@/lib/embeddings";
 
-const SYSTEM_PROMPT = `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
-Tu réponds de manière pédagogique et claire.
-Tu cites toujours tes sources quand tu mentionnes un article de loi ou un arrêt.
-Si tu n'es pas sûr d'une information, tu le dis clairement.
-Tu ne réponds qu'aux questions juridiques.`;
+interface LawArticleSource {
+  id: string;
+  code_name: string;
+  article_number: string;
+  content: string;
+  source_url: string;
+  similarity: number;
+}
+
+function buildSystemPrompt(sources: LawArticleSource[]): string {
+  if (sources.length === 0) {
+    return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
+
+RÈGLES :
+1. Tu n'as pas trouvé de sources juridiques pertinentes pour cette question
+2. Indique clairement que tu ne peux pas répondre sans sources fiables
+3. Suggère de reformuler la question ou d'être plus précis
+4. Ne réponds qu'aux questions juridiques`;
+  }
+
+  const sourcesText = sources
+    .map((s) => `- ${s.article_number} (${s.code_name}): ${s.content}`)
+    .join("\n");
+
+  return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
+
+SOURCES JURIDIQUES DISPONIBLES :
+${sourcesText}
+
+RÈGLES :
+1. Réponds UNIQUEMENT en te basant sur les sources ci-dessus
+2. Cite TOUJOURS l'article exact (ex: "Article 1240 du Code civil")
+3. Si les sources ne permettent pas de répondre, dis-le clairement
+4. Explique de manière pédagogique pour un étudiant`;
+}
 
 async function createSupabaseClient() {
   const cookieStore = await cookies();
@@ -89,6 +120,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate embedding for the user's question
+    let sources: LawArticleSource[] = [];
+    try {
+      const queryEmbedding = await generateEmbedding(message);
+
+      // Search for similar law articles
+      const { data: matchedSources, error: searchError } = await supabase.rpc(
+        "match_law_articles",
+        {
+          query_embedding: queryEmbedding,
+          match_threshold: 0.5,
+          match_count: 5,
+        }
+      );
+
+      if (searchError) {
+        console.error("Error searching law articles:", searchError);
+      } else {
+        sources = matchedSources || [];
+      }
+    } catch (embeddingError) {
+      console.error("Error generating embedding:", embeddingError);
+    }
+
     // Get conversation history for context
     const { data: history } = await supabase
       .from("messages")
@@ -96,9 +151,10 @@ export async function POST(request: NextRequest) {
       .eq("conversation_id", currentConversationId)
       .order("created_at", { ascending: true });
 
-    // Build messages array for Mistral
+    // Build messages array for Mistral with dynamic system prompt
+    const systemPrompt = buildSystemPrompt(sources);
     const messages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       ...(history || []).map((msg) => ({
         role: msg.role as "user" | "assistant",
         content: msg.content,
@@ -132,11 +188,19 @@ export async function POST(request: NextRequest) {
     const mistralData = await mistralResponse.json();
     const assistantMessage = mistralData.choices[0]?.message?.content || "";
 
-    // Save assistant message
+    // Format sources for storage and response
+    const sourcesForResponse = sources.map((s) => ({
+      article_number: s.article_number,
+      code_name: s.code_name,
+      source_url: s.source_url,
+    }));
+
+    // Save assistant message with sources
     const { error: assistantMsgError } = await supabase.from("messages").insert({
       conversation_id: currentConversationId,
       role: "assistant",
       content: assistantMessage,
+      sources: sourcesForResponse,
     });
 
     if (assistantMsgError) {
@@ -152,6 +216,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       response: assistantMessage,
       conversationId: currentConversationId,
+      sources: sourcesForResponse,
     });
   } catch (error) {
     console.error("Chat API error:", error);
