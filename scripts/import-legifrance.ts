@@ -4,13 +4,29 @@ dotenv.config({ path: ".env.local" });
 import { createClient } from "@supabase/supabase-js";
 import { generateEmbedding } from "../lib/embeddings";
 import {
-  CODE_CIVIL_ID,
   getTableMatieres,
   getArticle,
   extractArticleIds,
   cleanArticleText,
   buildLegifranceUrl,
 } from "../lib/legifrance-api";
+
+// Available codes
+const CODES: Record<string, string> = {
+  'civil': 'LEGITEXT000006070721',
+  'penal': 'LEGITEXT000006070719',
+  'commerce': 'LEGITEXT000005634379',
+  'travail': 'LEGITEXT000006072050',
+  'procedure-civile': 'LEGITEXT000006070716',
+};
+
+const CODE_NAMES: Record<string, string> = {
+  'civil': 'Code civil',
+  'penal': 'Code pénal',
+  'commerce': 'Code de commerce',
+  'travail': 'Code du travail',
+  'procedure-civile': 'Code de procédure civile',
+};
 
 const RATE_LIMIT_DELAY = 1000; // 1 second between requests
 const BATCH_SIZE = 10; // Save progress every N articles
@@ -20,7 +36,18 @@ async function sleep(ms: number) {
 }
 
 async function main() {
-  console.log("=== Legifrance Code Civil Import ===\n");
+  // Parse command line argument
+  const codeArg = process.argv[2] || 'civil';
+  const codeId = CODES[codeArg];
+  const codeName = CODE_NAMES[codeArg];
+
+  if (!codeId || !codeName) {
+    console.error(`Unknown code: ${codeArg}`);
+    console.error(`Available codes: ${Object.keys(CODES).join(', ')}`);
+    process.exit(1);
+  }
+
+  console.log(`=== Legifrance ${codeName} Import ===\n`);
 
   // Validate environment
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -50,7 +77,7 @@ async function main() {
   console.log("1. Fetching table des matieres...");
   let tableDesMatieres;
   try {
-    tableDesMatieres = await getTableMatieres(CODE_CIVIL_ID);
+    tableDesMatieres = await getTableMatieres(codeId);
     console.log("   Table des matieres retrieved successfully\n");
   } catch (error) {
     console.error("Failed to fetch table des matieres:", error);
@@ -67,7 +94,7 @@ async function main() {
   const { data: existingArticles } = await supabase
     .from("law_articles")
     .select("article_number")
-    .eq("code_name", "Code civil");
+    .eq("code_name", codeName);
 
   const existingSet = new Set(
     existingArticles?.map((a) => a.article_number) || []
@@ -110,12 +137,12 @@ async function main() {
       }
 
       // Generate embedding
-      const textToEmbed = `Code civil Article ${num}: ${cleanText}`;
+      const textToEmbed = `${codeName} Article ${num}: ${cleanText}`;
       const embedding = await generateEmbedding(textToEmbed);
 
       // Insert into database
       const { error: insertError } = await supabase.from("law_articles").insert({
-        code_name: "Code civil",
+        code_name: codeName,
         article_number: `Article ${num}`,
         content: cleanText,
         source_url: buildLegifranceUrl(id),
@@ -166,9 +193,9 @@ async function main() {
   const { count } = await supabase
     .from("law_articles")
     .select("*", { count: "exact", head: true })
-    .eq("code_name", "Code civil");
+    .eq("code_name", codeName);
 
-  console.log(`\nTotal Code civil articles in database: ${count}`);
+  console.log(`\nTotal ${codeName} articles in database: ${count}`);
 }
 
 main().catch((error) => {

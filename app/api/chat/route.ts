@@ -17,26 +17,27 @@ function buildSystemPrompt(sources: LawArticleSource[]): string {
     return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
 
 RÈGLES :
-1. Tu n'as pas trouvé de sources juridiques pertinentes pour cette question
-2. Indique clairement que tu ne peux pas répondre sans sources fiables
-3. Suggère de reformuler la question ou d'être plus précis
-4. Ne réponds qu'aux questions juridiques`;
+1. Si tu n'as pas de sources juridiques, réponds de manière générale et pédagogique
+2. Pour les salutations, réponds naturellement
+3. Si on te pose une question juridique précise, indique que tu n'as pas trouvé de sources pertinentes
+4. Sois honnête sur les limites de tes connaissances`;
   }
 
   const sourcesText = sources
-    .map((s) => `- ${s.article_number} (${s.code_name}): ${s.content}`)
-    .join("\n");
+    .map((s) => `[${s.article_number}] ${s.content}`)
+    .join("\n\n");
 
   return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
 
-SOURCES JURIDIQUES DISPONIBLES :
-${sourcesText}
+RÈGLES STRICTES :
+1. Réponds UNIQUEMENT avec les informations présentes dans les SOURCES ci-dessous
+2. Cite TOUJOURS le numéro d'article exact dans ta réponse (ex: "L'article 1130 du Code civil dispose que...")
+3. Si une information n'est pas dans les sources, dis clairement "Je n'ai pas trouvé cette information dans mes sources"
+4. N'invente JAMAIS de concepts, classifications ou jurisprudence
+5. Sois précis et pédagogique, adapté à un étudiant L2-M2
 
-RÈGLES :
-1. Réponds UNIQUEMENT en te basant sur les sources ci-dessus
-2. Cite TOUJOURS l'article exact (ex: "Article 1240 du Code civil")
-3. Si les sources ne permettent pas de répondre, dis-le clairement
-4. Explique de manière pédagogique pour un étudiant`;
+SOURCES DISPONIBLES :
+${sourcesText}`;
 }
 
 async function createSupabaseClient() {
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
         {
           query_embedding: queryEmbedding,
           match_threshold: 0.5,
-          match_count: 5,
+          match_count: 3,
         }
       );
 
@@ -139,6 +140,7 @@ export async function POST(request: NextRequest) {
         console.error("Error searching law articles:", searchError);
       } else {
         sources = matchedSources || [];
+        console.log("Sources trouvées:", sources.length, sources.map(s => s.article_number));
       }
     } catch (embeddingError) {
       console.error("Error generating embedding:", embeddingError);
@@ -188,7 +190,7 @@ export async function POST(request: NextRequest) {
     const mistralData = await mistralResponse.json();
     const assistantMessage = mistralData.choices[0]?.message?.content || "";
 
-    // Format sources for storage and response
+    // Format sources for response
     const sourcesForResponse = sources.map((s) => ({
       article_number: s.article_number,
       code_name: s.code_name,

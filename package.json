@@ -8,25 +8,33 @@
     "start": "next start",
     "lint": "eslint",
     "import:codes": "npx tsx scripts/import-codes.ts",
-    "import:legifrance": "npx tsx scripts/import-legifrance.ts"
+    "import:legifrance": "npx tsx scripts/import-legifrance.ts",
+    "import:code-civil": "npx tsx scripts/import-legifrance.ts civil",
+    "import:code-penal": "npx tsx scripts/import-legifrance.ts penal",
+    "import:code-commerce": "npx tsx scripts/import-legifrance.ts commerce",
+    "import:code-travail": "npx tsx scripts/import-legifrance.ts travail",
+    "import:code-procedure-civile": "npx tsx scripts/import-legifrance.ts procedure-civile",
+    "fix:urls": "npx tsx scripts/fix-urls.ts"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "dotenv": "^16.4.5",
     "next": "16.1.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "tsx": "^4.19.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.19.0",
     "typescript": "^5"
   }
 }
