@@ -28,11 +28,29 @@ const CODE_NAMES: Record<string, string> = {
   'procedure-civile': 'Code de procédure civile',
 };
 
-const RATE_LIMIT_DELAY = 1000; // 1 second between requests
+const RATE_LIMIT_DELAY = 1500; // 1.5 seconds between requests
 const BATCH_SIZE = 10; // Save progress every N articles
 
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function generateEmbeddingWithRetry(text: string, maxRetries = 3): Promise<number[]> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await generateEmbedding(text);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes("Rate limit") && i < maxRetries - 1) {
+        const waitTime = 2000 * (i + 1); // 2s, 4s, 6s
+        console.log(`   Rate limited, waiting ${waitTime / 1000}s...`);
+        await sleep(waitTime);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error("Max retries exceeded");
 }
 
 async function main() {
@@ -136,9 +154,9 @@ async function main() {
         continue;
       }
 
-      // Generate embedding
+      // Generate embedding with retry logic
       const textToEmbed = `${codeName} Article ${num}: ${cleanText}`;
-      const embedding = await generateEmbedding(textToEmbed);
+      const embedding = await generateEmbeddingWithRetry(textToEmbed);
 
       // Insert into database
       const { error: insertError } = await supabase.from("law_articles").insert({

@@ -224,80 +224,140 @@ body::before {
   }
 }
 
-/* Custom prose styles for chat */
-.prose-chat {
-  --tw-prose-body: #1C1917;
-  --tw-prose-headings: #1C1917;
-  --tw-prose-links: #0F766E;
-  --tw-prose-bold: #1C1917;
-  --tw-prose-code: #1C1917;
-  --tw-prose-pre-bg: #F5F5F5;
-  --tw-prose-pre-code: #1C1917;
+/* Custom prose styles for Nomo chat */
+.prose-nomo {
+  color: #1E293B;
+  line-height: 1.6;
 }
 
-.prose-chat p {
-  margin-top: 0.75em;
-  margin-bottom: 0.75em;
+.prose-nomo p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
-.prose-chat p:first-child {
+.prose-nomo p:first-child {
   margin-top: 0;
 }
 
-.prose-chat p:last-child {
+.prose-nomo p:last-child {
   margin-bottom: 0;
 }
 
-.prose-chat ul, .prose-chat ol {
+.prose-nomo h1,
+.prose-nomo h2,
+.prose-nomo h3,
+.prose-nomo h4 {
+  color: #2563EB;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.prose-nomo h1:first-child,
+.prose-nomo h2:first-child,
+.prose-nomo h3:first-child,
+.prose-nomo h4:first-child {
+  margin-top: 0;
+}
+
+.prose-nomo ul,
+.prose-nomo ol {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
-  padding-left: 1.25em;
+  padding-left: 1.5em;
 }
 
-.prose-chat li {
+.prose-nomo ul {
+  list-style-type: disc;
+}
+
+.prose-nomo ol {
+  list-style-type: decimal;
+}
+
+.prose-nomo li {
   margin-top: 0.25em;
   margin-bottom: 0.25em;
+  padding-left: 0.25em;
 }
 
-.prose-chat code {
-  background-color: #F5F5F5;
-  padding: 0.125em 0.25em;
+.prose-nomo li::marker {
+  color: #2563EB;
+}
+
+.prose-nomo strong {
+  color: #2563EB;
+  font-weight: 600;
+}
+
+.prose-nomo em {
+  font-style: italic;
+}
+
+.prose-nomo code {
+  background-color: #F1F5F9;
+  color: #1E293B;
+  padding: 0.125em 0.375em;
   border-radius: 0.25em;
   font-size: 0.875em;
+  font-family: ui-monospace, monospace;
 }
 
-.prose-chat pre {
-  background-color: #F5F5F5;
+.prose-nomo pre {
+  background-color: #F1F5F9;
   border-radius: 0.5em;
-  padding: 0.75em 1em;
+  padding: 1em;
   overflow-x: auto;
   margin-top: 0.75em;
   margin-bottom: 0.75em;
 }
 
-.prose-chat pre code {
+.prose-nomo pre code {
   background: none;
   padding: 0;
+  font-size: 0.875em;
 }
 
-.prose-chat a {
-  color: #0F766E;
+.prose-nomo a {
+  color: #2563EB;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.prose-chat a:hover {
-  color: #115E59;
+.prose-nomo a:hover {
+  color: #1D4ED8;
 }
 
-.prose-chat strong {
-  font-weight: 600;
-}
-
-.prose-chat blockquote {
-  border-left: 3px solid #E5E5E5;
+.prose-nomo blockquote {
+  border-left: 3px solid #2563EB;
   padding-left: 1em;
   margin-left: 0;
-  color: #666;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  color: #64748B;
   font-style: italic;
+}
+
+.prose-nomo hr {
+  border: none;
+  border-top: 1px solid #E2E8F0;
+  margin: 1em 0;
+}
+
+.prose-nomo table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+}
+
+.prose-nomo th,
+.prose-nomo td {
+  border: 1px solid #E2E8F0;
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.prose-nomo th {
+  background-color: #F1F5F9;
+  font-weight: 600;
 }

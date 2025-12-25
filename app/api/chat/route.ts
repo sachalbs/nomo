@@ -16,28 +16,37 @@ function buildSystemPrompt(sources: LawArticleSource[]): string {
   if (sources.length === 0) {
     return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
 
-RÈGLES :
-1. Si tu n'as pas de sources juridiques, réponds de manière générale et pédagogique
-2. Pour les salutations, réponds naturellement
-3. Si on te pose une question juridique précise, indique que tu n'as pas trouvé de sources pertinentes
-4. Sois honnête sur les limites de tes connaissances`;
+Je n'ai pas trouvé de sources juridiques pertinentes pour cette question.
+
+COMPORTEMENT :
+- Pour les salutations → réponds naturellement et brièvement
+- Pour les questions juridiques → dis "Je n'ai pas trouvé cette information dans mes sources juridiques. Essayez de reformuler votre question ou d'être plus précis."
+- N'invente JAMAIS d'articles, d'arrêts ou de concepts juridiques`;
   }
 
   const sourcesText = sources
-    .map((s) => `[${s.article_number}] ${s.content}`)
+    .map((s) => `[${s.article_number} - ${s.code_name}]\n${s.content}`)
     .join("\n\n");
 
   return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
 
-RÈGLES STRICTES :
-1. Réponds UNIQUEMENT avec les informations présentes dans les SOURCES ci-dessous
-2. Cite TOUJOURS le numéro d'article exact dans ta réponse (ex: "L'article 1130 du Code civil dispose que...")
-3. Si une information n'est pas dans les sources, dis clairement "Je n'ai pas trouvé cette information dans mes sources"
-4. N'invente JAMAIS de concepts, classifications ou jurisprudence
-5. Sois précis et pédagogique, adapté à un étudiant L2-M2
+⚠️ RÈGLE ABSOLUE : Tu ne peux répondre QU'en utilisant les SOURCES ci-dessous. Tu n'as AUCUNE autre connaissance.
+
+COMPORTEMENT :
+- Si les sources contiennent l'information → réponds en citant les articles exacts
+- Si les sources NE contiennent PAS l'information → dis "Je n'ai pas trouvé cette information dans mes sources juridiques. Essayez de reformuler votre question."
+- N'invente JAMAIS d'articles, d'arrêts ou de concepts juridiques
+- Ne complète JAMAIS avec des connaissances générales
+
+FORMAT DE RÉPONSE :
+- Cite toujours l'article (ex: "L'article 1130 du Code civil dispose que...")
+- Sois pédagogique et clair
+- Reste concis (pas de listes interminables)
 
 SOURCES DISPONIBLES :
-${sourcesText}`;
+${sourcesText}
+
+Si aucune source n'est pertinente ci-dessus, réponds que tu n'as pas trouvé l'information.`;
 }
 
 async function createSupabaseClient() {
@@ -123,27 +132,65 @@ export async function POST(request: NextRequest) {
 
     // Generate embedding for the user's question
     let sources: LawArticleSource[] = [];
-    try {
-      const queryEmbedding = await generateEmbedding(message);
+    let searchTimedOut = false;
 
-      // Search for similar law articles
-      const { data: matchedSources, error: searchError } = await supabase.rpc(
-        "match_law_articles",
-        {
-          query_embedding: queryEmbedding,
-          match_threshold: 0.5,
-          match_count: 3,
-        }
-      );
+    try {
+      const startTime = Date.now();
+      const queryEmbedding = await generateEmbedding(message);
+      console.log(`[RAG] Embedding generated in ${Date.now() - startTime}ms`);
+
+      // Search for similar law articles with timeout
+      const searchStartTime = Date.now();
+      const searchPromise = supabase.rpc("match_law_articles", {
+        query_embedding: queryEmbedding,
+        match_threshold: 0.6,
+        match_count: 3,
+      });
+
+      // 30 second timeout
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), 30000);
+      });
+
+      const { data: matchedSources, error: searchError } = await Promise.race([
+        searchPromise,
+        timeoutPromise,
+      ]);
+
+      const searchDuration = Date.now() - searchStartTime;
+      console.log(`[RAG] Search completed in ${searchDuration}ms`);
 
       if (searchError) {
         console.error("Error searching law articles:", searchError);
       } else {
         sources = matchedSources || [];
-        console.log("Sources trouvées:", sources.length, sources.map(s => s.article_number));
+        console.log(`[RAG] Sources trouvées: ${sources.length}`, sources.map(s => s.article_number));
       }
-    } catch (embeddingError) {
-      console.error("Error generating embedding:", embeddingError);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      if (errorMsg === "SEARCH_TIMEOUT") {
+        console.error("[RAG] Search timed out after 30s");
+        searchTimedOut = true;
+      } else {
+        console.error("Error in RAG pipeline:", errorMsg);
+      }
+    }
+
+    // If search timed out, return user-friendly error
+    if (searchTimedOut) {
+      // Save timeout message to conversation
+      await supabase.from("messages").insert({
+        conversation_id: currentConversationId,
+        role: "assistant",
+        content: "La recherche prend trop de temps. Essayez une question plus précise.",
+        sources: [],
+      });
+
+      return NextResponse.json({
+        response: "La recherche prend trop de temps. Essayez une question plus précise.",
+        conversationId: currentConversationId,
+        sources: [],
+      });
     }
 
     // Get conversation history for context

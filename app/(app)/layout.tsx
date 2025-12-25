@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { Trash2, Loader2 } from "lucide-react";
+import { NomoLogo } from "@/components/NomoLogo";
 
 interface Conversation {
   id: string;
@@ -28,9 +30,12 @@ function formatRelativeDate(dateString: string): string {
   }
 }
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -84,25 +89,69 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.push("/chat");
   };
 
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const deleteConversation = async (id: string) => {
+    setDeletingId(id);
+    setConversationToDelete(null);
+
+    try {
+      // Delete messages first (foreign key constraint)
+      const { error: messagesError } = await supabase
+        .from("messages")
+        .delete()
+        .eq("conversation_id", id);
+
+      if (messagesError) throw messagesError;
+
+      // Delete conversation
+      const { error: convError } = await supabase
+        .from("conversations")
+        .delete()
+        .eq("id", id);
+
+      if (convError) throw convError;
+
+      // Update local state
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+
+      // Redirect if deleting active conversation
+      if (currentConversationId === id) {
+        router.push("/chat");
+      }
+
+      showToast("Conversation supprimée", "success");
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      showToast("Erreur lors de la suppression", "error");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
-    <div className="flex h-screen bg-[#FAFAFA]">
+    <div className="flex h-screen bg-[#F8FAFC]">
       {/* Sidebar */}
       <aside
-        className={`bg-white border-r border-[#EFEFEF] flex flex-col transition-all duration-200 ease-in-out ${
+        className={`bg-white border-r border-[#E2E8F0] flex flex-col transition-all duration-200 ease-in-out ${
           sidebarOpen ? "w-[260px]" : "w-0 overflow-hidden"
         }`}
       >
         {/* Header */}
-        <div className="h-14 px-4 flex items-center justify-between border-b border-[#EFEFEF]">
+        <div className="h-14 px-4 flex items-center justify-between border-b border-[#E2E8F0]">
           <div className="flex items-center gap-2">
-            <h1 className="font-semibold text-[18px] text-text">Nomo</h1>
-            <span className="bg-[#F5F5F5] text-[#666] text-[10px] font-medium px-2 py-0.5 rounded-full">
+            <NomoLogo size="md" />
+            <h1 className="font-semibold text-xl text-[#1E293B]">Nomo</h1>
+            <span className="bg-[#EFF6FF] text-[#2563EB] text-[10px] font-medium px-2 py-0.5 rounded-full">
               Beta
             </span>
           </div>
           <button
             onClick={toggleSidebar}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F5F5F5] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F1F5F9] transition-all duration-200"
             aria-label="Fermer la sidebar"
           >
             <svg
@@ -114,7 +163,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-[#666]"
+              className="text-[#64748B]"
             >
               <path d="M15 18l-6-6 6-6" />
             </svg>
@@ -125,7 +174,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="p-3">
           <button
             onClick={handleNewConversation}
-            className="w-full h-10 flex items-center gap-2 px-3 rounded-lg border border-[#EFEFEF] text-text text-[14px] hover:bg-[#F5F5F5] transition-colors"
+            className="w-full h-10 flex items-center gap-2 px-3 rounded-lg border border-[#E2E8F0] text-[#1E293B] text-[14px] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] transition-all duration-200"
           >
             <svg
               width="16"
@@ -146,44 +195,66 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Conversations list */}
         <div className="flex-1 overflow-y-auto px-2 py-2">
           {conversations.length === 0 ? (
-            <p className="text-text-secondary text-[14px] px-2">
+            <p className="text-[#94A3B8] text-[14px] px-2">
               Aucune conversation
             </p>
           ) : (
             <nav className="space-y-0.5">
               {conversations.map((conv) => (
-                <Link
+                <div
                   key={conv.id}
-                  href={`/chat?id=${conv.id}`}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] transition-colors group ${
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] transition-all duration-200 group ${
                     currentConversationId === conv.id
-                      ? "bg-[#F5F5F5]"
-                      : "hover:bg-[#F5F5F5]"
+                      ? "bg-[#EFF6FF] text-[#2563EB]"
+                      : "text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#1E293B]"
                   }`}
                 >
-                  <span
-                    className={`truncate max-w-[160px] ${
-                      currentConversationId === conv.id
-                        ? "text-text font-medium"
-                        : "text-[#666] group-hover:text-text"
-                    }`}
+                  <Link
+                    href={`/chat?id=${conv.id}`}
+                    className="flex-1 min-w-0 flex items-center"
                   >
-                    {conv.title}
-                  </span>
-                  <span className="text-[12px] text-[#999] flex-shrink-0 ml-2">
-                    {formatRelativeDate(conv.updated_at)}
-                  </span>
-                </Link>
+                    <span
+                      className={`truncate ${
+                        currentConversationId === conv.id
+                          ? "font-medium"
+                          : ""
+                      }`}
+                    >
+                      {conv.title}
+                    </span>
+                  </Link>
+                  <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                    <span className="text-[12px] text-[#94A3B8] group-hover:hidden">
+                      {formatRelativeDate(conv.updated_at)}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setConversationToDelete(conv.id);
+                      }}
+                      disabled={deletingId === conv.id}
+                      className="hidden group-hover:flex w-6 h-6 items-center justify-center rounded hover:bg-red-50 transition-colors"
+                      aria-label="Supprimer la conversation"
+                    >
+                      {deletingId === conv.id ? (
+                        <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
+                      )}
+                    </button>
+                  </div>
+                </div>
               ))}
             </nav>
           )}
         </div>
 
         {/* Logout */}
-        <div className="p-4 border-t border-[#EFEFEF]">
+        <div className="p-4 border-t border-[#E2E8F0]">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-[#666] hover:text-text transition-colors text-[14px]"
+            className="flex items-center gap-2 text-[#64748B] hover:text-[#1E293B] transition-all duration-200 text-[14px]"
           >
             <svg
               width="16"
@@ -208,10 +279,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 flex flex-col min-w-0">
         {/* Header when sidebar is closed */}
         {!sidebarOpen && (
-          <header className="h-14 px-4 flex items-center gap-4 border-b border-[#EFEFEF] bg-white">
+          <header className="h-14 px-4 flex items-center gap-4 border-b border-[#E2E8F0] bg-white">
             <button
               onClick={toggleSidebar}
-              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F5F5F5] transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F1F5F9] transition-all duration-200"
               aria-label="Ouvrir la sidebar"
             >
               <svg
@@ -223,18 +294,71 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-[#666]"
+                className="text-[#64748B]"
               >
                 <line x1="3" y1="12" x2="21" y2="12" />
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <line x1="3" y1="18" x2="21" y2="18" />
               </svg>
             </button>
-            <h1 className="font-semibold text-[18px] text-text">Nomo</h1>
+            <NomoLogo size="md" />
+            <h1 className="font-semibold text-xl text-[#1E293B]">Nomo</h1>
+            <span className="bg-[#EFF6FF] text-[#2563EB] text-[10px] font-medium px-2 py-0.5 rounded-full">
+              Beta
+            </span>
           </header>
         )}
         <div className="flex-1 flex flex-col">{children}</div>
       </main>
+
+      {/* Delete confirmation modal */}
+      {conversationToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-[#1E293B] mb-2">
+              Supprimer cette conversation ?
+            </h3>
+            <p className="text-[#64748B] text-sm mb-6">
+              Cette action est irréversible.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConversationToDelete(null)}
+                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => deleteConversation(conversationToDelete)}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-lg text-sm font-medium z-50 transition-all duration-300 ${
+            toast.type === "success"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {toast.message}
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div className="flex h-screen bg-[#F8FAFC]" />}>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </Suspense>
   );
 }

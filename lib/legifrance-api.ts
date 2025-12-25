@@ -172,6 +172,7 @@ export function cleanArticleText(htmlText: string): string {
 }
 
 // Build Legifrance URL for an article
+// Format: https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI...
 export function buildLegifranceUrl(articleId: string): string {
   return `https://www.legifrance.gouv.fr/codes/article_lc/${articleId}`;
 }

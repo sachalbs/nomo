@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ReactMarkdown from "react-markdown";
+import { NomoLogo } from "@/components/NomoLogo";
 
 interface Source {
   article_number: string;
@@ -33,8 +34,8 @@ const suggestions = [
     text: "Expliquer l'arret Chronopost",
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3v18" />
-        <path d="M3 12h4l2-9 4 18 2-9h4" />
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
   },
@@ -56,7 +57,6 @@ const suggestions = [
         <polyline points="14 2 14 8 20 8" />
         <line x1="16" y1="13" x2="8" y2="13" />
         <line x1="16" y1="17" x2="8" y2="17" />
-        <polyline points="10 9 9 9 8 9" />
       </svg>
     ),
   },
@@ -69,7 +69,7 @@ function formatTime(dateString: string): string {
   });
 }
 
-export default function ChatPage() {
+function ChatPageContent() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -207,14 +207,17 @@ export default function ChatPage() {
   const hasInput = input.trim().length > 0;
 
   return (
-    <div className="h-full flex flex-col bg-[#FAFAFA]">
+    <div className="h-full flex flex-col bg-[#F8FAFC]">
       {isEmpty ? (
         // Empty state - centered input
-        <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-8">
-          {/* Greeting */}
-          <h1 className="font-semibold text-[32px] text-text mb-8">
-            {userName ? `Bonjour, ${userName}` : "Pose ta question juridique"}
-          </h1>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-8">
+          {/* Logo + Greeting */}
+          <div className="flex items-center gap-3 mb-8">
+            <NomoLogo size="lg" variant="outline" />
+            <h1 className="font-semibold text-[32px] text-[#1E293B]">
+              {userName ? `Bonjour, ${userName}` : "Pose ta question juridique"}
+            </h1>
+          </div>
 
           {/* Main input */}
           <div className="w-full max-w-[600px]">
@@ -229,16 +232,16 @@ export default function ChatPage() {
                   placeholder="Pose ta question juridique..."
                   rows={1}
                   disabled={isLoading}
-                  className="w-full bg-[#F5F5F5] border border-[#E5E5E5] rounded-2xl px-5 py-4 pr-14 resize-none outline-none text-text placeholder:text-[#999] disabled:opacity-50 focus:bg-white focus:border-[#D0D0D0] transition-all min-h-[56px]"
-                  style={{ maxHeight: "200px" }}
+                  className="w-full bg-white border border-[#E2E8F0] rounded-full px-6 py-4 pr-14 resize-none outline-none text-[#1E293B] placeholder:text-[#94A3B8] disabled:opacity-50 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all duration-200 min-h-[56px] shadow-sm"
+                  style={{ maxHeight: "56px" }}
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !hasInput}
-                  className={`absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                     hasInput
-                      ? "bg-[#1C1917] hover:bg-[#2C2927] text-white"
-                      : "bg-[#E5E5E5] text-[#999] cursor-not-allowed"
+                      ? "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-md"
+                      : "bg-[#E2E8F0] text-[#94A3B8] cursor-not-allowed"
                   }`}
                   aria-label="Envoyer"
                 >
@@ -252,8 +255,8 @@ export default function ChatPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M22 2L11 13" />
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>
                 </button>
               </div>
@@ -261,14 +264,14 @@ export default function ChatPage() {
           </div>
 
           {/* Suggestions */}
-          <div className="flex flex-wrap justify-center gap-2 mt-5 max-w-[600px]">
+          <div className="flex flex-wrap justify-center gap-3 mt-6 max-w-[600px]">
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion.text}
                 onClick={() => handleSuggestionClick(suggestion.text)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-[#EFEFEF] text-[14px] text-[#666] hover:bg-[#F5F5F5] hover:text-text transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-[#E2E8F0] text-[14px] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#1E293B] hover:border-[#CBD5E1] transition-all duration-200 shadow-sm"
               >
-                <span className="text-[#999]">{suggestion.icon}</span>
+                <span className="text-[#94A3B8]">{suggestion.icon}</span>
                 {suggestion.text}
               </button>
             ))}
@@ -277,25 +280,32 @@ export default function ChatPage() {
       ) : (
         // Messages state
         <div className="flex-1 flex flex-col relative">
-          <div className="flex-1 overflow-y-auto pb-28">
-            <div className="max-w-[768px] mx-auto px-6 py-6 space-y-4">
+          <div className="flex-1 overflow-y-auto pb-32">
+            <div className="max-w-[800px] mx-auto px-6 py-6 space-y-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`chat-message flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <div className="max-w-[75%] space-y-1">
+                  {/* Logo for assistant messages */}
+                  {msg.role === "assistant" && (
+                    <div className="flex-shrink-0 mr-2 mt-1">
+                      <NomoLogo size="sm" />
+                    </div>
+                  )}
+
+                  <div className={`${msg.role === "user" ? "max-w-[70%]" : "max-w-[85%]"} space-y-2`}>
                     <div
-                      className={`px-4 py-3 rounded-2xl ${
+                      className={`px-4 py-3 ${
                         msg.role === "user"
-                          ? "bg-[#F5F5F5] text-text"
-                          : "bg-white border border-[#EFEFEF] text-text"
+                          ? "bg-[#2563EB] text-white rounded-2xl rounded-tr-sm shadow-md"
+                          : "bg-white border border-[#E2E8F0] text-[#1E293B] rounded-2xl rounded-tl-sm shadow-sm"
                       }`}
                     >
                       {msg.role === "user" ? (
                         <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                       ) : (
-                        <div className="prose prose-sm prose-chat max-w-none leading-relaxed">
+                        <div className="prose-nomo">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       )}
@@ -303,18 +313,18 @@ export default function ChatPage() {
 
                     {/* Sources for assistant messages */}
                     {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2 pl-1">
                         {msg.sources.map((source, index) => (
                           <a
                             key={index}
                             href={source.source_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F5F5F4] border border-[#E7E5E4] rounded-lg text-[13px] text-[#666] hover:text-text hover:border-[#D0D0D0] transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EFF6FF] text-[#2563EB] rounded-full text-[13px] font-medium hover:bg-[#DBEAFE] transition-all duration-200"
                           >
                             <svg
-                              width="14"
-                              height="14"
+                              width="12"
+                              height="12"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="currentColor"
@@ -333,7 +343,7 @@ export default function ChatPage() {
                     )}
 
                     {/* Timestamp */}
-                    <p className={`text-[11px] text-[#999] ${msg.role === "user" ? "text-right" : "text-left"} px-1`}>
+                    <p className={`text-[11px] text-[#94A3B8] ${msg.role === "user" ? "text-right" : "text-left"} px-1`}>
                       {formatTime(msg.created_at)}
                     </p>
                   </div>
@@ -341,15 +351,11 @@ export default function ChatPage() {
               ))}
               {isLoading && (
                 <div className="chat-message flex justify-start">
-                  <div className="bg-white border border-[#EFEFEF] px-4 py-3 rounded-2xl">
-                    <p className="text-[#666] flex items-center gap-1">
-                      Nomo reflechit
-                      <span className="typing-dots">
-                        <span>.</span>
-                        <span>.</span>
-                        <span>.</span>
-                      </span>
-                    </p>
+                  <div className="flex-shrink-0 mr-2 mt-1">
+                    <NomoLogo size="sm" animated />
+                  </div>
+                  <div className="bg-white border border-[#E2E8F0] px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm">
+                    <span className="text-[#64748B]">Nomo reflechit...</span>
                   </div>
                 </div>
               )}
@@ -357,28 +363,28 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Input at bottom - sticky within the flex container */}
-          <div className="sticky bottom-0 bg-white border-t border-[#EFEFEF] px-6 py-4">
-            <form onSubmit={handleSubmit} className="max-w-[768px] mx-auto">
+          {/* Fixed input at bottom */}
+          <div className="fixed bottom-0 left-0 right-0 md:left-[260px] bg-[#F8FAFC]/80 backdrop-blur-lg border-t border-[#E2E8F0] px-6 py-4">
+            <form onSubmit={handleSubmit} className="max-w-[800px] mx-auto">
               <div className="relative">
                 <textarea
                   value={input}
                   onChange={handleTextareaChange}
                   onKeyDown={handleTextareaKeyDown}
                   onInput={handleTextareaInput}
-                  placeholder="Pose ta question juridique..."
+                  placeholder="Pose ta question..."
                   rows={1}
                   disabled={isLoading}
-                  className="w-full bg-[#F5F5F5] border border-[#E5E5E5] rounded-2xl px-5 py-4 pr-14 resize-none outline-none text-text placeholder:text-[#999] disabled:opacity-50 focus:bg-white focus:border-[#D0D0D0] transition-all min-h-[52px]"
-                  style={{ maxHeight: "200px" }}
+                  className="w-full bg-white border border-[#E2E8F0] rounded-full px-6 py-4 pr-14 resize-none outline-none text-[#1E293B] placeholder:text-[#94A3B8] disabled:opacity-50 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all duration-200 min-h-[56px] shadow-sm"
+                  style={{ maxHeight: "56px" }}
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !hasInput}
-                  className={`absolute right-3 bottom-3 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                     hasInput
-                      ? "bg-[#1C1917] hover:bg-[#2C2927] text-white"
-                      : "bg-[#E5E5E5] text-[#999] cursor-not-allowed"
+                      ? "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-md"
+                      : "bg-[#E2E8F0] text-[#94A3B8] cursor-not-allowed"
                   }`}
                   aria-label="Envoyer"
                 >
@@ -392,8 +398,8 @@ export default function ChatPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M22 2L11 13" />
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>
                 </button>
               </div>
@@ -402,5 +408,13 @@ export default function ChatPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="h-full flex flex-col bg-[#F8FAFC]" />}>
+      <ChatPageContent />
+    </Suspense>
   );
 }

@@ -16,6 +16,9 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Nomo",
   description: "L'IA juridique des etudiants.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

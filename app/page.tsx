@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DemoChat } from "@/components/demo-chat";
+import { NomoLogo } from "@/components/NomoLogo";
 
 const features = [
   {
@@ -65,8 +66,9 @@ export default function Home() {
           scrolled ? "bg-background/80 backdrop-blur-sm" : "bg-transparent"
         }`}
       >
-        <Link href="/" className="font-serif text-[24px] text-text">
-          Nomo
+        <Link href="/" className="flex items-center gap-2">
+          <NomoLogo size="md" />
+          <span className="font-serif text-[24px] text-text">Nomo</span>
         </Link>
         <Link
           href="/login"
@@ -81,6 +83,15 @@ export default function Home() {
         {/* Hero - reduced padding */}
         <section className="pt-24 md:pt-28 px-4 mb-12 md:mb-16">
           <div className="text-center max-w-4xl mx-auto">
+            {/* Logo */}
+            <div
+              className={`flex justify-center mb-6 ${
+                mounted ? "animate-fade-in-up" : "opacity-0"
+              }`}
+            >
+              <NomoLogo size="lg" />
+            </div>
+
             <h1
               className={`text-[44px] md:text-[64px] font-extrabold leading-[1.1] tracking-tight ${
                 mounted ? "animate-hero-title" : "opacity-0"

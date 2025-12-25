@@ -3,8 +3,11 @@ dotenv.config({ path: ".env.local" });
 
 import { createClient } from "@supabase/supabase-js";
 
+const BATCH_SIZE = 100;
+
 async function main() {
   console.log("=== Fix Legifrance URLs ===\n");
+  console.log("Removing date suffix from URLs...\n");
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -16,86 +19,87 @@ async function main() {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Fetch all articles
-  console.log("1. Fetching all articles...");
-  const { data: articles, error } = await supabase
+  // Count total articles
+  const { count: totalCount } = await supabase
     .from("law_articles")
-    .select("id, article_number, source_url")
-    .eq("code_name", "Code civil");
+    .select("*", { count: "exact", head: true });
 
-  if (error) {
-    console.error("Error fetching articles:", error);
+  console.log(`Total articles in database: ${totalCount}\n`);
+
+  // Find articles with date suffix in URL (format: /YYYY-MM-DD at end)
+  const { data: articlesToFix, error: fetchError } = await supabase
+    .from("law_articles")
+    .select("id, source_url")
+    .like("source_url", "%/____-__-__");
+
+  if (fetchError) {
+    console.error("Error fetching articles:", fetchError);
     process.exit(1);
   }
 
-  console.log(`   Found ${articles?.length || 0} articles\n`);
-
-  if (!articles || articles.length === 0) {
-    console.log("No articles found.");
+  if (!articlesToFix || articlesToFix.length === 0) {
+    console.log("All URLs already in correct format. Nothing to fix!");
     return;
   }
 
-  // Check URLs
-  console.log("2. Checking URLs...\n");
+  console.log(`Found ${articlesToFix.length} articles to fix\n`);
 
-  const correctFormat = /^https:\/\/www\.legifrance\.gouv\.fr\/codes\/article_lc\/LEGIARTI\d+$/;
-  const invalidArticles: typeof articles = [];
-  const emptyUrls: typeof articles = [];
-  const validArticles: typeof articles = [];
+  // Process in batches
+  let successCount = 0;
+  let errorCount = 0;
 
-  for (const article of articles) {
-    if (!article.source_url || article.source_url.trim() === "") {
-      emptyUrls.push(article);
-    } else if (!correctFormat.test(article.source_url)) {
-      invalidArticles.push(article);
-    } else {
-      validArticles.push(article);
+  for (let i = 0; i < articlesToFix.length; i += BATCH_SIZE) {
+    const batch = articlesToFix.slice(i, i + BATCH_SIZE);
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(articlesToFix.length / BATCH_SIZE);
+
+    console.log(`Processing batch ${batchNum}/${totalBatches}...`);
+
+    for (const article of batch) {
+      // Remove date suffix from URL
+      // From: https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI.../2025-12-24
+      // To: https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI...
+      const newUrl = article.source_url?.replace(/\/\d{4}-\d{2}-\d{2}$/, "");
+
+      if (!newUrl || newUrl === article.source_url) {
+        console.error(`  Could not fix URL: ${article.source_url}`);
+        errorCount++;
+        continue;
+      }
+
+      const { error: updateError } = await supabase
+        .from("law_articles")
+        .update({ source_url: newUrl })
+        .eq("id", article.id);
+
+      if (updateError) {
+        console.error(`  Error updating ${article.id}:`, updateError);
+        errorCount++;
+      } else {
+        successCount++;
+      }
     }
-  }
 
-  console.log(`   Valid URLs: ${validArticles.length}`);
-  console.log(`   Empty URLs: ${emptyUrls.length}`);
-  console.log(`   Invalid URLs: ${invalidArticles.length}`);
-
-  if (emptyUrls.length > 0) {
-    console.log("\n   Articles with empty URLs:");
-    emptyUrls.slice(0, 10).forEach((a) => {
-      console.log(`     - ${a.article_number} (id: ${a.id})`);
-    });
-    if (emptyUrls.length > 10) {
-      console.log(`     ... and ${emptyUrls.length - 10} more`);
-    }
-  }
-
-  if (invalidArticles.length > 0) {
-    console.log("\n   Articles with invalid URLs:");
-    invalidArticles.slice(0, 10).forEach((a) => {
-      console.log(`     - ${a.article_number}: ${a.source_url}`);
-    });
-    if (invalidArticles.length > 10) {
-      console.log(`     ... and ${invalidArticles.length - 10} more`);
-    }
-  }
-
-  // Show sample of valid URLs
-  if (validArticles.length > 0) {
-    console.log("\n   Sample valid URLs:");
-    validArticles.slice(0, 3).forEach((a) => {
-      console.log(`     - ${a.article_number}: ${a.source_url}`);
-    });
+    console.log(`  Batch ${batchNum} done (${successCount} success, ${errorCount} errors)`);
   }
 
   console.log("\n=== Summary ===");
-  console.log(`Total articles: ${articles.length}`);
-  console.log(`Valid: ${validArticles.length} (${((validArticles.length / articles.length) * 100).toFixed(1)}%)`);
-  console.log(`Need fixing: ${emptyUrls.length + invalidArticles.length}`);
+  console.log(`Total processed: ${articlesToFix.length}`);
+  console.log(`Success: ${successCount}`);
+  console.log(`Errors: ${errorCount}`);
 
-  // If there are articles to fix, we would need to re-fetch from Legifrance API
-  // For now, just report the status
-  if (emptyUrls.length + invalidArticles.length > 0) {
-    console.log("\nTo fix URLs, you need to:");
-    console.log("1. Delete affected articles from the database");
-    console.log("2. Re-run the import script: npm run import:legifrance");
+  // Verify fix
+  console.log("\n=== Verification ===");
+  const { data: sampleArticles } = await supabase
+    .from("law_articles")
+    .select("article_number, source_url")
+    .limit(3);
+
+  if (sampleArticles) {
+    console.log("Sample URLs after fix:");
+    sampleArticles.forEach((a) => {
+      console.log(`  ${a.article_number}: ${a.source_url}`);
+    });
   }
 }
 

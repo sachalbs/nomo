@@ -14,13 +14,16 @@
     "import:code-commerce": "npx tsx scripts/import-legifrance.ts commerce",
     "import:code-travail": "npx tsx scripts/import-legifrance.ts travail",
     "import:code-procedure-civile": "npx tsx scripts/import-legifrance.ts procedure-civile",
-    "fix:urls": "npx tsx scripts/fix-urls.ts"
+    "fix:urls": "npx tsx scripts/fix-urls.ts",
+    "check:urls": "npx tsx scripts/check-urls.ts",
+    "test:rag": "npx tsx scripts/test-rag.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
     "@tailwindcss/typography": "^0.5.19",
     "dotenv": "^16.4.5",
+    "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
