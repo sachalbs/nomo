@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { generateEmbedding } from "@/lib/embeddings";
+import Anthropic from "@anthropic-ai/sdk";
 
 interface LawArticleSource {
   id: string;
@@ -21,6 +22,50 @@ interface CourtDecisionSource {
   summary: string;
   source_url: string;
   similarity: number;
+}
+
+// Keywords that indicate a legal question requiring RAG search
+const LEGAL_KEYWORDS = [
+  // General legal terms
+  "article", "loi", "code", "droit", "juridique", "legal", "justice",
+  "tribunal", "cour", "juge", "avocat", "jurisprudence",
+  // Contract law
+  "contrat", "obligation", "clause", "consentement", "nullite", "resiliation",
+  "inexecution", "dommages", "interets", "creancier", "debiteur",
+  // Tort law
+  "responsabilite", "faute", "prejudice", "reparation", "indemnisation",
+  "negligence", "dommage",
+  // Criminal law
+  "penal", "crime", "delit", "infraction", "peine", "amende", "prison",
+  // Labor law
+  "travail", "licenciement", "cdi", "cdd", "salarie", "employeur",
+  "contrat de travail", "preavis", "indemnite",
+  // Commercial law
+  "commerce", "commercial", "societe", "entreprise", "faillite",
+  // Civil law
+  "civil", "mariage", "divorce", "heritage", "succession", "propriete",
+  // Court decisions
+  "arret", "cassation", "appel", "pourvoi", "chronopost", "pleniere",
+  // Specific codes
+  "code civil", "code penal", "code du travail", "code de commerce",
+  // Legal concepts
+  "prescription", "forclusion", "caducite", "vice", "erreur", "dol",
+  "violence", "lesion", "capacite", "incapacite",
+];
+
+function isLegalQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+
+  // Check if message is too short (likely a greeting)
+  if (message.trim().length < 15) {
+    // Unless it contains a clear legal reference like "article 1240"
+    if (!/article\s*\d+/i.test(message)) {
+      return false;
+    }
+  }
+
+  // Check for legal keywords
+  return LEGAL_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
 }
 
 type CasPratiqueDetection = "explicit" | "uncertain" | "none";
@@ -353,42 +398,42 @@ export async function POST(request: NextRequest) {
       console.log("[CAS PRATIQUE] Uncertain - will ask user for preference");
     }
 
-    // Build messages array for Mistral with dynamic system prompt
+    // Build system prompt with dynamic content
     const systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection);
-    const messages = [
-      { role: "system", content: systemPrompt },
+
+    // Build messages for Claude (history + current message)
+    const claudeMessages = [
       ...(history || []).map((msg) => ({
         role: msg.role as "user" | "assistant",
         content: msg.content,
       })),
     ];
 
-    // Call Mistral AI
-    const mistralResponse = await fetch(
-      "https://api.mistral.ai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages,
-        }),
-      }
-    );
+    // Call Claude API
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
 
-    if (!mistralResponse.ok) {
-      console.error("Mistral API error:", await mistralResponse.text());
+    let assistantMessage = "";
+
+    try {
+      const claudeResponse = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: claudeMessages,
+      });
+
+      // Extract text response
+      const textContent = claudeResponse.content.find((c) => c.type === "text");
+      assistantMessage = textContent?.text || "";
+    } catch (error) {
+      console.error("Claude API error:", error);
       return NextResponse.json(
         { error: "Failed to get AI response" },
         { status: 500 }
       );
     }
-
-    const mistralData = await mistralResponse.json();
-    const assistantMessage = mistralData.choices[0]?.message?.content || "";
 
     // Format sources for response (articles + jurisprudence)
     // Deduplicate articles by article_number

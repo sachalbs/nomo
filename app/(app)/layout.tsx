@@ -133,10 +133,10 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC]">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`bg-white border-r border-[#E2E8F0] flex flex-col transition-all duration-200 ease-in-out ${
+        className={`h-screen bg-white border-r border-[#E2E8F0] flex flex-col flex-shrink-0 transition-all duration-200 ease-in-out ${
           sidebarOpen ? "w-[260px]" : "w-0 overflow-hidden"
         }`}
       >
@@ -276,7 +276,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         {/* Header when sidebar is closed */}
         {!sidebarOpen && (
           <header className="h-14 px-4 flex items-center gap-4 border-b border-[#E2E8F0] bg-white">
@@ -308,7 +308,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             </span>
           </header>
         )}
-        <div className="flex-1 flex flex-col">{children}</div>
+        <div className="flex-1 flex flex-col min-h-0">{children}</div>
       </main>
 
       {/* Delete confirmation modal */}
