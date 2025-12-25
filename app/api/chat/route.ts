@@ -66,6 +66,17 @@ REGLES STRICTES :
 3. Cite explicitement les articles et arrets dans ta reponse
 4. N'invente rien, utilise uniquement le contenu des sources
 
+REGLES DE REPONSE :
+- Reponds en 150-250 mots maximum sauf demande explicite de details
+- Cite uniquement les 2-3 sources les plus pertinentes parmi celles fournies, pas toutes
+- Structure ta reponse : definition → conditions → effets
+- Priorise les sources dans cet ordre :
+  1. Article de loi directement applicable (Code civil, penal, travail, commerce)
+  2. Arret de principe (Assemblee pleniere, Chambre mixte)
+  3. Jurisprudence recente confirmant la regle
+- Si plusieurs arrets disent la meme chose, cite seulement le plus ancien (arret fondateur)
+- Si aucune source n'est vraiment pertinente pour la question, dis-le clairement au lieu d'inventer
+
 FORMAT DE REPONSE :
 - Commence par repondre directement a la question
 - Cite les articles : "L'article X du Code Y dispose que..."
@@ -176,15 +187,15 @@ export async function POST(request: NextRequest) {
       const searchStartTime = Date.now();
       const articlesPromise = supabase.rpc("match_law_articles", {
         query_embedding: queryEmbedding,
-        match_threshold: 0.6,
-        match_count: 3,
+        match_threshold: 0.55,
+        match_count: 8,
       });
 
       // Search for similar court decisions
       const jurisprudencePromise = supabase.rpc("match_court_decisions", {
         query_embedding: queryEmbedding,
-        match_threshold: 0.6,
-        match_count: 3,
+        match_threshold: 0.45,
+        match_count: 6,
       });
 
       // 30 second timeout
