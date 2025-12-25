@@ -23,53 +23,57 @@ interface CourtDecisionSource {
   similarity: number;
 }
 
-// Keywords that indicate a legal question requiring RAG search
-const LEGAL_KEYWORDS = [
-  // General legal terms
-  "article", "loi", "code", "droit", "juridique", "legal", "justice",
-  "tribunal", "cour", "juge", "avocat", "jurisprudence",
-  // Contract law
-  "contrat", "obligation", "clause", "consentement", "nullite", "resiliation",
-  "inexecution", "dommages", "interets", "creancier", "debiteur",
-  // Tort law
-  "responsabilite", "faute", "prejudice", "reparation", "indemnisation",
-  "negligence", "dommage",
-  // Criminal law
-  "penal", "crime", "delit", "infraction", "peine", "amende", "prison",
-  // Labor law
-  "travail", "licenciement", "cdi", "cdd", "salarie", "employeur",
-  "contrat de travail", "preavis", "indemnite",
-  // Commercial law
-  "commerce", "commercial", "societe", "entreprise", "faillite",
-  // Civil law
-  "civil", "mariage", "divorce", "heritage", "succession", "propriete",
-  // Court decisions
-  "arret", "cassation", "appel", "pourvoi", "chronopost", "pleniere",
-  // Specific codes
-  "code civil", "code penal", "code du travail", "code de commerce",
-  // Legal concepts
-  "prescription", "forclusion", "caducite", "vice", "erreur", "dol",
-  "violence", "lesion", "capacite", "incapacite",
-];
+type CasPratiqueDetection = "explicit" | "uncertain" | "none";
 
-function isLegalQuestion(message: string): boolean {
+function detectCasPratique(message: string): CasPratiqueDetection {
   const lowerMessage = message.toLowerCase();
 
-  // Check if message is too short (likely a greeting)
-  if (message.trim().length < 15) {
-    // Unless it contains a clear legal reference like "article 1240"
-    if (!/article\s*\d+/i.test(message)) {
-      return false;
-    }
+  // Check for EXPLICIT cas pratique keywords
+  const explicitKeywords = ["cas pratique", "cas-pratique"];
+  if (explicitKeywords.some(keyword => lowerMessage.includes(keyword))) {
+    return "explicit";
   }
 
-  // Check for legal keywords
-  return LEGAL_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
+  // Check for typical case study indicators
+  const caseStudyKeywords = ["en l'espèce", "en l'occurrence", "en l'espece", "résoudre ce cas"];
+  const hasCaseStudyKeywords = caseStudyKeywords.some(keyword => lowerMessage.includes(keyword));
+
+  // Check for typical case study questions
+  const questionPatterns = [
+    "peut-il", "peut-elle", "peuvent-ils",
+    "a-t-il le droit", "a-t-elle le droit",
+    "que risque", "quel risque",
+    "quelle solution", "quelle sanction",
+    "est-il possible", "est-ce possible",
+    "comment peut", "que peut",
+    "quelles sont les conséquences"
+  ];
+
+  const hasQuestion = questionPatterns.some(pattern => lowerMessage.includes(pattern));
+
+  // Check if message contains factual elements (people, legal actors)
+  const hasFactualElements = (
+    /\b(monsieur|madame|m\.|mme|personne|société|entreprise|employeur|salarié|locataire|propriétaire|vendeur|acheteur|client)\b/i.test(message) ||
+    message.length > 150 // Long factual description
+  );
+
+  // If has case study keywords → explicit
+  if (hasCaseStudyKeywords) {
+    return "explicit";
+  }
+
+  // If has question + factual elements → uncertain (might be a case study)
+  if (hasQuestion && hasFactualElements) {
+    return "uncertain";
+  }
+
+  return "none";
 }
 
 function buildSystemPrompt(
   sources: LawArticleSource[],
-  jurisprudence: CourtDecisionSource[]
+  jurisprudence: CourtDecisionSource[],
+  casPratiqueDetection: CasPratiqueDetection = "none"
 ): string {
   const hasArticles = sources.length > 0;
   const hasJurisprudence = jurisprudence.length > 0;
@@ -100,6 +104,49 @@ COMPORTEMENT :
         .join("\n\n")
     : "Aucune jurisprudence pertinente trouvee.";
 
+  const casPratiqueMethodology = casPratiqueDetection === "explicit" ? `
+
+MÉTHODOLOGIE CAS PRATIQUE :
+
+L'utilisateur a explicitement demandé un cas pratique. Tu DOIS structurer ta réponse selon le syllogisme juridique :
+
+1. **Qualification des faits**
+   - Situe le cas en une phrase (thème juridique : droit du travail, droit des contrats, etc.)
+   - Résume les faits pertinents en utilisant des termes juridiques
+   - Qualifie les parties (ex: "le locataire", "l'employeur", "le vendeur") plutôt que les noms propres
+
+2. **Problème de droit**
+   - Formule la question juridique de manière générale et abstraite
+   - Ne te réfère pas aux faits spécifiques de l'espèce
+   - Exemple : "Un salarié peut-il..." plutôt que "M. Dupont peut-il..."
+
+3. **Règle de droit applicable (Majeure)**
+   - Cite les articles de loi pertinents en les reformulant (ne recopie pas)
+   - Mentionne la jurisprudence applicable avec les arrêts fournis
+   - Respecte la hiérarchie des normes (Constitution > Traités > Lois > Règlements)
+
+4. **Application aux faits (Mineure)**
+   - Commence par "En l'espèce..."
+   - Applique concrètement la règle de droit aux faits qualifiés
+   - Si plusieurs solutions sont possibles, envisage-les toutes et argumente
+
+5. **Conclusion**
+   - Énonce les conséquences juridiques en quelques lignes
+   - Réponds directement à la question posée
+
+` : casPratiqueDetection === "uncertain" ? `
+
+DÉTECTION CAS PRATIQUE :
+
+Tu as détecté une situation juridique factuelle, mais ce n'est pas clair si l'utilisateur veut un cas pratique structuré ou une simple explication.
+
+COMMENCE TA RÉPONSE PAR :
+"Il semble que tu me présentes une situation juridique concrète. Souhaites-tu que je structure ma réponse sous forme de cas pratique (avec syllogisme juridique : qualification des faits, problème de droit, majeure, mineure, conclusion) ou préfères-tu une explication simple et directe ?"
+
+PUIS donne une réponse courte et directe à la question en utilisant les sources.
+
+` : '';
+
   return `Tu es Nomo, un assistant juridique pour les etudiants en droit francais.
 
 ⚠️ INSTRUCTION OBLIGATOIRE : Tu DOIS utiliser les sources ci-dessous pour repondre. Des sources pertinentes ont ete trouvees pour cette question.
@@ -109,20 +156,9 @@ REGLES STRICTES :
 2. Ne dis JAMAIS "je n'ai pas trouve" si des sources sont presentes ci-dessous
 3. Cite explicitement les articles et arrets dans ta reponse
 4. N'invente rien, utilise uniquement le contenu des sources
-
-REGLES DE REPONSE :
-- Reponds en 150-250 mots maximum sauf demande explicite de details
-- Cite uniquement les 2-3 sources les plus pertinentes parmi celles fournies, pas toutes
-- Structure ta reponse : definition → conditions → effets
-- Priorise les sources dans cet ordre :
-  1. Article de loi directement applicable (Code civil, penal, travail, commerce)
-  2. Arret de principe (Assemblee pleniere, Chambre mixte)
-  3. Jurisprudence recente confirmant la regle
-- Si plusieurs arrets disent la meme chose, cite seulement le plus ancien (arret fondateur)
-- Si aucune source n'est vraiment pertinente pour la question, dis-le clairement au lieu d'inventer
-
+${casPratiqueMethodology}
 FORMAT DE REPONSE :
-- Commence par repondre directement a la question
+- ${casPratiqueDetection === "explicit" ? 'SUIS STRICTEMENT la méthodologie du cas pratique ci-dessus (5 étapes obligatoires)' : casPratiqueDetection === "uncertain" ? 'Demande d\'abord le format souhaité, puis donne une réponse courte' : 'Commence par repondre directement a la question'}
 - Cite les articles : "L'article X du Code Y dispose que..."
 - Cite les arrets : "L'arret [nom] du [date] a juge que..."
 - Sois pedagogique et clair pour un etudiant en droit
@@ -309,22 +345,16 @@ export async function POST(request: NextRequest) {
       .eq("conversation_id", currentConversationId)
       .order("created_at", { ascending: true });
 
-    // Build messages array for Mistral with dynamic system prompt
-    let systemPrompt: string;
-
-    if (!needsRag) {
-      // Simple conversation prompt (no legal search needed)
-      systemPrompt = `Tu es Nomo, un assistant juridique pour les etudiants en droit francais.
-
-Pour les messages simples (salutations, questions personnelles), reponds naturellement et brievement.
-
-Si l'utilisateur pose une question juridique, invite-le a reformuler avec plus de precision ou a mentionner des termes juridiques specifiques (article, code, contrat, responsabilite, etc.).
-
-Exemple : "Bonjour ! Je suis Nomo, ton assistant juridique. Pose-moi une question sur le droit francais et je chercherai les articles et arrets pertinents pour t'aider."`;
-    } else {
-      systemPrompt = buildSystemPrompt(sources, jurisprudence);
+    // Detect if this is a case study (cas pratique)
+    const casPratiqueDetection = detectCasPratique(message);
+    if (casPratiqueDetection === "explicit") {
+      console.log("[CAS PRATIQUE] Explicit - will use structured methodology");
+    } else if (casPratiqueDetection === "uncertain") {
+      console.log("[CAS PRATIQUE] Uncertain - will ask user for preference");
     }
 
+    // Build messages array for Mistral with dynamic system prompt
+    const systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection);
     const messages = [
       { role: "system", content: systemPrompt },
       ...(history || []).map((msg) => ({
