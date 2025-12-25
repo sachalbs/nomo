@@ -23,6 +23,50 @@ interface CourtDecisionSource {
   similarity: number;
 }
 
+// Keywords that indicate a legal question requiring RAG search
+const LEGAL_KEYWORDS = [
+  // General legal terms
+  "article", "loi", "code", "droit", "juridique", "legal", "justice",
+  "tribunal", "cour", "juge", "avocat", "jurisprudence",
+  // Contract law
+  "contrat", "obligation", "clause", "consentement", "nullite", "resiliation",
+  "inexecution", "dommages", "interets", "creancier", "debiteur",
+  // Tort law
+  "responsabilite", "faute", "prejudice", "reparation", "indemnisation",
+  "negligence", "dommage",
+  // Criminal law
+  "penal", "crime", "delit", "infraction", "peine", "amende", "prison",
+  // Labor law
+  "travail", "licenciement", "cdi", "cdd", "salarie", "employeur",
+  "contrat de travail", "preavis", "indemnite",
+  // Commercial law
+  "commerce", "commercial", "societe", "entreprise", "faillite",
+  // Civil law
+  "civil", "mariage", "divorce", "heritage", "succession", "propriete",
+  // Court decisions
+  "arret", "cassation", "appel", "pourvoi", "chronopost", "pleniere",
+  // Specific codes
+  "code civil", "code penal", "code du travail", "code de commerce",
+  // Legal concepts
+  "prescription", "forclusion", "caducite", "vice", "erreur", "dol",
+  "violence", "lesion", "capacite", "incapacite",
+];
+
+function isLegalQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+
+  // Check if message is too short (likely a greeting)
+  if (message.trim().length < 15) {
+    // Unless it contains a clear legal reference like "article 1240"
+    if (!/article\s*\d+/i.test(message)) {
+      return false;
+    }
+  }
+
+  // Check for legal keywords
+  return LEGAL_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
+}
+
 function buildSystemPrompt(
   sources: LawArticleSource[],
   jurisprudence: CourtDecisionSource[]
@@ -173,41 +217,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate embedding for the user's question
+    // Check if this is a legal question that needs RAG
+    const needsRag = isLegalQuestion(message);
+    console.log(`[RAG] Question juridique detectee: ${needsRag}`);
+
+    // Generate embedding and search only for legal questions
     let sources: LawArticleSource[] = [];
     let jurisprudence: CourtDecisionSource[] = [];
     let searchTimedOut = false;
 
-    try {
-      const startTime = Date.now();
-      const queryEmbedding = await generateEmbedding(message);
-      console.log(`[RAG] Embedding generated in ${Date.now() - startTime}ms`);
+    if (needsRag) {
+      try {
+        const startTime = Date.now();
+        const queryEmbedding = await generateEmbedding(message);
+        console.log(`[RAG] Embedding generated in ${Date.now() - startTime}ms`);
 
-      // Search for similar law articles with timeout
-      const searchStartTime = Date.now();
-      const articlesPromise = supabase.rpc("match_law_articles", {
-        query_embedding: queryEmbedding,
-        match_threshold: 0.55,
-        match_count: 8,
-      });
+        // Search for similar law articles with timeout
+        const searchStartTime = Date.now();
+        const articlesPromise = supabase.rpc("match_law_articles", {
+          query_embedding: queryEmbedding,
+          match_threshold: 0.55,
+          match_count: 3,
+        });
 
-      // Search for similar court decisions
-      const jurisprudencePromise = supabase.rpc("match_court_decisions", {
-        query_embedding: queryEmbedding,
-        match_threshold: 0.45,
-        match_count: 6,
-      });
+        // Search for similar court decisions
+        const jurisprudencePromise = supabase.rpc("match_court_decisions", {
+          query_embedding: queryEmbedding,
+          match_threshold: 0.45,
+          match_count: 2,
+        });
 
-      // 30 second timeout
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), 30000);
-      });
+        // 30 second timeout
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), 30000);
+        });
 
-      // Run both searches in parallel with timeout
-      const [articlesResult, jurisprudenceResult] = await Promise.race([
-        Promise.all([articlesPromise, jurisprudencePromise]),
-        timeoutPromise,
-      ]);
+        // Run both searches in parallel with timeout
+        const [articlesResult, jurisprudenceResult] = await Promise.race([
+          Promise.all([articlesPromise, jurisprudencePromise]),
+          timeoutPromise,
+        ]);
 
       const searchDuration = Date.now() - searchStartTime;
       console.log(`[RAG] Search completed in ${searchDuration}ms`);
@@ -225,15 +274,16 @@ export async function POST(request: NextRequest) {
         jurisprudence = jurisprudenceResult.data || [];
         console.log(`[RAG] Jurisprudence trouvee: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
       }
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      if (errorMsg === "SEARCH_TIMEOUT") {
-        console.error("[RAG] Search timed out after 30s");
-        searchTimedOut = true;
-      } else {
-        console.error("Error in RAG pipeline:", errorMsg);
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        if (errorMsg === "SEARCH_TIMEOUT") {
+          console.error("[RAG] Search timed out after 30s");
+          searchTimedOut = true;
+        } else {
+          console.error("Error in RAG pipeline:", errorMsg);
+        }
       }
-    }
+    } // End of if (needsRag)
 
     // If search timed out, return user-friendly error
     if (searchTimedOut) {
@@ -260,7 +310,21 @@ export async function POST(request: NextRequest) {
       .order("created_at", { ascending: true });
 
     // Build messages array for Mistral with dynamic system prompt
-    const systemPrompt = buildSystemPrompt(sources, jurisprudence);
+    let systemPrompt: string;
+
+    if (!needsRag) {
+      // Simple conversation prompt (no legal search needed)
+      systemPrompt = `Tu es Nomo, un assistant juridique pour les etudiants en droit francais.
+
+Pour les messages simples (salutations, questions personnelles), reponds naturellement et brievement.
+
+Si l'utilisateur pose une question juridique, invite-le a reformuler avec plus de precision ou a mentionner des termes juridiques specifiques (article, code, contrat, responsabilite, etc.).
+
+Exemple : "Bonjour ! Je suis Nomo, ton assistant juridique. Pose-moi une question sur le droit francais et je chercherai les articles et arrets pertinents pour t'aider."`;
+    } else {
+      systemPrompt = buildSystemPrompt(sources, jurisprudence);
+    }
+
     const messages = [
       { role: "system", content: systemPrompt },
       ...(history || []).map((msg) => ({
@@ -297,21 +361,40 @@ export async function POST(request: NextRequest) {
     const assistantMessage = mistralData.choices[0]?.message?.content || "";
 
     // Format sources for response (articles + jurisprudence)
-    const articleSources = sources.map((s) => ({
-      type: "article" as const,
-      article_number: s.article_number,
-      code_name: s.code_name,
-      source_url: s.source_url,
-    }));
+    // Deduplicate articles by article_number
+    const seenArticles = new Set<string>();
+    const articleSources = sources
+      .filter((s) => {
+        if (seenArticles.has(s.article_number)) return false;
+        seenArticles.add(s.article_number);
+        return true;
+      })
+      .slice(0, 3) // Max 3 articles
+      .map((s) => ({
+        type: "article" as const,
+        article_number: s.article_number,
+        code_name: s.code_name,
+        source_url: s.source_url,
+      }));
 
-    const jurisprudenceSources = jurisprudence.map((j) => ({
-      type: "jurisprudence" as const,
-      article_number: `Arret ${j.case_number}`,
-      code_name: `${j.jurisdiction}${j.chambre ? ` - ${j.chambre}` : ""}`,
-      source_url: j.source_url,
-    }));
+    // Deduplicate jurisprudence by case_number
+    const seenCases = new Set<string>();
+    const jurisprudenceSources = jurisprudence
+      .filter((j) => {
+        if (seenCases.has(j.case_number)) return false;
+        seenCases.add(j.case_number);
+        return true;
+      })
+      .slice(0, 2) // Max 2 arrêts
+      .map((j) => ({
+        type: "jurisprudence" as const,
+        article_number: `Arret ${j.case_number}`,
+        code_name: `${j.jurisdiction}${j.chambre ? ` - ${j.chambre}` : ""}`,
+        source_url: j.source_url,
+      }));
 
-    const sourcesForResponse = [...articleSources, ...jurisprudenceSources];
+    // Total max 5 sources
+    const sourcesForResponse = [...articleSources, ...jurisprudenceSources].slice(0, 5);
 
     // Save assistant message with sources
     const { error: assistantMsgError } = await supabase.from("messages").insert({
