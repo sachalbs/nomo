@@ -237,6 +237,12 @@ async function createSupabaseClient() {
   );
 }
 
+// Admin emails with unlimited free access
+const ADMIN_EMAILS = [
+  "sachalbs@outlook.com",
+  "scipbeylouni@gmail.com",
+];
+
 export async function POST(request: NextRequest) {
   try {
     const { message, conversationId } = await request.json();
@@ -257,6 +263,31 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check subscription status
+    const isAdmin = ADMIN_EMAILS.includes(user.email || "");
+
+    if (!isAdmin) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("message_count, is_subscribed")
+        .eq("id", user.id)
+        .single();
+
+      const messageCount = profile?.message_count || 0;
+      const isSubscribed = profile?.is_subscribed || false;
+
+      if (messageCount >= 10 && !isSubscribed) {
+        return NextResponse.json(
+          {
+            error: "subscription_required",
+            message: "Vous avez atteint la limite de 10 messages gratuits. Abonnez-vous pour continuer.",
+            messageCount,
+          },
+          { status: 402 }
+        );
+      }
     }
 
     let currentConversationId = conversationId;
@@ -490,6 +521,9 @@ export async function POST(request: NextRequest) {
       .from("conversations")
       .update({ updated_at: new Date().toISOString() })
       .eq("id", currentConversationId);
+
+    // Increment message count for subscription tracking
+    await supabase.rpc("increment_message_count", { user_id: user.id });
 
     return NextResponse.json({
       response: assistantMessage,

@@ -83,6 +83,9 @@ function ChatPageContent() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [messageCount, setMessageCount] = useState<number>(0);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [showSubscriptionBanner, setShowSubscriptionBanner] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchParams = useSearchParams();
@@ -109,14 +112,27 @@ function ChatPageContent() {
   }, [isLoading]);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.user_metadata?.full_name) {
         const firstName = user.user_metadata.full_name.split(" ")[0];
         setUserName(firstName);
       }
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("message_count, is_subscribed")
+          .eq("id", user.id)
+          .single();
+
+        if (profile) {
+          setMessageCount(profile.message_count || 0);
+          setIsSubscribed(profile.is_subscribed || false);
+        }
+      }
     };
-    fetchUser();
+    fetchUserAndProfile();
   }, [supabase.auth]);
 
   useEffect(() => {
@@ -183,8 +199,17 @@ function ChatPageContent() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle subscription required error
+        if (response.status === 402 && data.error === "subscription_required") {
+          setShowSubscriptionBanner(true);
+          setMessages((prev) => prev.filter((m) => m.id !== "temp-user"));
+          return;
+        }
         throw new Error(data.error || "Failed to send message");
       }
+
+      // Increment local message count
+      setMessageCount((prev) => prev + 1);
 
       if (!conversationId && data.conversationId) {
         setConversationId(data.conversationId);
@@ -232,9 +257,50 @@ function ChatPageContent() {
 
   const isEmpty = messages.length === 0 && !isLoading;
   const hasInput = input.trim().length > 0;
+  const messagesRemaining = Math.max(0, 10 - messageCount);
 
   return (
     <div className="h-full flex flex-col bg-[#F8FAFC]">
+      {/* Subscription banner */}
+      {showSubscriptionBanner && (
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-4">
+          <div className="max-w-[800px] mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span className="text-amber-800">
+                Vous avez atteint la limite de 10 messages gratuits.
+              </span>
+            </div>
+            <button
+              onClick={() => router.push("/pricing")}
+              className="px-4 py-2 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-[#1D4ED8] transition-colors"
+            >
+              S'abonner
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Messages remaining indicator (only show if not subscribed and has used messages) */}
+      {!isSubscribed && messageCount > 0 && !showSubscriptionBanner && (
+        <div className="bg-[#EFF6FF] border-b border-[#DBEAFE] px-6 py-2">
+          <div className="max-w-[800px] mx-auto flex items-center justify-center gap-2 text-sm text-[#2563EB]">
+            <span>{messagesRemaining} message{messagesRemaining !== 1 ? 's' : ''} gratuit{messagesRemaining !== 1 ? 's' : ''} restant{messagesRemaining !== 1 ? 's' : ''}</span>
+            <span className="text-[#94A3B8]">•</span>
+            <button
+              onClick={() => router.push("/pricing")}
+              className="font-medium hover:underline"
+            >
+              Passer à l'illimité
+            </button>
+          </div>
+        </div>
+      )}
+
       {isEmpty ? (
         // Empty state - centered input
         <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-8">

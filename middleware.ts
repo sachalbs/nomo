@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const FREE_MESSAGES_LIMIT = 5;
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -35,8 +37,8 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Protect /chat routes - redirect to login if not authenticated
-  if (pathname.startsWith("/chat") && !user) {
+  // Protect /chat and /pricing routes - redirect to login if not authenticated
+  if ((pathname.startsWith("/chat") || pathname.startsWith("/pricing")) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -49,9 +51,34 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Check subscription for chat API
+  if (pathname === "/api/chat" && request.method === "POST" && user) {
+    // Get user profile with subscription status and message count
+    const { data: profile } = await supabase
+      .from("users")
+      .select("is_subscribed, message_count")
+      .eq("id", user.id)
+      .single();
+
+    const isSubscribed = profile?.is_subscribed || false;
+    const messageCount = profile?.message_count || 0;
+
+    // Allow if subscribed or under free limit
+    if (!isSubscribed && messageCount >= FREE_MESSAGES_LIMIT) {
+      return NextResponse.json(
+        {
+          error: "subscription_required",
+          message: `Vous avez atteint la limite de ${FREE_MESSAGES_LIMIT} messages gratuits. Abonnez-vous pour continuer.`,
+          redirectUrl: "/pricing",
+        },
+        { status: 402 }
+      );
+    }
+  }
+
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/chat/:path*", "/login", "/signup"],
+  matcher: ["/chat/:path*", "/pricing/:path*", "/login", "/signup", "/api/chat"],
 };
