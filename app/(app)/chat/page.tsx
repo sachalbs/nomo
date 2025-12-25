@@ -69,10 +69,18 @@ function formatTime(dateString: string): string {
   });
 }
 
+const loadingSteps = [
+  "Analyse de votre question...",
+  "Recherche dans 24 000 articles de loi...",
+  "Identification des sources pertinentes...",
+  "Redaction de la reponse...",
+];
+
 function ChatPageContent() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -80,6 +88,25 @@ function ChatPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const supabase = createClient();
+
+  // Progress through loading steps
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingStep(0);
+      return;
+    }
+
+    // Step 0 immediately, then progress through steps
+    const timers: NodeJS.Timeout[] = [];
+
+    timers.push(setTimeout(() => setLoadingStep(1), 800));
+    timers.push(setTimeout(() => setLoadingStep(2), 2500));
+    timers.push(setTimeout(() => setLoadingStep(3), 4000));
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [isLoading]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -212,8 +239,8 @@ function ChatPageContent() {
         // Empty state - centered input
         <div className="flex-1 flex flex-col items-center justify-center px-6 -mt-8">
           {/* Logo + Greeting */}
-          <div className="flex items-center gap-3 mb-8">
-            <NomoLogo size="lg" variant="outline" />
+          <div className="flex items-center gap-4 mb-8">
+            <NomoLogo size="xl" variant="outline" breathing />
             <h1 className="font-semibold text-[32px] text-[#1E293B]">
               {userName ? `Bonjour, ${userName}` : "Pose ta question juridique"}
             </h1>
@@ -289,8 +316,8 @@ function ChatPageContent() {
                 >
                   {/* Logo for assistant messages */}
                   {msg.role === "assistant" && (
-                    <div className="flex-shrink-0 mr-2 mt-1">
-                      <NomoLogo size="sm" />
+                    <div className="flex-shrink-0 mr-3">
+                      <NomoLogo size="md" variant="filled" />
                     </div>
                   )}
 
@@ -351,11 +378,31 @@ function ChatPageContent() {
               ))}
               {isLoading && (
                 <div className="chat-message flex justify-start">
-                  <div className="flex-shrink-0 mr-2 mt-1">
-                    <NomoLogo size="sm" animated />
+                  <div className="flex-shrink-0 mr-3">
+                    <NomoLogo size="md" variant="filled" animated />
                   </div>
-                  <div className="bg-white border border-[#E2E8F0] px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm">
-                    <span className="text-[#64748B]">Nomo reflechit...</span>
+                  <div className="bg-white border border-[#E2E8F0] px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm min-w-[280px]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#1E293B] font-medium transition-all duration-300">
+                        {loadingSteps[loadingStep]}
+                      </span>
+                      <span className="flex gap-0.5">
+                        <span className="w-1.5 h-1.5 bg-[#2563EB] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <span className="w-1.5 h-1.5 bg-[#2563EB] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-1.5 h-1.5 bg-[#2563EB] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      </span>
+                    </div>
+                    {/* Progress indicator */}
+                    <div className="mt-2 flex gap-1">
+                      {loadingSteps.map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                            i <= loadingStep ? "bg-[#2563EB]" : "bg-[#E2E8F0]"
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

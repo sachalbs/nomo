@@ -1,19 +1,31 @@
 interface NomoLogoProps {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   variant?: "filled" | "outline";
   animated?: boolean;
+  breathing?: boolean;
 }
 
 const sizes = {
   sm: 24,
   md: 32,
   lg: 48,
+  xl: 64,
 };
 
-export function NomoLogo({ size = "md", variant = "filled", animated = false }: NomoLogoProps) {
+export function NomoLogo({
+  size = "md",
+  variant = "filled",
+  animated = false,
+  breathing = false,
+}: NomoLogoProps) {
   const px = sizes[size];
   const isFilled = variant === "filled";
   const strokeColor = isFilled ? "white" : "#2563EB";
+
+  const classes = [
+    animated ? "nomo-logo-animated" : "",
+    breathing ? "nomo-logo-breathing" : "",
+  ].filter(Boolean).join(" ");
 
   return (
     <svg
@@ -21,7 +33,7 @@ export function NomoLogo({ size = "md", variant = "filled", animated = false }: 
       fill="none"
       width={px}
       height={px}
-      className={animated ? "nomo-logo-animated" : ""}
+      className={classes || undefined}
     >
       {isFilled && <rect width="64" height="64" rx="16" fill="#2563EB" />}
       <path
@@ -48,8 +60,15 @@ export function NomoLogo({ size = "md", variant = "filled", animated = false }: 
         className={animated ? "nomo-line-3" : ""}
       />
       <style>
-        {animated
-          ? `
+        {`
+          .nomo-logo-breathing {
+            animation: nomo-breathing 3s ease-in-out infinite;
+          }
+          @keyframes nomo-breathing {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+          }
+          ${animated ? `
           .nomo-line-1 {
             animation: nomo-pulse-1 1.5s ease-in-out infinite;
           }
@@ -74,8 +93,8 @@ export function NomoLogo({ size = "md", variant = "filled", animated = false }: 
             33% { opacity: 0.6; }
             66% { opacity: 1; }
           }
-        `
-          : ""}
+          ` : ""}
+        `}
       </style>
     </svg>
   );

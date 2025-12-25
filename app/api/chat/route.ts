@@ -12,8 +12,25 @@ interface LawArticleSource {
   similarity: number;
 }
 
-function buildSystemPrompt(sources: LawArticleSource[]): string {
-  if (sources.length === 0) {
+interface CourtDecisionSource {
+  id: string;
+  case_number: string;
+  jurisdiction: string;
+  chambre: string;
+  date_decision: string;
+  summary: string;
+  source_url: string;
+  similarity: number;
+}
+
+function buildSystemPrompt(
+  sources: LawArticleSource[],
+  jurisprudence: CourtDecisionSource[]
+): string {
+  const hasArticles = sources.length > 0;
+  const hasJurisprudence = jurisprudence.length > 0;
+
+  if (!hasArticles && !hasJurisprudence) {
     return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
 
 Je n'ai pas trouvé de sources juridiques pertinentes pour cette question.
@@ -24,27 +41,42 @@ COMPORTEMENT :
 - N'invente JAMAIS d'articles, d'arrêts ou de concepts juridiques`;
   }
 
-  const sourcesText = sources
-    .map((s) => `[${s.article_number} - ${s.code_name}]\n${s.content}`)
-    .join("\n\n");
+  const articlesText = hasArticles
+    ? sources
+        .map((s) => `[${s.article_number} - ${s.code_name}]\n${s.content}`)
+        .join("\n\n")
+    : "Aucun article pertinent trouve.";
+
+  const jurisprudenceText = hasJurisprudence
+    ? jurisprudence
+        .map(
+          (j) =>
+            `- Arret ${j.case_number} (${j.jurisdiction}${j.chambre ? `, ${j.chambre}` : ""}, ${j.date_decision}):\n  ${j.summary}`
+        )
+        .join("\n\n")
+    : "Aucune jurisprudence pertinente trouvee.";
 
   return `Tu es Nomo, un assistant juridique pour les étudiants en droit français.
 
 ⚠️ RÈGLE ABSOLUE : Tu ne peux répondre QU'en utilisant les SOURCES ci-dessous. Tu n'as AUCUNE autre connaissance.
 
 COMPORTEMENT :
-- Si les sources contiennent l'information → réponds en citant les articles exacts
+- Si les sources contiennent l'information → réponds en citant les articles exacts et/ou la jurisprudence
 - Si les sources NE contiennent PAS l'information → dis "Je n'ai pas trouvé cette information dans mes sources juridiques. Essayez de reformuler votre question."
 - N'invente JAMAIS d'articles, d'arrêts ou de concepts juridiques
 - Ne complète JAMAIS avec des connaissances générales
 
 FORMAT DE RÉPONSE :
 - Cite toujours l'article (ex: "L'article 1130 du Code civil dispose que...")
+- Pour la jurisprudence, cite l'arret (ex: "L'arret Chronopost du 22 octobre 1996...")
 - Sois pédagogique et clair
 - Reste concis (pas de listes interminables)
 
-SOURCES DISPONIBLES :
-${sourcesText}
+ARTICLES DE LOI :
+${articlesText}
+
+JURISPRUDENCE PERTINENTE :
+${jurisprudenceText}
 
 Si aucune source n'est pertinente ci-dessus, réponds que tu n'as pas trouvé l'information.`;
 }
@@ -132,6 +164,7 @@ export async function POST(request: NextRequest) {
 
     // Generate embedding for the user's question
     let sources: LawArticleSource[] = [];
+    let jurisprudence: CourtDecisionSource[] = [];
     let searchTimedOut = false;
 
     try {
@@ -141,7 +174,14 @@ export async function POST(request: NextRequest) {
 
       // Search for similar law articles with timeout
       const searchStartTime = Date.now();
-      const searchPromise = supabase.rpc("match_law_articles", {
+      const articlesPromise = supabase.rpc("match_law_articles", {
+        query_embedding: queryEmbedding,
+        match_threshold: 0.6,
+        match_count: 3,
+      });
+
+      // Search for similar court decisions
+      const jurisprudencePromise = supabase.rpc("match_court_decisions", {
         query_embedding: queryEmbedding,
         match_threshold: 0.6,
         match_count: 3,
@@ -152,19 +192,27 @@ export async function POST(request: NextRequest) {
         setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), 30000);
       });
 
-      const { data: matchedSources, error: searchError } = await Promise.race([
-        searchPromise,
+      // Run both searches in parallel with timeout
+      const [articlesResult, jurisprudenceResult] = await Promise.race([
+        Promise.all([articlesPromise, jurisprudencePromise]),
         timeoutPromise,
       ]);
 
       const searchDuration = Date.now() - searchStartTime;
       console.log(`[RAG] Search completed in ${searchDuration}ms`);
 
-      if (searchError) {
-        console.error("Error searching law articles:", searchError);
+      if (articlesResult.error) {
+        console.error("Error searching law articles:", articlesResult.error);
       } else {
-        sources = matchedSources || [];
-        console.log(`[RAG] Sources trouvées: ${sources.length}`, sources.map(s => s.article_number));
+        sources = articlesResult.data || [];
+        console.log(`[RAG] Articles trouves: ${sources.length}`, sources.map(s => s.article_number));
+      }
+
+      if (jurisprudenceResult.error) {
+        console.error("Error searching court decisions:", jurisprudenceResult.error);
+      } else {
+        jurisprudence = jurisprudenceResult.data || [];
+        console.log(`[RAG] Jurisprudence trouvee: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
@@ -201,7 +249,7 @@ export async function POST(request: NextRequest) {
       .order("created_at", { ascending: true });
 
     // Build messages array for Mistral with dynamic system prompt
-    const systemPrompt = buildSystemPrompt(sources);
+    const systemPrompt = buildSystemPrompt(sources, jurisprudence);
     const messages = [
       { role: "system", content: systemPrompt },
       ...(history || []).map((msg) => ({
@@ -237,12 +285,22 @@ export async function POST(request: NextRequest) {
     const mistralData = await mistralResponse.json();
     const assistantMessage = mistralData.choices[0]?.message?.content || "";
 
-    // Format sources for response
-    const sourcesForResponse = sources.map((s) => ({
+    // Format sources for response (articles + jurisprudence)
+    const articleSources = sources.map((s) => ({
+      type: "article" as const,
       article_number: s.article_number,
       code_name: s.code_name,
       source_url: s.source_url,
     }));
+
+    const jurisprudenceSources = jurisprudence.map((j) => ({
+      type: "jurisprudence" as const,
+      article_number: `Arret ${j.case_number}`,
+      code_name: `${j.jurisdiction}${j.chambre ? ` - ${j.chambre}` : ""}`,
+      source_url: j.source_url,
+    }));
+
+    const sourcesForResponse = [...articleSources, ...jurisprudenceSources];
 
     // Save assistant message with sources
     const { error: assistantMsgError } = await supabase.from("messages").insert({
