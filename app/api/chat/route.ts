@@ -299,8 +299,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if this is a legal question that needs RAG
-    const needsRag = isLegalQuestion(message);
-    console.log(`[RAG] Question juridique detectee: ${needsRag}`);
+    // TEMPORAIREMENT DÉSACTIVÉ - toutes les questions passent par le RAG
+    // const needsRag = isLegalQuestion(message);
+    const needsRag = true;
+    console.log(`[RAG] Question juridique detectee: ${needsRag} (filtre desactive)`);
 
     // Generate embedding and search only for legal questions
     let sources: LawArticleSource[] = [];
