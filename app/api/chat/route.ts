@@ -115,6 +115,64 @@ function detectCasPratique(message: string): CasPratiqueDetection {
   return "none";
 }
 
+function extractArticleNumber(message: string): string | null {
+  // Match patterns like "article 108", "Article 1240", "art. 123", "art 456"
+  const patterns = [
+    /\barticle\s+(\d+(?:[.-]\d+)*)/i,
+    /\bart\.?\s+(\d+(?:[.-]\d+)*)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
+function extractCodeName(message: string): string | null {
+  const lowerMessage = message.toLowerCase();
+
+  // Map common code names to exact database names
+  const codeMapping: Record<string, string> = {
+    "code de procédure pénale": "Code de procédure pénale",
+    "code de procedure penale": "Code de procédure pénale",
+    "procédure pénale": "Code de procédure pénale",
+    "procedure penale": "Code de procédure pénale",
+    "cpp": "Code de procédure pénale",
+
+    "code de procédure civile": "Code de procédure civile",
+    "code de procedure civile": "Code de procédure civile",
+    "procédure civile": "Code de procédure civile",
+    "procedure civile": "Code de procédure civile",
+    "cpc": "Code de procédure civile",
+
+    "code civil": "Code civil",
+    "code civ": "Code civil",
+    "cc": "Code civil",
+
+    "code pénal": "Code pénal",
+    "code penal": "Code pénal",
+
+    "code du travail": "Code du travail",
+    "code travail": "Code du travail",
+
+    "code de commerce": "Code de commerce",
+    "code commerce": "Code de commerce",
+  };
+
+  // Check each pattern
+  for (const [pattern, codeName] of Object.entries(codeMapping)) {
+    if (lowerMessage.includes(pattern)) {
+      return codeName;
+    }
+  }
+
+  return null;
+}
+
 function buildSystemPrompt(
   sources: LawArticleSource[],
   jurisprudence: CourtDecisionSource[],
@@ -338,11 +396,55 @@ export async function POST(request: NextRequest) {
     // Generate embedding and search only for legal questions
     let sources: LawArticleSource[] = [];
     let jurisprudence: CourtDecisionSource[] = [];
+    let exactMatchArticles: LawArticleSource[] = [];
     let searchTimedOut = false;
 
     if (needsRag) {
+      // STEP 1: Exact search (separate from vector search)
+      const articleNumber = extractArticleNumber(message);
+      const codeName = extractCodeName(message);
+
+      if (articleNumber) {
+        console.log(`[EXACT MATCH] Detected article number: ${articleNumber}`);
+        if (codeName) {
+          console.log(`[EXACT MATCH] Detected code: ${codeName}`);
+        }
+
+        try {
+          // Direct search for exact article number
+          let query = supabase
+            .from("law_articles")
+            .select("id, code_name, article_number, content, source_url")
+            .ilike("article_number", `%${articleNumber}%`);
+
+          // Filter by code name if detected
+          if (codeName) {
+            query = query.eq("code_name", codeName);
+          }
+
+          const { data: exactMatches, error: exactError } = await query.limit(5);
+
+          if (exactError) {
+            console.error("[EXACT MATCH] Error:", exactError);
+          } else if (exactMatches && exactMatches.length > 0) {
+            exactMatchArticles = exactMatches.map(a => ({
+              ...a,
+              similarity: 1.0, // Perfect match
+            }));
+            console.log(`[EXACT MATCH] Found ${exactMatchArticles.length} articles:`,
+                       exactMatchArticles.map(a => a.article_number));
+          } else {
+            console.log("[EXACT MATCH] No exact matches found");
+          }
+        } catch (error) {
+          console.error("[EXACT MATCH] Exception:", error);
+        }
+      }
+
+      // STEP 2: Vector search (with timeout handling)
       try {
         const startTime = Date.now();
+
         const queryEmbedding = await generateEmbedding(message);
         console.log(`[RAG] Embedding generated in ${Date.now() - startTime}ms`);
 
@@ -350,7 +452,7 @@ export async function POST(request: NextRequest) {
         const searchStartTime = Date.now();
         const articlesPromise = supabase.rpc("match_law_articles", {
           query_embedding: queryEmbedding,
-          match_threshold: 0.55,
+          match_threshold: 0.45,
           match_count: 3,
         });
 
@@ -373,34 +475,66 @@ export async function POST(request: NextRequest) {
         ]);
 
       const searchDuration = Date.now() - searchStartTime;
-      console.log(`[RAG] Search completed in ${searchDuration}ms`);
+      console.log(`[RAG] Vector search completed in ${searchDuration}ms`);
 
+      // Store vector results
+      let vectorArticles: LawArticleSource[] = [];
       if (articlesResult.error) {
-        console.error("Error searching law articles:", articlesResult.error);
+        console.error("[RAG] Error searching law articles:", articlesResult.error);
       } else {
-        sources = articlesResult.data || [];
-        console.log(`[RAG] Articles trouves: ${sources.length}`, sources.map(s => s.article_number));
+        vectorArticles = articlesResult.data || [];
+        console.log(`[RAG] Vector search found: ${vectorArticles.length}`, vectorArticles.map(s => s.article_number));
       }
 
+      // Store jurisprudence results
       if (jurisprudenceResult.error) {
-        console.error("Error searching court decisions:", jurisprudenceResult.error);
+        console.error("[RAG] Error searching court decisions:", jurisprudenceResult.error);
       } else {
         jurisprudence = jurisprudenceResult.data || [];
-        console.log(`[RAG] Jurisprudence trouvee: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
+        console.log(`[RAG] Jurisprudence found: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
       }
+
+      // Combine exact matches with vector results
+      if (exactMatchArticles.length > 0) {
+        // Remove duplicates: filter out vector results that are already in exact matches
+        const exactArticleNumbers = new Set(exactMatchArticles.map(a => a.article_number));
+        const uniqueVectorArticles = vectorArticles.filter(
+          v => !exactArticleNumbers.has(v.article_number)
+        );
+
+        // Exact matches first, then vector results
+        sources = [...exactMatchArticles, ...uniqueVectorArticles].slice(0, 5);
+        console.log(`[COMBINED] Total articles: ${sources.length} (${exactMatchArticles.length} exact + ${uniqueVectorArticles.length} vector)`);
+      } else {
+        sources = vectorArticles;
+      }
+
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         if (errorMsg === "SEARCH_TIMEOUT") {
-          console.error("[RAG] Search timed out after 30s");
+          console.error("[RAG] Vector search timed out after 30s");
           searchTimedOut = true;
         } else {
-          console.error("Error in RAG pipeline:", errorMsg);
+          console.error("[RAG] Error in vector search pipeline:", errorMsg);
         }
+      }
+
+      // STEP 3: Combine results even if vector search failed
+      // If we have exact matches but vector search failed/timed out, use exact matches
+      if (exactMatchArticles.length > 0 && sources.length === 0) {
+        sources = exactMatchArticles;
+        console.log(`[FALLBACK] Using ${sources.length} exact match articles (vector search failed)`);
+      }
+
+      console.log(`[FINAL] Total sources: ${sources.length} articles, ${jurisprudence.length} jurisprudence`);
+      if (sources.length > 0) {
+        console.log(`[FINAL] Articles:`, sources.map(s => `${s.article_number} (sim: ${s.similarity.toFixed(2)})`));
       }
     } // End of if (needsRag)
 
-    // If search timed out, return user-friendly error
-    if (searchTimedOut) {
+    // If search timed out BUT we have exact matches, continue anyway
+    if (searchTimedOut && sources.length === 0 && jurisprudence.length === 0) {
+      console.log("[TIMEOUT] No sources available, returning error");
       // Save timeout message to conversation
       await supabase.from("messages").insert({
         conversation_id: currentConversationId,
@@ -414,6 +548,8 @@ export async function POST(request: NextRequest) {
         conversationId: currentConversationId,
         sources: [],
       });
+    } else if (searchTimedOut) {
+      console.log(`[TIMEOUT] Vector search timed out, but continuing with ${sources.length} exact matches`);
     }
 
     // Get conversation history for context
@@ -433,6 +569,23 @@ export async function POST(request: NextRequest) {
 
     // Build system prompt with dynamic content
     const systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection);
+
+    // DEBUG: Log system prompt
+    console.log("\n========== SYSTEM PROMPT DEBUG ==========");
+    console.log(`Sources count: ${sources.length}`);
+    console.log(`Jurisprudence count: ${jurisprudence.length}`);
+    if (sources.length > 0) {
+      console.log("\n--- Articles in prompt ---");
+      sources.forEach((s, idx) => {
+        console.log(`\n[${idx + 1}] ${s.article_number} - ${s.code_name}`);
+        console.log(`Content length: ${s.content?.length || 0} chars`);
+        console.log(`Content preview: ${s.content?.substring(0, 150) || 'NO CONTENT'}...`);
+        console.log(`Similarity: ${s.similarity}`);
+      });
+    }
+    console.log("\n--- Full System Prompt ---");
+    console.log(systemPrompt);
+    console.log("========== END SYSTEM PROMPT DEBUG ==========\n");
 
     // Build messages for Claude (history + current message)
     const claudeMessages = [

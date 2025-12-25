@@ -11,24 +11,9 @@ import {
   buildLegifranceUrl,
 } from "../lib/legifrance-api";
 
-// Available codes
-const CODES: Record<string, string> = {
-  'civil': 'LEGITEXT000006070721',
-  'penal': 'LEGITEXT000006070719',
-  'commerce': 'LEGITEXT000005634379',
-  'travail': 'LEGITEXT000006072050',
-  'procedure-civile': 'LEGITEXT000006070716',
-  'procedure-penale': 'LEGITEXT000006071154',
-};
-
-const CODE_NAMES: Record<string, string> = {
-  'civil': 'Code civil',
-  'penal': 'Code pénal',
-  'commerce': 'Code de commerce',
-  'travail': 'Code du travail',
-  'procedure-civile': 'Code de procédure civile',
-  'procedure-penale': 'Code de procédure pénale',
-};
+// Code de procédure pénale
+const CODE_ID = "LEGITEXT000006071154";
+const CODE_NAME = "Code de procédure pénale";
 
 const RATE_LIMIT_DELAY = 1500; // 1.5 seconds between requests
 const BATCH_SIZE = 10; // Save progress every N articles
@@ -56,18 +41,7 @@ async function generateEmbeddingWithRetry(text: string, maxRetries = 3): Promise
 }
 
 async function main() {
-  // Parse command line argument
-  const codeArg = process.argv[2] || 'civil';
-  const codeId = CODES[codeArg];
-  const codeName = CODE_NAMES[codeArg];
-
-  if (!codeId || !codeName) {
-    console.error(`Unknown code: ${codeArg}`);
-    console.error(`Available codes: ${Object.keys(CODES).join(', ')}`);
-    process.exit(1);
-  }
-
-  console.log(`=== Legifrance ${codeName} Import ===\n`);
+  console.log(`=== Import ${CODE_NAME} ===\n`);
 
   // Validate environment
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -91,49 +65,69 @@ async function main() {
     process.exit(1);
   }
 
+  console.log("✓ Environment variables validated");
+  console.log(`✓ Supabase URL: ${supabaseUrl}`);
+  console.log(`✓ Code ID: ${CODE_ID}`);
+  console.log(`✓ Code Name: ${CODE_NAME}\n`);
+
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // Step 1: Get table des matieres
   console.log("1. Fetching table des matieres...");
   let tableDesMatieres;
   try {
-    tableDesMatieres = await getTableMatieres(codeId);
-    console.log("   Table des matieres retrieved successfully\n");
+    tableDesMatieres = await getTableMatieres(CODE_ID);
+    console.log("   ✓ Table des matieres retrieved successfully\n");
   } catch (error) {
-    console.error("Failed to fetch table des matieres:", error);
+    console.error("   ✗ Failed to fetch table des matieres:", error);
     process.exit(1);
   }
 
   // Step 2: Extract all article IDs
   console.log("2. Extracting article IDs...");
   const articleRefs = extractArticleIds(tableDesMatieres.sections);
-  console.log(`   Found ${articleRefs.length} articles in force\n`);
+  console.log(`   ✓ Found ${articleRefs.length} articles in force\n`);
 
   // Step 3: Check existing articles to resume import
-  console.log("3. Checking existing articles...");
-  const { data: existingArticles } = await supabase
+  console.log("3. Checking existing articles in database...");
+  const { data: existingArticles, error: fetchError } = await supabase
     .from("law_articles")
     .select("article_number")
-    .eq("code_name", codeName);
+    .eq("code_name", CODE_NAME);
+
+  if (fetchError) {
+    console.error("   ✗ Error fetching existing articles:", fetchError);
+    process.exit(1);
+  }
 
   const existingSet = new Set(
     existingArticles?.map((a) => a.article_number) || []
   );
-  console.log(`   Found ${existingSet.size} existing articles\n`);
+  console.log(`   ✓ Found ${existingSet.size} existing articles in database\n`);
 
   // Filter out already imported articles
   const articlesToImport = articleRefs.filter(
     (ref) => !existingSet.has(`Article ${ref.num}`)
   );
-  console.log(`   ${articlesToImport.length} articles to import\n`);
+  console.log(`   → ${articlesToImport.length} articles to import\n`);
 
   if (articlesToImport.length === 0) {
-    console.log("All articles already imported. Done!");
+    console.log("✓ All articles already imported. Done!");
+
+    // Final verification
+    const { count } = await supabase
+      .from("law_articles")
+      .select("*", { count: "exact", head: true })
+      .eq("code_name", CODE_NAME);
+
+    console.log(`\nTotal ${CODE_NAME} articles in database: ${count}`);
     return;
   }
 
   // Step 4: Import articles
   console.log("4. Starting import...\n");
+  console.log(`   Rate limit: ${RATE_LIMIT_DELAY}ms between requests`);
+  console.log(`   Batch size: ${BATCH_SIZE} articles\n`);
 
   let successCount = 0;
   let errorCount = 0;
@@ -152,17 +146,17 @@ async function main() {
       const cleanText = cleanArticleText(article.texteHtml || article.texte);
 
       if (!cleanText || cleanText.length < 10) {
-        console.log(`${progress} Skipping Article ${num} (empty content)`);
+        console.log(`${progress} ⊘ Skipping Article ${num} (empty content)`);
         continue;
       }
 
       // Generate embedding with retry logic
-      const textToEmbed = `${codeName} Article ${num}: ${cleanText}`;
+      const textToEmbed = `${CODE_NAME} Article ${num}: ${cleanText}`;
       const embedding = await generateEmbeddingWithRetry(textToEmbed);
 
       // Insert into database
       const { error: insertError } = await supabase.from("law_articles").insert({
-        code_name: codeName,
+        code_name: CODE_NAME,
         article_number: `Article ${num}`,
         content: cleanText,
         source_url: buildLegifranceUrl(id),
@@ -170,11 +164,12 @@ async function main() {
       });
 
       if (insertError) {
+        console.error(`${progress} ✗ Database insert error for Article ${num}:`, insertError);
         throw insertError;
       }
 
       successCount++;
-      console.log(`${progress} Imported Article ${num}`);
+      console.log(`${progress} ✓ Imported Article ${num}`);
 
       // Rate limiting
       await sleep(RATE_LIMIT_DELAY);
@@ -182,7 +177,7 @@ async function main() {
       errorCount++;
       const errorMsg = error instanceof Error ? error.message : String(error);
       errors.push({ num, error: errorMsg });
-      console.error(`${progress} Error importing Article ${num}: ${errorMsg}`);
+      console.error(`${progress} ✗ Error importing Article ${num}: ${errorMsg}`);
 
       // Still apply rate limiting on error
       await sleep(RATE_LIMIT_DELAY);
@@ -203,22 +198,34 @@ async function main() {
   console.log(`Errors: ${errorCount}`);
 
   if (errors.length > 0) {
-    console.log("\nFailed articles:");
+    console.log("\n✗ Failed articles:");
     errors.forEach(({ num, error }) => {
       console.log(`  - Article ${num}: ${error}`);
     });
   }
 
-  // Verify total count
-  const { count } = await supabase
+  // Verify total count in database
+  console.log("\n=== Database Verification ===");
+  const { count, error: countError } = await supabase
     .from("law_articles")
     .select("*", { count: "exact", head: true })
-    .eq("code_name", codeName);
+    .eq("code_name", CODE_NAME);
 
-  console.log(`\nTotal ${codeName} articles in database: ${count}`);
+  if (countError) {
+    console.error("✗ Error verifying count:", countError);
+  } else {
+    console.log(`✓ Total ${CODE_NAME} articles in database: ${count}`);
+    console.log(`✓ Expected: ${articleRefs.length}`);
+
+    if (count === articleRefs.length) {
+      console.log("\n🎉 Import complete! All articles successfully imported.");
+    } else {
+      console.log(`\n⚠️  Warning: Database has ${count} articles but expected ${articleRefs.length}`);
+    }
+  }
 }
 
 main().catch((error) => {
-  console.error("Fatal error:", error);
+  console.error("\n✗ Fatal error:", error);
   process.exit(1);
 });
