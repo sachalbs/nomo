@@ -10,7 +10,9 @@
     "import:codes": "npx tsx scripts/import-codes.ts",
     "import:judilibre": "npx tsx scripts/import-judilibre.ts",
     "import:legifrance": "npx tsx scripts/import-legifrance.ts",
-    "import:procedure-penale": "npx tsx scripts/import-procedure-penale.ts"
+    "import:procedure-penale": "npx tsx scripts/import-procedure-penale.ts",
+    "import:procedure-civile": "npx tsx scripts/import-procedure-civile.ts",
+    "test:rag": "npx tsx scripts/test-rag-complete.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

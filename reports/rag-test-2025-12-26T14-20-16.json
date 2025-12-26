@@ -1,0 +1,4227 @@
+{
+  "results": [
+    {
+      "question": "C'est quoi un contrat ?",
+      "niveau": "L1",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "contrat"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1103",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1104",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1101",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1105",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1102",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-10.278",
+        "19-25.478"
+      ],
+      "responseTimeMs": 5985,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'est-ce qu'un crime ?",
+      "niveau": "L1",
+      "domaine": "penal",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal"
+      ],
+      "conceptsMatched": [
+        "prescription pénale"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 7",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 8",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 9",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 9-1",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 212-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.819254900284129
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-84.071",
+        "22-82.468"
+      ],
+      "responseTimeMs": 2279,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'est-ce qu'un CDI ?",
+      "niveau": "L1",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "cdi"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L1221-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1221-2",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1231-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1232-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article R4313-1",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.783956201553779
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-23.743",
+        "24-20.894"
+      ],
+      "responseTimeMs": 1823,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelles sont les conséquences de la requalification d'un CDD en CDI ?",
+      "niveau": "M2",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "cdi",
+        "cdd"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L1221-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1221-2",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1231-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1232-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1241-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-18.876",
+        "21-17.971"
+      ],
+      "responseTimeMs": 1820,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Différence entre faute grave et faute lourde en droit du travail ?",
+      "niveau": "L3",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "responsabilité délictuelle",
+        "divorce",
+        "faute grave"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1243",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1244",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-18.868",
+        "24-81.365"
+      ],
+      "responseTimeMs": 1745,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quels sont les cas de licenciement pour motif personnel ?",
+      "niveau": "L2",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "licenciement",
+        "faute grave"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L1232-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1234-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1234-5",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1233-7",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.833701963991685
+        },
+        {
+          "number": "Article L1233-2",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.832287916609265
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-17.544",
+        "22-16.218"
+      ],
+      "responseTimeMs": 1743,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment la Cour de cassation apprécie-t-elle la faute grave ?",
+      "niveau": "M1",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "responsabilité délictuelle",
+        "divorce",
+        "faute grave"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1243",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1244",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-81.365",
+        "24-86.411"
+      ],
+      "responseTimeMs": 1741,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelle est la responsabilité des dirigeants sociaux en cas de procédure collective ?",
+      "niveau": "M2",
+      "domaine": "commercial",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code de commerce"
+      ],
+      "conceptsMatched": [
+        "abus de biens sociaux"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L241-3",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L242-6",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 7",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 8",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 9",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-10.271",
+        "24-14.565"
+      ],
+      "responseTimeMs": 1663,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelles sont les causes d'exonération de responsabilité ?",
+      "niveau": "L2",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1245-11",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.84102227320363
+        },
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.83712547730705
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.837066507600156
+        },
+        {
+          "number": "Article 121-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.834660534596271
+        },
+        {
+          "number": "Article 385-1",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.830813813636307
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-16.820",
+        "23-10.638"
+      ],
+      "responseTimeMs": 1637,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quel est le délai de prescription pour un délit ?",
+      "niveau": "procedure",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal",
+        "Code de procédure pénale"
+      ],
+      "conceptsMatched": [
+        "prescription civile",
+        "abus de biens sociaux",
+        "prescription pénale"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-83.550",
+        "21-14.479"
+      ],
+      "responseTimeMs": 1586,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment s'articulent la loi Badinter et le droit commun ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 2",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.810282716978098
+        },
+        {
+          "number": "Article L121-5",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.808131213226719
+        },
+        {
+          "number": "Article 2064",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.807581775906517
+        },
+        {
+          "number": "Article 29-5",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.807447020669482
+        },
+        {
+          "number": "Article L670-1-1",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.805417688208237
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-40.013",
+        "21-17.338"
+      ],
+      "responseTimeMs": 1536,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelles sont les conditions de validité d'un contrat ?",
+      "niveau": "L2",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "contrat"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1103",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1104",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1101",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1105",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1102",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "19-25.478",
+        "23-22.883"
+      ],
+      "responseTimeMs": 1523,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comparez le CDI et le CDD",
+      "niveau": "L3",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "cdi",
+        "cdd"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L1221-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1221-2",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1231-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1232-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1241-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-12.381",
+        "22-24.724"
+      ],
+      "responseTimeMs": 1506,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment s'articulent responsabilité pénale et civile en cas d'accident mortel de la circulation ?",
+      "niveau": "M2",
+      "domaine": "mixte",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil",
+        "Code pénal"
+      ],
+      "conceptsMatched": [
+        "responsabilité pénale",
+        "accident"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 121-1",
+          "code": "Code pénal",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 121-2",
+          "code": "Code pénal",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 121-3",
+          "code": "Code pénal",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-18.525",
+        "24-86.411"
+      ],
+      "responseTimeMs": 1506,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelle est la distinction entre crime, délit et contravention ?",
+      "niveau": "L3",
+      "domaine": "penal",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal"
+      ],
+      "conceptsMatched": [
+        "prescription pénale"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 7",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 8",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 9",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 9-1",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 111-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.851407215209366
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-86.411",
+        "23-83.178"
+      ],
+      "responseTimeMs": 1464,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi le divorce ?",
+      "niveau": "L1",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "divorce"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 229",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 232",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 229-2",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 229-1",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-19.154",
+        "23-21.842"
+      ],
+      "responseTimeMs": 1458,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quel est l'impact de la réforme du droit des contrats de 2016 ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "contrat"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1103",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1104",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1101",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1105",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1102",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "19-25.478",
+        "24-14.750"
+      ],
+      "responseTimeMs": 1415,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment s'applique la prescription en matière d'abus de biens sociaux occulte ?",
+      "niveau": "M2",
+      "domaine": "mixte",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code de commerce",
+        "Code de procédure pénale"
+      ],
+      "conceptsMatched": [
+        "prescription civile",
+        "abus de biens sociaux"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-84.249",
+        "24-83.595"
+      ],
+      "responseTimeMs": 1400,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi la prescription ?",
+      "niveau": "ambigue",
+      "domaine": "mixte",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code de procédure pénale"
+      ],
+      "conceptsMatched": [
+        "prescription civile",
+        "abus de biens sociaux"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "20-18.084",
+        "23-16.106"
+      ],
+      "responseTimeMs": 1390,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quel est le délai pour contester un licenciement ?",
+      "niveau": "procedure",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "prescription civile",
+        "licenciement",
+        "faute grave"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-19.401",
+        "24-10.009"
+      ],
+      "responseTimeMs": 1338,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment se déroule l'instruction pénale ?",
+      "niveau": "procedure",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal",
+        "Code de procédure pénale"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 175-2",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.833286409182179
+        },
+        {
+          "number": "Article 52-1",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.830411917790583
+        },
+        {
+          "number": "Article 51",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.829773130684355
+        },
+        {
+          "number": "Article 81",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.82896401706972
+        },
+        {
+          "number": "Article 175-1",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.828317730432817
+        }
+      ],
+      "jurisprudenceFound": [
+        "25-82.028",
+        "21-87.452"
+      ],
+      "responseTimeMs": 1321,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'est-ce que l'article 700 du Code de procédure civile ?",
+      "niveau": "article",
+      "domaine": "procedure_civile",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil",
+        "Code de procédure pénale",
+        "Code de procédure civile"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 700",
+          "code": "Code de procédure civile",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article 709",
+          "code": "Code de procédure civile",
+          "source": "vector",
+          "similarity": 0.877909984828595
+        },
+        {
+          "number": "Article 790",
+          "code": "Code de procédure civile",
+          "source": "vector",
+          "similarity": 0.875120862783751
+        },
+        {
+          "number": "Article 702",
+          "code": "Code de procédure civile",
+          "source": "vector",
+          "similarity": 0.874885710018494
+        },
+        {
+          "number": "Article 703",
+          "code": "Code de procédure civile",
+          "source": "vector",
+          "similarity": 0.869479331784278
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-20.070",
+        "21-21.719"
+      ],
+      "responseTimeMs": 1299,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment se calcule le préjudice économique en cas de décès de la victime ?",
+      "niveau": "M2",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "abus de confiance"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 314-1",
+          "code": "Code pénal",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 314-2",
+          "code": "Code pénal",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 314-3",
+          "code": "Code pénal",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1251",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.81093194298949
+        },
+        {
+          "number": "Article 1252",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.808850975739699
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-22.961",
+        "22-11.031"
+      ],
+      "responseTimeMs": 1289,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi une société ?",
+      "niveau": "ambigue",
+      "domaine": "commercial",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code de commerce"
+      ],
+      "conceptsMatched": [
+        "abus de biens sociaux"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L241-3",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L242-6",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 7",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 8",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 9",
+          "code": "Code de procédure pénale",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-84.249",
+        "24-10.604"
+      ],
+      "responseTimeMs": 1247,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quels sont les délais de prescription en matière civile ?",
+      "niveau": "procedure",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil",
+        "Code de procédure pénale"
+      ],
+      "conceptsMatched": [
+        "prescription civile",
+        "abus de biens sociaux"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-14.479",
+        "22-18.729"
+      ],
+      "responseTimeMs": 1225,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Un salarié en CDI depuis 5 ans est licencié pour faute grave après un vol. Quels sont ses droits ?",
+      "niveau": "cas_pratique",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal",
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "responsabilité délictuelle",
+        "divorce",
+        "cdi",
+        "faute grave"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1243",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1244",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-23.494",
+        "23-10.888"
+      ],
+      "responseTimeMs": 1217,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Que dit l'article 1240 du Code civil ?",
+      "niveau": "article",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article 494-12",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.876093438252887
+        },
+        {
+          "number": "Article 1245-1",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.86701556565565
+        },
+        {
+          "number": "Article 1246",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.858640208350005
+        },
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.858269367458312
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-17.231",
+        "22-17.439"
+      ],
+      "responseTimeMs": 1196,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quel est le délai d'appel en matière civile ?",
+      "niveau": "procedure",
+      "domaine": "procedure_civile",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil",
+        "Code de procédure civile"
+      ],
+      "conceptsMatched": [
+        "prescription civile"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-15.596",
+        "22-23.237"
+      ],
+      "responseTimeMs": 1182,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment faire opposition à une ordonnance pénale ?",
+      "niveau": "procedure",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [
+        "22-86.375",
+        "21-25.801"
+      ],
+      "responseTimeMs": 1180,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "C'est quoi l'article 121-3 du Code pénal ?",
+      "niveau": "article",
+      "domaine": "penal",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 121-3",
+          "code": "Code pénal",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article 121-4",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.88102172702948
+        },
+        {
+          "number": "Article 121-6",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.866942461866791
+        },
+        {
+          "number": "Article 314-12",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.865918660301857
+        },
+        {
+          "number": "Article 221-15",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.862827181752955
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-87.217",
+        "23-80.347"
+      ],
+      "responseTimeMs": 1142,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Distinguez responsabilité contractuelle et délictuelle",
+      "niveau": "L3",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1245-17",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.828743188139532
+        },
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.824487932879357
+        },
+        {
+          "number": "Article 1245",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.824424008064374
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.81753183112283
+        },
+        {
+          "number": "Article 1245-12",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.816511370191927
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-14.947",
+        "19-25.750"
+      ],
+      "responseTimeMs": 1131,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quels sont les recours du salarié en cas de licenciement sans cause réelle et sérieuse ?",
+      "niveau": "M2",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [
+        "licenciement",
+        "faute grave"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L1232-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1234-1",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1234-5",
+          "code": "Code du travail",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L1134-4",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.861489462207904
+        },
+        {
+          "number": "Article R1235-17",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.85940605231005
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-11.825",
+        "20-22.220"
+      ],
+      "responseTimeMs": 1122,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi l'article 9 du Code de procédure pénale ?",
+      "niveau": "article",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal",
+        "Code de procédure pénale"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article R329",
+          "code": "Code de procédure pénale",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article R339",
+          "code": "Code de procédure pénale",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article R349",
+          "code": "Code de procédure pénale",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article 929",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.884366644098045
+        },
+        {
+          "number": "Article 925",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.881859674544912
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-87.088",
+        "24-86.895"
+      ],
+      "responseTimeMs": 1085,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi la faute ?",
+      "niveau": "ambigue",
+      "domaine": "mixte",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [
+        "responsabilité délictuelle",
+        "divorce"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1243",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1244",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-18.868",
+        "24-10.782"
+      ],
+      "responseTimeMs": 1079,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Que prévoit l'article L1232-1 du Code du travail ?",
+      "niveau": "article",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article L1232-5",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.910309222682199
+        },
+        {
+          "number": "Article L1232-3",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.902729685298579
+        },
+        {
+          "number": "Article L1231-4",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.90233588517476
+        },
+        {
+          "number": "Article L1235-6",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.901859320040977
+        },
+        {
+          "number": "Article L1233-14",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.901259430228052
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-21.926",
+        "22-10.551"
+      ],
+      "responseTimeMs": 1077,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment se répartit la responsabilité entre commettant et préposé ?",
+      "niveau": "M2",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1850",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.825472019765173
+        },
+        {
+          "number": "Article L821-37",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.820923662773616
+        },
+        {
+          "number": "Article 213-4-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.819469004322206
+        },
+        {
+          "number": "Article L223-22",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.817345006289824
+        },
+        {
+          "number": "Article 412",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.814629814743362
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-10.139",
+        "22-86.894"
+      ],
+      "responseTimeMs": 1043,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Un contrat a été signé sous la menace. Peut-il être annulé et dans quel délai ?",
+      "niveau": "cas_pratique",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "prescription civile",
+        "contrat"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 2224",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2225",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2226",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2230",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 2231",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-10.551",
+        "23-19.086"
+      ],
+      "responseTimeMs": 1034,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Un salarié est harcelé par son supérieur. Quels sont ses recours ?",
+      "niveau": "cas_pratique",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code du travail"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article L1153-6",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.861126743197044
+        },
+        {
+          "number": "Article L1152-1",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.85858059557965
+        },
+        {
+          "number": "Article L1153-1",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.856388120104666
+        },
+        {
+          "number": "Article L1152-5",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.855389413659719
+        },
+        {
+          "number": "Article L2312-59",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.850277298308368
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-11.437",
+        "24-15.412"
+      ],
+      "responseTimeMs": 1025,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelle est la procédure de divorce par consentement mutuel ?",
+      "niveau": "procedure",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "vices du consentement",
+        "divorce"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1130",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1131",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1137",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1132",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1139",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-17.532",
+        "21-25.251"
+      ],
+      "responseTimeMs": 975,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Une entreprise est en cessation de paiement. Quelles procédures peuvent être ouvertes ?",
+      "niveau": "cas_pratique",
+      "domaine": "commercial",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code de commerce"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article L631-1",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.879921339800224
+        },
+        {
+          "number": "Article L640-1",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.874508623780134
+        },
+        {
+          "number": "Article L640-4",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.873224295665402
+        },
+        {
+          "number": "Article L628-5",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.870800553261674
+        },
+        {
+          "number": "Article L631-4",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.869874315179917
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-12.250",
+        "21-21.424"
+      ],
+      "responseTimeMs": 969,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Que dit l'article 1134 ancien du Code civil ?",
+      "niveau": "article",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1134",
+          "code": "Code civil",
+          "source": "exact",
+          "similarity": 1
+        },
+        {
+          "number": "Article 1131",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.85822379257564
+        },
+        {
+          "number": "Article 1834",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.853977098656597
+        },
+        {
+          "number": "Article 1130",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.851744965375938
+        },
+        {
+          "number": "Article 1543",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.850454686853715
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-18.496",
+        "21-20.538"
+      ],
+      "responseTimeMs": 956,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'est-ce qu'un contrat ?",
+      "niveau": "ambigue",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "contrat"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1103",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1104",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1101",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1105",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1102",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "19-25.478",
+        "22-10.278"
+      ],
+      "responseTimeMs": 946,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Un associé de SARL veut céder ses parts. Quelle est la procédure ?",
+      "niveau": "cas_pratique",
+      "domaine": "commercial",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code de commerce"
+      ],
+      "conceptsMatched": [
+        "sarl"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article L223-1",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L223-2",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L223-3",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article L223-7",
+          "code": "Code de commerce",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article R743-126",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.855591044487154
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-17.246",
+        "23-20.199"
+      ],
+      "responseTimeMs": 933,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelles sont les conditions du divorce pour faute ?",
+      "niveau": "L2",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil"
+      ],
+      "conceptsMatched": [
+        "responsabilité délictuelle",
+        "divorce"
+      ],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1243",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1244",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "concept",
+          "similarity": 0.98
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-17.532",
+        "21-17.153"
+      ],
+      "responseTimeMs": 915,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quelles sont les exceptions au principe de l'autorité de la chose jugée au pénal sur le civil ?",
+      "niveau": "M2",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code civil",
+        "Code pénal"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1355",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.862422300314158
+        },
+        {
+          "number": "Article 1649",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.847235900731673
+        },
+        {
+          "number": "Article 1360",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.844448861825331
+        },
+        {
+          "number": "Article 1966",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.844284429426859
+        },
+        {
+          "number": "Article 1254",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.843257170061283
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-20.787",
+        "20-16.841"
+      ],
+      "responseTimeMs": 898,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "J'me suis fait virer, j'ai droit à quoi ?",
+      "niveau": "familier",
+      "domaine": "travail",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article L8223-1",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.805647827565578
+        },
+        {
+          "number": "Article L7112-3",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.800934654862288
+        },
+        {
+          "number": "Article L1235-15",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.79616153326969
+        },
+        {
+          "number": "Article L1235-3-1",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.796072438948725
+        },
+        {
+          "number": "Article L1235-11",
+          "code": "Code du travail",
+          "source": "vector",
+          "similarity": 0.795806241319226
+        }
+      ],
+      "jurisprudenceFound": [
+        "20-22.220",
+        "22-20.650"
+      ],
+      "responseTimeMs": 870,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Un conducteur renverse un piéton. Quelles responsabilités encourt-il ?",
+      "niveau": "cas_pratique",
+      "domaine": "mixte",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 221-18",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.858153733968527
+        },
+        {
+          "number": "Article 221-19",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.855376171784295
+        },
+        {
+          "number": "Article 221-20",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.850481051406095
+        },
+        {
+          "number": "Article 434-10",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.848092995170109
+        },
+        {
+          "number": "Article 388-1",
+          "code": "Code de procédure pénale",
+          "source": "vector",
+          "similarity": 0.846795919303284
+        }
+      ],
+      "jurisprudenceFound": [
+        "24-86.411",
+        "23-12.120"
+      ],
+      "responseTimeMs": 802,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment a évolué la jurisprudence sur la responsabilité du fait des choses ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [
+        "Code pénal"
+      ],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 121-3",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.825155330345708
+        },
+        {
+          "number": "Article 121-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.818544429394747
+        },
+        {
+          "number": "Article 122-3",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.811943828722663
+        },
+        {
+          "number": "Article 121-2",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.809472192663058
+        },
+        {
+          "number": "Article 213-4",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.808766278092203
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-23.726",
+        "24-13.470"
+      ],
+      "responseTimeMs": 790,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'est-ce que la responsabilité ?",
+      "niveau": "ambigue",
+      "domaine": "mixte",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.819607106584168
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.815168661533102
+        },
+        {
+          "number": "Article 121-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.799571878963996
+        },
+        {
+          "number": "Article 412",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.797768305611033
+        },
+        {
+          "number": "Article L822-14",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.792838243826744
+        }
+      ],
+      "jurisprudenceFound": [
+        "20-17.123",
+        "23-21.837"
+      ],
+      "responseTimeMs": 764,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Distinguez la responsabilité du fait personnel et du fait d'autrui",
+      "niveau": "L3",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.849018308287697
+        },
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.842328690814511
+        },
+        {
+          "number": "Article 121-1",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.837674767518473
+        },
+        {
+          "number": "Article 1245-12",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.829201677063489
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.824139827684982
+        }
+      ],
+      "jurisprudenceFound": [
+        "22-16.820",
+        "21-23.726"
+      ],
+      "responseTimeMs": 759,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'a changé l'arrêt Bertrand sur la responsabilité du fait d'autrui ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.825318410345772
+        },
+        {
+          "number": "Article 1242",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.816037473413182
+        },
+        {
+          "number": "Article 1240",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.813193642382347
+        },
+        {
+          "number": "Article 121-3",
+          "code": "Code pénal",
+          "source": "vector",
+          "similarity": 0.809791645672979
+        },
+        {
+          "number": "Article 1245-12",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.809198454576369
+        }
+      ],
+      "jurisprudenceFound": [
+        "23-23.775",
+        "21-22.239"
+      ],
+      "responseTimeMs": 745,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment s'articule le principe de non-cumul des responsabilités contractuelle et délictuelle ?",
+      "niveau": "M2",
+      "domaine": "civil",
+      "isLegalQuestion": true,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [
+        {
+          "number": "Article 1850",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.838522776212666
+        },
+        {
+          "number": "Article 1241",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.833237142694809
+        },
+        {
+          "number": "Article 1245-17",
+          "code": "Code civil",
+          "source": "vector",
+          "similarity": 0.832528374796169
+        },
+        {
+          "number": "Article L442-1",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.830525514518216
+        },
+        {
+          "number": "Article L223-22",
+          "code": "Code de commerce",
+          "source": "vector",
+          "similarity": 0.829895154115631
+        }
+      ],
+      "jurisprudenceFound": [
+        "21-14.947",
+        "24-20.154"
+      ],
+      "responseTimeMs": 653,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Un employeur ne paie pas les heures supplémentaires. Que peut faire le salarié ?",
+      "niveau": "cas_pratique",
+      "domaine": "travail",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 1,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "C'est quoi le vol ?",
+      "niveau": "L1",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Qu'est-ce qu'une SARL ?",
+      "niveau": "L1",
+      "domaine": "commercial",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quels sont les effets de la nullité ?",
+      "niveau": "L2",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quelles sont les conditions de la légitime défense ?",
+      "niveau": "L2",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quels sont les éléments constitutifs de l'escroquerie ?",
+      "niveau": "L2",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quelle est la différence entre nullité relative et nullité absolue ?",
+      "niveau": "L3",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quelle est la différence entre résolution et résiliation ?",
+      "niveau": "L3",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Distinguez l'erreur, le dol et la violence",
+      "niveau": "L3",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quelle est la différence entre meurtre et assassinat ?",
+      "niveau": "L3",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Comparez la garde à vue et la détention provisoire",
+      "niveau": "L3",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quel est l'apport de l'arrêt Chronopost ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Qu'est-ce que l'arrêt Jand'heur ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quelle est la portée de l'arrêt Perruche ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Qu'est-ce que la théorie de l'imprévision après la réforme ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quel est l'apport de l'arrêt Costedoat sur l'immunité du préposé ?",
+      "niveau": "M1",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Quelle est l'articulation entre action civile et action publique ?",
+      "niveau": "M2",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Une personne est blessée par un produit défectueux. Sur quel fondement peut-elle agir ?",
+      "niveau": "cas_pratique",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Un locataire ne paie plus son loyer depuis 3 mois. Comment le propriétaire peut-il réagir ?",
+      "niveau": "cas_pratique",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Un consommateur a acheté un bien défectueux. Quelles garanties peut-il invoquer ?",
+      "niveau": "cas_pratique",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Comment se déroule une garde à vue ?",
+      "niveau": "procedure",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Comment saisir le conseil de prud'hommes ?",
+      "niveau": "procedure",
+      "domaine": "travail",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Comment contester un PV ?",
+      "niveau": "procedure",
+      "domaine": "procedure_penale",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Salut !",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Comment ça va ?",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Merci pour ta réponse",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Tu peux m'aider ?",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi la vie ?",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Quel temps fait-il ?",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Raconte-moi une blague",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qui est le président de la République ?",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "C'est quoi sa voiture ?",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Il a fait sa déclaration",
+      "niveau": "piege",
+      "domaine": "non_juridique",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": true
+    },
+    {
+      "question": "Qu'est-ce que la nullité ?",
+      "niveau": "ambigue",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Mon proprio veut m'expulser, il peut ?",
+      "niveau": "familier",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "J'ai tapé quelqu'un, je risque quoi ?",
+      "niveau": "familier",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Mon patron me harcèle, que faire ?",
+      "niveau": "familier",
+      "domaine": "travail",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "On m'a arnaqué sur internet, c'est quoi comme infraction ?",
+      "niveau": "familier",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Mon ex veut la garde des enfants, comment ça marche ?",
+      "niveau": "familier",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "J'ai grillé un feu rouge, je risque quoi ?",
+      "niveau": "familier",
+      "domaine": "penal",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Mon voisin fait trop de bruit, que faire ?",
+      "niveau": "familier",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "J'ai signé un truc sans lire, je peux annuler ?",
+      "niveau": "familier",
+      "domaine": "civil",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    },
+    {
+      "question": "Mon employeur me doit de l'argent, comment je fais ?",
+      "niveau": "familier",
+      "domaine": "travail",
+      "isLegalQuestion": false,
+      "codesDetected": [],
+      "conceptsMatched": [],
+      "articlesFound": [],
+      "jurisprudenceFound": [],
+      "responseTimeMs": 0,
+      "timeout": false,
+      "success": false
+    }
+  ],
+  "stats": {
+    "total": 95,
+    "success": 61,
+    "failed": [
+      {
+        "question": "Comment faire opposition à une ordonnance pénale ?",
+        "niveau": "procedure",
+        "domaine": "procedure_penale",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code pénal"
+        ],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [
+          "22-86.375",
+          "21-25.801"
+        ],
+        "responseTimeMs": 1180,
+        "timeout": false,
+        "success": false
+      }
+    ],
+    "timeout": 0,
+    "errors": 0,
+    "avgResponseTime": 731,
+    "byLevel": {
+      "L1": {
+        "total": 6,
+        "success": 4,
+        "avgTime": 1924
+      },
+      "M2": {
+        "total": 10,
+        "success": 9,
+        "avgTime": 1139
+      },
+      "L3": {
+        "total": 10,
+        "success": 5,
+        "avgTime": 661
+      },
+      "L2": {
+        "total": 7,
+        "success": 4,
+        "avgTime": 831
+      },
+      "M1": {
+        "total": 10,
+        "success": 5,
+        "avgTime": 623
+      },
+      "procedure": {
+        "total": 10,
+        "success": 6,
+        "avgTime": 881
+      },
+      "ambigue": {
+        "total": 6,
+        "success": 5,
+        "avgTime": 904
+      },
+      "article": {
+        "total": 6,
+        "success": 6,
+        "avgTime": 1126
+      },
+      "cas_pratique": {
+        "total": 10,
+        "success": 6,
+        "avgTime": 598
+      },
+      "familier": {
+        "total": 10,
+        "success": 1,
+        "avgTime": 87
+      },
+      "piege": {
+        "total": 10,
+        "success": 10,
+        "avgTime": 0
+      }
+    },
+    "byDomain": {
+      "civil": {
+        "total": 37,
+        "success": 20,
+        "avgTime": 735
+      },
+      "penal": {
+        "total": 10,
+        "success": 3,
+        "avgTime": 489
+      },
+      "travail": {
+        "total": 16,
+        "success": 12,
+        "avgTime": 1064
+      },
+      "commercial": {
+        "total": 5,
+        "success": 4,
+        "avgTime": 962
+      },
+      "procedure_penale": {
+        "total": 9,
+        "success": 4,
+        "avgTime": 674
+      },
+      "mixte": {
+        "total": 6,
+        "success": 6,
+        "avgTime": 1157
+      },
+      "procedure_civile": {
+        "total": 2,
+        "success": 2,
+        "avgTime": 1241
+      },
+      "non_juridique": {
+        "total": 10,
+        "success": 10,
+        "avgTime": 0
+      }
+    },
+    "topSlowest": [
+      {
+        "question": "C'est quoi un contrat ?",
+        "niveau": "L1",
+        "domaine": "civil",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code civil"
+        ],
+        "conceptsMatched": [
+          "contrat"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article 1103",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1104",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1101",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1105",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1102",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          }
+        ],
+        "jurisprudenceFound": [
+          "22-10.278",
+          "19-25.478"
+        ],
+        "responseTimeMs": 5985,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Qu'est-ce qu'un crime ?",
+        "niveau": "L1",
+        "domaine": "penal",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code pénal"
+        ],
+        "conceptsMatched": [
+          "prescription pénale"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article 7",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 8",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 9",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 9-1",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 212-1",
+            "code": "Code pénal",
+            "source": "vector",
+            "similarity": 0.819254900284129
+          }
+        ],
+        "jurisprudenceFound": [
+          "24-84.071",
+          "22-82.468"
+        ],
+        "responseTimeMs": 2279,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Qu'est-ce qu'un CDI ?",
+        "niveau": "L1",
+        "domaine": "travail",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code du travail"
+        ],
+        "conceptsMatched": [
+          "cdi"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article L1221-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1221-2",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1231-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1232-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article R4313-1",
+            "code": "Code du travail",
+            "source": "vector",
+            "similarity": 0.783956201553779
+          }
+        ],
+        "jurisprudenceFound": [
+          "23-23.743",
+          "24-20.894"
+        ],
+        "responseTimeMs": 1823,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Quelles sont les conséquences de la requalification d'un CDD en CDI ?",
+        "niveau": "M2",
+        "domaine": "travail",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code du travail"
+        ],
+        "conceptsMatched": [
+          "cdi",
+          "cdd"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article L1221-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1221-2",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1231-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1232-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1241-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          }
+        ],
+        "jurisprudenceFound": [
+          "23-18.876",
+          "21-17.971"
+        ],
+        "responseTimeMs": 1820,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Différence entre faute grave et faute lourde en droit du travail ?",
+        "niveau": "L3",
+        "domaine": "travail",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code du travail"
+        ],
+        "conceptsMatched": [
+          "responsabilité délictuelle",
+          "divorce",
+          "faute grave"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article 1241",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1243",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1244",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1242",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1240",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          }
+        ],
+        "jurisprudenceFound": [
+          "22-18.868",
+          "24-81.365"
+        ],
+        "responseTimeMs": 1745,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Quels sont les cas de licenciement pour motif personnel ?",
+        "niveau": "L2",
+        "domaine": "travail",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code du travail"
+        ],
+        "conceptsMatched": [
+          "licenciement",
+          "faute grave"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article L1232-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1234-1",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1234-5",
+            "code": "Code du travail",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L1233-7",
+            "code": "Code du travail",
+            "source": "vector",
+            "similarity": 0.833701963991685
+          },
+          {
+            "number": "Article L1233-2",
+            "code": "Code du travail",
+            "source": "vector",
+            "similarity": 0.832287916609265
+          }
+        ],
+        "jurisprudenceFound": [
+          "23-17.544",
+          "22-16.218"
+        ],
+        "responseTimeMs": 1743,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Comment la Cour de cassation apprécie-t-elle la faute grave ?",
+        "niveau": "M1",
+        "domaine": "travail",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code du travail"
+        ],
+        "conceptsMatched": [
+          "responsabilité délictuelle",
+          "divorce",
+          "faute grave"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article 1241",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1243",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1244",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1242",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 1240",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          }
+        ],
+        "jurisprudenceFound": [
+          "24-81.365",
+          "24-86.411"
+        ],
+        "responseTimeMs": 1741,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Quelle est la responsabilité des dirigeants sociaux en cas de procédure collective ?",
+        "niveau": "M2",
+        "domaine": "commercial",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code de commerce"
+        ],
+        "conceptsMatched": [
+          "abus de biens sociaux"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article L241-3",
+            "code": "Code de commerce",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article L242-6",
+            "code": "Code de commerce",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 7",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 8",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 9",
+            "code": "Code de procédure pénale",
+            "source": "concept",
+            "similarity": 0.98
+          }
+        ],
+        "jurisprudenceFound": [
+          "22-10.271",
+          "24-14.565"
+        ],
+        "responseTimeMs": 1663,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Quelles sont les causes d'exonération de responsabilité ?",
+        "niveau": "L2",
+        "domaine": "civil",
+        "isLegalQuestion": true,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [
+          {
+            "number": "Article 1245-11",
+            "code": "Code civil",
+            "source": "vector",
+            "similarity": 0.84102227320363
+          },
+          {
+            "number": "Article 1241",
+            "code": "Code civil",
+            "source": "vector",
+            "similarity": 0.83712547730705
+          },
+          {
+            "number": "Article 1242",
+            "code": "Code civil",
+            "source": "vector",
+            "similarity": 0.837066507600156
+          },
+          {
+            "number": "Article 121-1",
+            "code": "Code pénal",
+            "source": "vector",
+            "similarity": 0.834660534596271
+          },
+          {
+            "number": "Article 385-1",
+            "code": "Code de procédure pénale",
+            "source": "vector",
+            "similarity": 0.830813813636307
+          }
+        ],
+        "jurisprudenceFound": [
+          "22-16.820",
+          "23-10.638"
+        ],
+        "responseTimeMs": 1637,
+        "timeout": false,
+        "success": true
+      },
+      {
+        "question": "Quel est le délai de prescription pour un délit ?",
+        "niveau": "procedure",
+        "domaine": "procedure_penale",
+        "isLegalQuestion": true,
+        "codesDetected": [
+          "Code pénal",
+          "Code de procédure pénale"
+        ],
+        "conceptsMatched": [
+          "prescription civile",
+          "abus de biens sociaux",
+          "prescription pénale"
+        ],
+        "articlesFound": [
+          {
+            "number": "Article 2224",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 2225",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 2226",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 2230",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          },
+          {
+            "number": "Article 2231",
+            "code": "Code civil",
+            "source": "concept",
+            "similarity": 0.98
+          }
+        ],
+        "jurisprudenceFound": [
+          "23-83.550",
+          "21-14.479"
+        ],
+        "responseTimeMs": 1586,
+        "timeout": false,
+        "success": true
+      }
+    ],
+    "falsePositives": [],
+    "falseNegatives": [
+      {
+        "question": "Un employeur ne paie pas les heures supplémentaires. Que peut faire le salarié ?",
+        "niveau": "cas_pratique",
+        "domaine": "travail",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 1,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "C'est quoi le vol ?",
+        "niveau": "L1",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Qu'est-ce qu'une SARL ?",
+        "niveau": "L1",
+        "domaine": "commercial",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quels sont les effets de la nullité ?",
+        "niveau": "L2",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quelles sont les conditions de la légitime défense ?",
+        "niveau": "L2",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quels sont les éléments constitutifs de l'escroquerie ?",
+        "niveau": "L2",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quelle est la différence entre nullité relative et nullité absolue ?",
+        "niveau": "L3",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quelle est la différence entre résolution et résiliation ?",
+        "niveau": "L3",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Distinguez l'erreur, le dol et la violence",
+        "niveau": "L3",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quelle est la différence entre meurtre et assassinat ?",
+        "niveau": "L3",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Comparez la garde à vue et la détention provisoire",
+        "niveau": "L3",
+        "domaine": "procedure_penale",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quel est l'apport de l'arrêt Chronopost ?",
+        "niveau": "M1",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Qu'est-ce que l'arrêt Jand'heur ?",
+        "niveau": "M1",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quelle est la portée de l'arrêt Perruche ?",
+        "niveau": "M1",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Qu'est-ce que la théorie de l'imprévision après la réforme ?",
+        "niveau": "M1",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quel est l'apport de l'arrêt Costedoat sur l'immunité du préposé ?",
+        "niveau": "M1",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Quelle est l'articulation entre action civile et action publique ?",
+        "niveau": "M2",
+        "domaine": "procedure_penale",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Une personne est blessée par un produit défectueux. Sur quel fondement peut-elle agir ?",
+        "niveau": "cas_pratique",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Un locataire ne paie plus son loyer depuis 3 mois. Comment le propriétaire peut-il réagir ?",
+        "niveau": "cas_pratique",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Un consommateur a acheté un bien défectueux. Quelles garanties peut-il invoquer ?",
+        "niveau": "cas_pratique",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Comment se déroule une garde à vue ?",
+        "niveau": "procedure",
+        "domaine": "procedure_penale",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Comment saisir le conseil de prud'hommes ?",
+        "niveau": "procedure",
+        "domaine": "travail",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Comment contester un PV ?",
+        "niveau": "procedure",
+        "domaine": "procedure_penale",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Qu'est-ce que la nullité ?",
+        "niveau": "ambigue",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Mon proprio veut m'expulser, il peut ?",
+        "niveau": "familier",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "J'ai tapé quelqu'un, je risque quoi ?",
+        "niveau": "familier",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Mon patron me harcèle, que faire ?",
+        "niveau": "familier",
+        "domaine": "travail",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "On m'a arnaqué sur internet, c'est quoi comme infraction ?",
+        "niveau": "familier",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Mon ex veut la garde des enfants, comment ça marche ?",
+        "niveau": "familier",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "J'ai grillé un feu rouge, je risque quoi ?",
+        "niveau": "familier",
+        "domaine": "penal",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Mon voisin fait trop de bruit, que faire ?",
+        "niveau": "familier",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "J'ai signé un truc sans lire, je peux annuler ?",
+        "niveau": "familier",
+        "domaine": "civil",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      },
+      {
+        "question": "Mon employeur me doit de l'argent, comment je fais ?",
+        "niveau": "familier",
+        "domaine": "travail",
+        "isLegalQuestion": false,
+        "codesDetected": [],
+        "conceptsMatched": [],
+        "articlesFound": [],
+        "jurisprudenceFound": [],
+        "responseTimeMs": 0,
+        "timeout": false,
+        "success": false
+      }
+    ]
+  }
+}

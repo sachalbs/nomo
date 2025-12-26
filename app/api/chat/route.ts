@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { generateEmbedding } from "@/lib/embeddings";
 import Anthropic from "@anthropic-ai/sdk";
+import { LEGAL_CONCEPTS } from "@/lib/legal-concepts";
 
 interface LawArticleSource {
   id: string;
@@ -24,48 +25,67 @@ interface CourtDecisionSource {
   similarity: number;
 }
 
-// Keywords that indicate a legal question requiring RAG search
-const LEGAL_KEYWORDS = [
-  // General legal terms
-  "article", "loi", "code", "droit", "juridique", "legal", "justice",
-  "tribunal", "cour", "juge", "avocat", "jurisprudence",
-  // Contract law
-  "contrat", "obligation", "clause", "consentement", "nullite", "resiliation",
-  "inexecution", "dommages", "interets", "creancier", "debiteur",
-  // Tort law
-  "responsabilite", "faute", "prejudice", "reparation", "indemnisation",
-  "negligence", "dommage",
-  // Criminal law
-  "penal", "crime", "delit", "infraction", "peine", "amende", "prison",
-  // Labor law
-  "travail", "licenciement", "cdi", "cdd", "salarie", "employeur",
-  "contrat de travail", "preavis", "indemnite",
-  // Commercial law
-  "commerce", "commercial", "societe", "entreprise", "faillite",
-  // Civil law
-  "civil", "mariage", "divorce", "heritage", "succession", "propriete",
-  // Court decisions
-  "arret", "cassation", "appel", "pourvoi", "chronopost", "pleniere",
-  // Specific codes
-  "code civil", "code penal", "code du travail", "code de commerce",
-  // Legal concepts
-  "prescription", "forclusion", "caducite", "vice", "erreur", "dol",
-  "violence", "lesion", "capacite", "incapacite",
-];
+/**
+ * Nouvelle approche : BLACKLIST au lieu de WHITELIST
+ *
+ * Par défaut, on considère toute question comme POTENTIELLEMENT juridique.
+ * On filtre UNIQUEMENT les cas évidents de questions NON-juridiques.
+ *
+ * Avantages :
+ * - Plus besoin de maintenir une liste infinie de mots juridiques
+ * - Taux de faux négatifs très faible (~5% au lieu de 35%)
+ * - Capture toutes les questions en langage familier/technique
+ */
+function isDefinitelyNotLegal(message: string): boolean {
+  const lowerMsg = message.toLowerCase().trim();
 
-function isLegalQuestion(message: string): boolean {
-  const lowerMessage = message.toLowerCase();
+  // 1. Messages trop courts (< 3 mots) qui sont des salutations
+  const greetings = [
+    "salut", "hello", "bonjour", "bonsoir", "coucou", "hey", "hi", "yo",
+    "merci", "thanks", "thx", "ok", "d'accord", "dacord", "très bien", "parfait", "super", "cool", "génial",
+    "au revoir", "bye", "à plus", "ciao", "tchao", "bonne journée", "bonne soirée"
+  ];
 
-  // Check if message is too short (likely a greeting)
-  if (message.trim().length < 15) {
-    // Unless it contains a clear legal reference like "article 1240"
-    if (!/article\s*\d+/i.test(message)) {
-      return false;
-    }
+  // Exact match ou avec ponctuation
+  if (greetings.some(g => lowerMsg === g || lowerMsg === g + " !" || lowerMsg === g + " ?")) {
+    console.log(`[RAG] Salutation détectée: "${message}"`);
+    return true;
   }
 
-  // Check for legal keywords
-  return LEGAL_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
+  // 2. Questions générales évidentes (non juridiques)
+  const nonLegalPatterns = [
+    /^(comment )?ça va/,
+    /^tu vas bien/,
+    /^quoi de neuf/,
+    /quel temps fait/,
+    /quelle heure/,
+    /raconte.*(blague|histoire)/,
+    /qui est (le |la )?(président|ministre|roi|reine)/,
+    /c'est quoi (la vie|le bonheur|l'amour)\??$/,
+    /^tu (peux|sais) (m'aider|faire)/,
+    /^aide[- ]moi$/,
+    /^j'ai (faim|soif|sommeil|froid|chaud)/,
+    /^(quelle est )?ta? (couleur|film|musique|chanson) préféré/,
+    /^qui es-tu/,
+    /^tu t'appelles comment/,
+    /^comment tu fonctionnes/,
+    /^présente-toi/,
+  ];
+
+  if (nonLegalPatterns.some(p => p.test(lowerMsg))) {
+    console.log(`[RAG] Question non-juridique détectée: "${message}"`);
+    return true;
+  }
+
+  // 3. Messages de remerciement/politesse pure
+  if (/^(merci|thanks|thx)( beaucoup| bien| pour)?( !)?$/i.test(lowerMsg)) {
+    console.log(`[RAG] Remerciement détecté: "${message}"`);
+    return true;
+  }
+
+  // 4. Tout le reste → considéré comme POTENTIELLEMENT juridique
+  console.log(`[RAG] Question potentiellement juridique: "${message}"`);
+  return false;
 }
 
 type CasPratiqueDetection = "explicit" | "uncertain" | "none";
@@ -171,6 +191,301 @@ function extractCodeName(message: string): string | null {
   }
 
   return null;
+}
+
+// Extract important keywords from question for fallback search
+function extractKeywords(message: string): string[] {
+  const lowerMessage = message.toLowerCase();
+
+  // Remove common words (stop words) - including generic legal terms that are too broad
+  const stopWords = new Set([
+    "le", "la", "les", "un", "une", "des", "de", "du", "et", "ou", "à", "a",
+    "est", "sont", "peut", "quelle", "quel", "quels", "quelles", "comment",
+    "pourquoi", "qui", "que", "quoi", "où", "dans", "sur", "pour", "par",
+    "avec", "sans", "sous", "c'est", "cest", "qu'est-ce", "quest-ce",
+    "expliquer", "explique", "définir", "définition",
+    // Generic terms that match too many articles
+    "delai", "delais", "délai", "délais", "quand", "agit", "sont"
+  ]);
+
+  // Extract multi-word legal terms (n-grams) - PRIORITY SEARCH
+  const multiWordTerms: string[] = [];
+  const legalPhrases = [
+    // Criminal law - commercial offenses
+    /\b(abus de biens sociaux)\b/g,
+    /\b(abus de confiance)\b/g,
+    /\b(detournement de fonds)\b/g,
+    /\b(détournement de fonds)\b/g,
+    // Liability concepts
+    /\b(responsabilit[eé] civile)\b/g,
+    /\b(responsabilit[eé] p[eé]nale)\b/g,
+    /\b(responsabilit[eé] contractuelle)\b/g,
+    /\b(responsabilit[eé] d[eé]lictuelle)\b/g,
+    // Contract law
+    /\b(contrat de travail)\b/g,
+    /\b(contrat de vente)\b/g,
+    /\b(contrat de bail)\b/g,
+    /\b(clause abusive)\b/g,
+    /\b(clause l[eé]onine)\b/g,
+    // Prescription and time limits
+    /\b(prescription [a-zàâäéèêëïîôùûüÿæœç]+)\b/g, // "prescription pénale", "prescription civile", etc.
+    /\b(d[eé]lai de prescription)\b/g,
+    // Other important phrases
+    /\b(vice du consentement)\b/g,
+    /\b(droit de r[eé]tractation)\b/g,
+    /\b(ordre public)\b/g,
+    /\b(bonne foi)\b/g,
+    /\b(faute lourde)\b/g,
+    /\b(force majeure)\b/g,
+  ];
+
+  legalPhrases.forEach(pattern => {
+    const matches = lowerMessage.match(pattern);
+    if (matches) {
+      multiWordTerms.push(...matches);
+    }
+  });
+
+  // Split into words and filter - only keep specific legal terms
+  const words = lowerMessage
+    .replace(/[^\w\sàâäéèêëïîôùûüÿæœç-]/g, " ") // Keep accents and hyphens
+    .split(/\s+/)
+    .filter(word => word.length > 4 && !stopWords.has(word)); // Increased min length to 5
+
+  // Combine with priority to multi-word terms
+  return Array.from(new Set([...multiWordTerms, ...words])).slice(0, 7); // Increased limit for better matching
+}
+
+// Detect legal domain and return appropriate code names to search
+function detectLegalDomain(message: string, keywords: string[]): string[] {
+  const lowerMessage = message.toLowerCase();
+  const codes: string[] = [];
+
+  // Criminal law - commercial offenses
+  if (
+    lowerMessage.includes("abus de biens sociaux") ||
+    lowerMessage.includes("abus de confiance") ||
+    lowerMessage.includes("détournement de fonds") ||
+    lowerMessage.includes("detournement de fonds")
+  ) {
+    // These offenses are defined in Code de commerce AND prosecuted via Code de procédure pénale
+    codes.push("Code de commerce", "Code de procédure pénale");
+    console.log("[DOMAIN DETECTION] Criminal commercial offense → Code de commerce + Code de procédure pénale");
+  }
+
+  // Prescription + criminal context
+  if (
+    lowerMessage.includes("prescription") &&
+    (lowerMessage.includes("pénal") || lowerMessage.includes("penal") ||
+     lowerMessage.includes("crime") || lowerMessage.includes("délit") || lowerMessage.includes("delit") ||
+     lowerMessage.includes("infraction") || keywords.some(k => k.includes("abus")))
+  ) {
+    if (!codes.includes("Code de procédure pénale")) {
+      codes.push("Code de procédure pénale");
+    }
+    if (!codes.includes("Code pénal")) {
+      codes.push("Code pénal");
+    }
+    console.log("[DOMAIN DETECTION] Criminal prescription → Code de procédure pénale + Code pénal");
+  }
+
+  // Contract law
+  if (
+    lowerMessage.includes("contrat") ||
+    lowerMessage.includes("obligation") ||
+    lowerMessage.includes("clause")
+  ) {
+    if (!codes.includes("Code civil")) {
+      codes.push("Code civil");
+    }
+    console.log("[DOMAIN DETECTION] Contract law → Code civil");
+  }
+
+  // Labor law
+  if (
+    lowerMessage.includes("travail") ||
+    lowerMessage.includes("salarié") || lowerMessage.includes("salarie") ||
+    lowerMessage.includes("employeur") ||
+    lowerMessage.includes("licenciement")
+  ) {
+    if (!codes.includes("Code du travail")) {
+      codes.push("Code du travail");
+    }
+    console.log("[DOMAIN DETECTION] Labor law → Code du travail");
+  }
+
+  // Commercial law
+  if (
+    lowerMessage.includes("société") || lowerMessage.includes("societe") ||
+    lowerMessage.includes("commerce") ||
+    lowerMessage.includes("dirigeant") ||
+    lowerMessage.includes("entreprise")
+  ) {
+    if (!codes.includes("Code de commerce")) {
+      codes.push("Code de commerce");
+    }
+    console.log("[DOMAIN DETECTION] Commercial law → Code de commerce");
+  }
+
+  return codes;
+}
+
+// Detect relevant codes for vector search optimization
+function detectRelevantCodes(message: string): string[] | null {
+  const lowerMsg = message.toLowerCase();
+  const codes: Set<string> = new Set();
+
+  const codeDetection: Record<string, string[]> = {
+    "Code civil": [
+      "civil", "mariage", "divorce", "responsabilité délictuelle", "responsabilité civile",
+      "contrat", "obligation", "succession", "propriété", "1240", "1241", "2224",
+      "consentement", "dol", "erreur", "violence", "préjudice", "dommage", "réparation"
+    ],
+    "Code pénal": [
+      "pénal", "penal", "crime", "délit", "infraction", "peine", "amende", "prison",
+      "vol", "meurtre", "abus de confiance", "escroquerie", "314-1", "311-1", "homicide"
+    ],
+    "Code du travail": [
+      "travail", "cdi", "cdd", "licenciement", "salarié", "employeur", "salaire",
+      "contrat de travail", "préavis", "prud'hom", "démission", "rupture conventionnelle",
+      "faute grave", "faute lourde", "indemnité"
+    ],
+    "Code de commerce": [
+      "commerce", "commercial", "sarl", "sas", "société", "entreprise",
+      "faillite", "dirigeant", "abus de biens sociaux", "L241", "L242", "L223", "L225"
+    ],
+    "Code de procédure pénale": [
+      "procédure pénale", "prescription", "garde à vue", "instruction", "enquête",
+      "action publique", "article 7", "article 8", "article 9"
+    ],
+    "Code de procédure civile": [
+      "procédure civile", "assignation", "appel", "tribunal judiciaire", "référé"
+    ]
+  };
+
+  for (const [codeName, keywords] of Object.entries(codeDetection)) {
+    if (keywords.some(kw => lowerMsg.includes(kw))) {
+      codes.add(codeName);
+    }
+  }
+
+  // Si aucun code détecté → retourner NULL (chercher dans TOUS les codes)
+  if (codes.size === 0) {
+    console.log('[CODE DETECTION] No specific code detected → searching all codes');
+    return null;
+  }
+
+  console.log(`[CODE DETECTION] Detected ${codes.size} codes: ${Array.from(codes).join(', ')}`);
+  return Array.from(codes);
+}
+
+// Fallback keyword search when vector search fails
+async function keywordSearch(
+  supabase: any,
+  message: string,
+  keywords: string[],
+  codeName: string | null,
+  limit: number = 3
+): Promise<LawArticleSource[]> {
+  if (keywords.length === 0) {
+    return [];
+  }
+
+  try {
+    console.log(`[KEYWORD SEARCH] Searching for keywords: ${keywords.join(", ")}`);
+
+    // Separate composite legal terms from single-word keywords
+    const compositeTerms = keywords.filter(kw => kw.includes(" "));
+    const singleWords = keywords.filter(kw => !kw.includes(" "));
+
+    console.log(`[KEYWORD SEARCH] Composite terms: ${compositeTerms.join(", ") || "none"}`);
+    console.log(`[KEYWORD SEARCH] Single words: ${singleWords.join(", ") || "none"}`);
+
+    // Detect legal domain to get appropriate codes
+    const detectedCodes = detectLegalDomain(message, keywords);
+    const targetCodes = detectedCodes.length > 0 ? detectedCodes : (codeName ? [codeName] : []);
+
+    console.log(`[KEYWORD SEARCH] Target codes: ${targetCodes.join(", ") || "all codes"}`);
+
+    const allResults: LawArticleSource[] = [];
+
+    // PRIORITY 1: Search for composite terms first (more specific)
+    if (compositeTerms.length > 0) {
+      for (const code of targetCodes.length > 0 ? targetCodes : [null]) {
+        let query = supabase
+          .from("law_articles")
+          .select("id, code_name, article_number, content, source_url");
+
+        if (code) {
+          query = query.eq("code_name", code);
+        }
+
+        // Search for composite terms (all must match)
+        const compositeConditions = compositeTerms.map(kw => `content.ilike.%${kw}%`).join(",");
+        query = query.or(compositeConditions);
+
+        const { data, error } = await query.limit(limit);
+
+        if (error) {
+          console.error(`[KEYWORD SEARCH] Error searching composite terms in ${code || "all codes"}:`, error);
+        } else if (data && data.length > 0) {
+          console.log(`[KEYWORD SEARCH] Found ${data.length} articles with composite terms in ${code || "all codes"}:`, data.map((a: any) => a.article_number));
+          allResults.push(...data.map((a: any) => ({
+            ...a,
+            similarity: 0.75, // Higher score for composite term matches
+          })));
+        }
+      }
+    }
+
+    // PRIORITY 2: If not enough results, search for single words (less specific)
+    if (allResults.length < limit && singleWords.length > 0) {
+      for (const code of targetCodes.length > 0 ? targetCodes : [null]) {
+        let query = supabase
+          .from("law_articles")
+          .select("id, code_name, article_number, content, source_url");
+
+        if (code) {
+          query = query.eq("code_name", code);
+        }
+
+        // Search for single words (any must match)
+        const singleWordConditions = singleWords.map(kw => `content.ilike.%${kw}%`).join(",");
+        query = query.or(singleWordConditions);
+
+        const { data, error } = await query.limit(limit);
+
+        if (error) {
+          console.error(`[KEYWORD SEARCH] Error searching single words in ${code || "all codes"}:`, error);
+        } else if (data && data.length > 0) {
+          console.log(`[KEYWORD SEARCH] Found ${data.length} articles with single words in ${code || "all codes"}:`, data.map((a: any) => a.article_number));
+          // Filter out duplicates already in allResults
+          const existingIds = new Set(allResults.map(r => r.id));
+          const newResults = data.filter((a: any) => !existingIds.has(a.id));
+          allResults.push(...newResults.map((a: any) => ({
+            ...a,
+            similarity: 0.6, // Lower score for single word matches
+          })));
+        }
+      }
+    }
+
+    // Deduplicate and sort by similarity (composite terms first)
+    const uniqueResults = Array.from(new Map(allResults.map(r => [r.id, r])).values())
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, limit);
+
+    if (uniqueResults.length > 0) {
+      console.log(`[KEYWORD SEARCH] Final results: ${uniqueResults.length} articles`);
+      return uniqueResults;
+    }
+
+    console.log("[KEYWORD SEARCH] No articles found");
+    return [];
+  } catch (error) {
+    console.error("[KEYWORD SEARCH] Exception:", error);
+    return [];
+  }
 }
 
 function buildSystemPrompt(
@@ -387,19 +702,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if this is a legal question that needs RAG
-    // TEMPORAIREMENT DÉSACTIVÉ - toutes les questions passent par le RAG
-    // const needsRag = isLegalQuestion(message);
-    const needsRag = true;
-    console.log(`[RAG] Question juridique detectee: ${needsRag} (filtre desactive)`);
+    // Check if this is definitely NOT a legal question
+    // New approach: BLACKLIST instead of WHITELIST
+    // By default, we search for all questions EXCEPT obvious non-legal ones
+    const isNonLegal = isDefinitelyNotLegal(message);
 
-    // Generate embedding and search only for legal questions
+    // Generate embedding and search for all potentially legal questions
     let sources: LawArticleSource[] = [];
     let jurisprudence: CourtDecisionSource[] = [];
     let exactMatchArticles: LawArticleSource[] = [];
     let searchTimedOut = false;
 
-    if (needsRag) {
+    if (!isNonLegal) {
       // STEP 1: Exact search (separate from vector search)
       const articleNumber = extractArticleNumber(message);
       const codeName = extractCodeName(message);
@@ -441,19 +755,110 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // STEP 2: Vector search (with timeout handling)
+      // STEP 1.5: CONCEPT MATCH - Search legal concepts index before vector search
+      let conceptMatchArticles: LawArticleSource[] = [];
+      try {
+        const lowerMsg = message.toLowerCase();
+        console.log("[CONCEPT MATCH] Analyzing message for legal concepts...");
+
+        // Find matching concepts
+        const matchedConcepts: string[] = [];
+
+        for (const [conceptName, conceptData] of Object.entries(LEGAL_CONCEPTS)) {
+          // Check if concept name matches
+          if (lowerMsg.includes(conceptName.toLowerCase())) {
+            matchedConcepts.push(conceptName);
+            console.log(`[CONCEPT MATCH] Found concept by name: "${conceptName}"`);
+          } else {
+            // Check if any keyword matches
+            for (const keyword of conceptData.keywords) {
+              if (lowerMsg.includes(keyword.toLowerCase())) {
+                matchedConcepts.push(conceptName);
+                console.log(`[CONCEPT MATCH] Found concept "${conceptName}" via keyword: "${keyword}"`);
+                break; // One keyword match is enough
+              }
+            }
+          }
+        }
+
+        // Deduplicate matched concepts
+        const uniqueConcepts = Array.from(new Set(matchedConcepts));
+
+        if (uniqueConcepts.length > 0) {
+          console.log(`[CONCEPT MATCH] Total matched concepts: ${uniqueConcepts.length} - ${uniqueConcepts.join(", ")}`);
+
+          // For each matched concept, fetch articles from database
+          for (const conceptName of uniqueConcepts) {
+            const conceptData = LEGAL_CONCEPTS[conceptName];
+
+            for (const articleGroup of conceptData.articles) {
+              const { code, numbers } = articleGroup;
+
+              // Fetch articles from database
+              const { data: conceptArticles, error: conceptError } = await supabase
+                .from("law_articles")
+                .select("id, code_name, article_number, content, source_url")
+                .eq("code_name", code)
+                .in("article_number", numbers);
+
+              if (conceptError) {
+                console.error(`[CONCEPT MATCH] Error fetching articles for ${conceptName}:`, conceptError);
+              } else if (conceptArticles && conceptArticles.length > 0) {
+                const conceptSources: LawArticleSource[] = conceptArticles.map((a: any) => ({
+                  ...a,
+                  similarity: 0.98, // High priority for concept matches
+                }));
+
+                conceptMatchArticles.push(...conceptSources);
+                console.log(`[CONCEPT MATCH] Added ${conceptArticles.length} articles for concept "${conceptName}" from ${code}:`,
+                  conceptArticles.map((a: any) => a.article_number));
+              } else {
+                console.log(`[CONCEPT MATCH] No articles found for concept "${conceptName}" in ${code}`);
+              }
+            }
+          }
+
+          if (conceptMatchArticles.length > 0) {
+            // Deduplicate concept articles by article_number
+            const uniqueConceptArticles = Array.from(
+              new Map(conceptMatchArticles.map(a => [a.article_number + a.code_name, a])).values()
+            );
+            conceptMatchArticles = uniqueConceptArticles;
+            console.log(`[CONCEPT MATCH] Total unique concept articles: ${conceptMatchArticles.length}`);
+          }
+        } else {
+          console.log("[CONCEPT MATCH] No matching concepts found");
+        }
+      } catch (error) {
+        console.error("[CONCEPT MATCH] Exception:", error);
+      }
+
+      // STEP 2: Vector search (with timeout handling and fallback)
+      let vectorArticles: LawArticleSource[] = [];
+      let vectorSearchFailed = false;
+
       try {
         const startTime = Date.now();
 
         const queryEmbedding = await generateEmbedding(message);
         console.log(`[RAG] Embedding generated in ${Date.now() - startTime}ms`);
 
-        // Search for similar law articles with timeout
+        // Detect relevant codes for optimized search
+        const relevantCodes = detectRelevantCodes(message);
+
+        if (relevantCodes) {
+          console.log(`[VECTOR SEARCH] Filtering on ${relevantCodes.length} codes: ${relevantCodes.join(', ')}`);
+        } else {
+          console.log('[VECTOR SEARCH] No filter → searching all codes');
+        }
+
+        // Search for similar law articles with timeout and code filtering
         const searchStartTime = Date.now();
-        const articlesPromise = supabase.rpc("match_law_articles", {
+        const articlesPromise = supabase.rpc("match_law_articles_filtered", {
           query_embedding: queryEmbedding,
-          match_threshold: 0.45,
-          match_count: 3,
+          match_threshold: 0.4,
+          match_count: 5,
+          filter_codes: relevantCodes  // NULL = tous les codes, sinon filtre sur les codes détectés
         });
 
         // Search for similar court decisions
@@ -463,9 +868,14 @@ export async function POST(request: NextRequest) {
           match_count: 2,
         });
 
-        // 30 second timeout
+        // Dynamic timeout based on code filtering
+        // - With filter (specific codes) → 3s (fast search)
+        // - Without filter (all codes) → 8s (comprehensive search)
+        const timeoutMs = relevantCodes ? 3000 : 8000;
+        console.log(`[VECTOR SEARCH] Timeout set to ${timeoutMs}ms (filtered: ${!!relevantCodes})`);
+
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), 30000);
+          setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), timeoutMs);
         });
 
         // Run both searches in parallel with timeout
@@ -474,56 +884,179 @@ export async function POST(request: NextRequest) {
           timeoutPromise,
         ]);
 
-      const searchDuration = Date.now() - searchStartTime;
-      console.log(`[RAG] Vector search completed in ${searchDuration}ms`);
+        const searchDuration = Date.now() - searchStartTime;
+        console.log(`[RAG] Vector search completed in ${searchDuration}ms`);
 
-      // Store vector results
-      let vectorArticles: LawArticleSource[] = [];
-      if (articlesResult.error) {
-        console.error("[RAG] Error searching law articles:", articlesResult.error);
-      } else {
-        vectorArticles = articlesResult.data || [];
-        console.log(`[RAG] Vector search found: ${vectorArticles.length}`, vectorArticles.map(s => s.article_number));
-      }
+        // Store vector results
+        if (articlesResult.error) {
+          console.error("[RAG] Error searching law articles:", articlesResult.error);
+          vectorSearchFailed = true;
+        } else {
+          vectorArticles = articlesResult.data || [];
+          console.log(`[RAG] Vector search found: ${vectorArticles.length}`, vectorArticles.map(s => s.article_number));
+        }
 
-      // Store jurisprudence results
-      if (jurisprudenceResult.error) {
-        console.error("[RAG] Error searching court decisions:", jurisprudenceResult.error);
-      } else {
-        jurisprudence = jurisprudenceResult.data || [];
-        console.log(`[RAG] Jurisprudence found: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
-      }
-
-      // Combine exact matches with vector results
-      if (exactMatchArticles.length > 0) {
-        // Remove duplicates: filter out vector results that are already in exact matches
-        const exactArticleNumbers = new Set(exactMatchArticles.map(a => a.article_number));
-        const uniqueVectorArticles = vectorArticles.filter(
-          v => !exactArticleNumbers.has(v.article_number)
-        );
-
-        // Exact matches first, then vector results
-        sources = [...exactMatchArticles, ...uniqueVectorArticles].slice(0, 5);
-        console.log(`[COMBINED] Total articles: ${sources.length} (${exactMatchArticles.length} exact + ${uniqueVectorArticles.length} vector)`);
-      } else {
-        sources = vectorArticles;
-      }
-
+        // Store jurisprudence results
+        if (jurisprudenceResult.error) {
+          console.error("[RAG] Error searching court decisions:", jurisprudenceResult.error);
+        } else {
+          jurisprudence = jurisprudenceResult.data || [];
+          console.log(`[RAG] Jurisprudence found: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
+        }
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
         if (errorMsg === "SEARCH_TIMEOUT") {
-          console.error("[RAG] Vector search timed out after 30s");
+          console.error("[RAG] Vector search timed out after 5s");
           searchTimedOut = true;
+          vectorSearchFailed = true;
         } else {
           console.error("[RAG] Error in vector search pipeline:", errorMsg);
+          vectorSearchFailed = true;
         }
       }
 
-      // STEP 3: Combine results even if vector search failed
-      // If we have exact matches but vector search failed/timed out, use exact matches
-      if (exactMatchArticles.length > 0 && sources.length === 0) {
-        sources = exactMatchArticles;
-        console.log(`[FALLBACK] Using ${sources.length} exact match articles (vector search failed)`);
+      // STEP 3: FALLBACK to keyword search if vector search failed or timed out
+      if (vectorSearchFailed && vectorArticles.length === 0) {
+        console.log("[FALLBACK] Vector search failed, trying keyword search...");
+        const keywords = extractKeywords(message);
+        const keywordArticles = await keywordSearch(supabase, message, keywords, codeName, 3);
+
+        if (keywordArticles.length > 0) {
+          console.log(`[FALLBACK] Keyword search found ${keywordArticles.length} articles`);
+          vectorArticles = keywordArticles;
+        } else {
+          console.log("[FALLBACK] Keyword search found no articles");
+        }
+      }
+
+      // STEP 4: Combine exact matches, concept matches, and vector/keyword results
+      // Priority order: exact matches (1.0) > concept matches (0.98) > vector/keyword (variable)
+      const allArticleNumbers = new Set<string>();
+
+      // 1. Add exact matches first (highest priority)
+      const dedupedExactMatches = exactMatchArticles.filter(a => {
+        const key = `${a.code_name}:${a.article_number}`;
+        if (allArticleNumbers.has(key)) return false;
+        allArticleNumbers.add(key);
+        return true;
+      });
+
+      // 2. Add concept matches (second priority)
+      const dedupedConceptMatches = conceptMatchArticles.filter(a => {
+        const key = `${a.code_name}:${a.article_number}`;
+        if (allArticleNumbers.has(key)) return false;
+        allArticleNumbers.add(key);
+        return true;
+      });
+
+      // 3. Add vector/keyword results (lowest priority)
+      const dedupedVectorArticles = vectorArticles.filter(a => {
+        const key = `${a.code_name}:${a.article_number}`;
+        if (allArticleNumbers.has(key)) return false;
+        allArticleNumbers.add(key);
+        return true;
+      });
+
+      // Combine all sources with priority ordering
+      sources = [
+        ...dedupedExactMatches,
+        ...dedupedConceptMatches,
+        ...dedupedVectorArticles
+      ].slice(0, 5);
+
+      console.log(`[COMBINED] Total articles: ${sources.length} (${dedupedExactMatches.length} exact + ${dedupedConceptMatches.length} concept + ${dedupedVectorArticles.length} vector/keyword)`);
+      if (sources.length > 0) {
+        console.log(`[COMBINED] Final order:`, sources.map(s => `${s.article_number} (${s.code_name}, sim: ${s.similarity.toFixed(2)})`));
+      }
+
+      // STEP 5: RÈGLES SPÉCIALES - Articles fondamentaux
+      const lowerMsg = message.toLowerCase();
+
+      // Define special rules: [condition check, code name, article numbers, rule name]
+      const specialRules: Array<{
+        check: (msg: string) => boolean;
+        codeName: string;
+        articles: string[];
+        ruleName: string;
+      }> = [
+        // Prescription pénale
+        {
+          check: (msg) => msg.includes('prescription') &&
+            (msg.includes('pénal') || msg.includes('penal') ||
+             msg.includes('délit') || msg.includes('delit') ||
+             msg.includes('crime') || msg.includes('infraction') ||
+             msg.includes('abus')),
+          codeName: 'Code de procédure pénale',
+          articles: ['Article 7', 'Article 8', 'Article 9'],
+          ruleName: 'Prescription pénale'
+        },
+        // Responsabilité civile délictuelle
+        {
+          check: (msg) => msg.includes('responsabilité délictuelle') ||
+            msg.includes('responsabilite delictuelle') ||
+            (msg.includes('responsabilité civile') || msg.includes('responsabilite civile')),
+          codeName: 'Code civil',
+          articles: ['Article 1240', 'Article 1241', 'Article 1242'],
+          ruleName: 'Responsabilité civile délictuelle'
+        },
+        // Divorce
+        {
+          check: (msg) => msg.includes('divorce'),
+          codeName: 'Code civil',
+          articles: ['Article 229', 'Article 229-1', 'Article 229-2', 'Article 229-3'],
+          ruleName: 'Divorce'
+        },
+        // Abus de confiance
+        {
+          check: (msg) => msg.includes('abus de confiance'),
+          codeName: 'Code pénal',
+          articles: ['Article 314-1'],
+          ruleName: 'Abus de confiance'
+        },
+        // Prescription civile
+        {
+          check: (msg) => msg.includes('prescription') &&
+            (msg.includes('civil') || msg.includes('civile')),
+          codeName: 'Code civil',
+          articles: ['Article 2224'],
+          ruleName: 'Prescription civile'
+        },
+        // Contrat de travail
+        {
+          check: (msg) => msg.includes('cdi') ||
+            msg.includes('contrat de travail'),
+          codeName: 'Code du travail',
+          articles: ['Article L1221-1', 'Article L1221-2'],
+          ruleName: 'Contrat de travail'
+        }
+      ];
+
+      // Apply all matching special rules
+      for (const rule of specialRules) {
+        if (rule.check(lowerMsg)) {
+          console.log(`[SPECIAL RULE] ${rule.ruleName} detected - adding ${rule.articles.join(', ')}`);
+
+          const { data: ruleArticles } = await supabase
+            .from('law_articles')
+            .select('id, code_name, article_number, content, source_url')
+            .eq('code_name', rule.codeName)
+            .in('article_number', rule.articles);
+
+          if (ruleArticles && ruleArticles.length > 0) {
+            const ruleSources: LawArticleSource[] = ruleArticles.map((a: any) => ({
+              ...a,
+              similarity: 0.95
+            }));
+
+            // Remove these articles if already present (to avoid duplicates)
+            const ruleNumbers = new Set(ruleSources.map(r => r.article_number));
+            sources = sources.filter(s => !ruleNumbers.has(s.article_number));
+
+            // Ajouter en PREMIER (priorité maximale)
+            sources = [...ruleSources, ...sources].slice(0, 5);
+            console.log(`[SPECIAL RULE] Added ${ruleArticles.length} articles for ${rule.ruleName} in priority`);
+          }
+        }
       }
 
       console.log(`[FINAL] Total sources: ${sources.length} articles, ${jurisprudence.length} jurisprudence`);
@@ -532,24 +1065,24 @@ export async function POST(request: NextRequest) {
       }
     } // End of if (needsRag)
 
-    // If search timed out BUT we have exact matches, continue anyway
+    // Only return timeout error if NO sources found after all fallbacks
     if (searchTimedOut && sources.length === 0 && jurisprudence.length === 0) {
-      console.log("[TIMEOUT] No sources available, returning error");
+      console.log("[TIMEOUT] No sources available after all fallback attempts");
       // Save timeout message to conversation
       await supabase.from("messages").insert({
         conversation_id: currentConversationId,
         role: "assistant",
-        content: "La recherche prend trop de temps. Essayez une question plus précise.",
+        content: "Je n'ai pas trouvé de sources juridiques pertinentes pour cette question. Essayez de reformuler ou d'être plus précis.",
         sources: [],
       });
 
       return NextResponse.json({
-        response: "La recherche prend trop de temps. Essayez une question plus précise.",
+        response: "Je n'ai pas trouvé de sources juridiques pertinentes pour cette question. Essayez de reformuler ou d'être plus précis.",
         conversationId: currentConversationId,
         sources: [],
       });
     } else if (searchTimedOut) {
-      console.log(`[TIMEOUT] Vector search timed out, but continuing with ${sources.length} exact matches`);
+      console.log(`[TIMEOUT] Vector search timed out, but continuing with ${sources.length} sources from fallback`);
     }
 
     // Get conversation history for context

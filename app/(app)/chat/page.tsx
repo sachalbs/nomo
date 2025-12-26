@@ -7,6 +7,7 @@ import ReactMarkdown from "react-markdown";
 import { NomoLogo } from "@/components/NomoLogo";
 
 interface Source {
+  type?: "article" | "jurisprudence";
   article_number: string;
   code_name: string;
   source_url: string;
@@ -67,6 +68,170 @@ function formatTime(dateString: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+// Group articles by code name
+function groupArticlesByCode(sources: Source[]): Record<string, Source[]> {
+  const articles = sources.filter((s) => s.type === "article");
+  const grouped: Record<string, Source[]> = {};
+
+  articles.forEach((article) => {
+    if (!grouped[article.code_name]) {
+      grouped[article.code_name] = [];
+    }
+    grouped[article.code_name].push(article);
+  });
+
+  return grouped;
+}
+
+// Get color badge for each code
+function getCodeColor(codeName: string): { bg: string; text: string; border: string } {
+  const lowerCode = codeName.toLowerCase();
+
+  if (lowerCode.includes("civil")) {
+    return { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" };
+  }
+  if (lowerCode.includes("pénal") || lowerCode.includes("penal")) {
+    return { bg: "bg-red-50", text: "text-red-700", border: "border-red-200" };
+  }
+  if (lowerCode.includes("travail")) {
+    return { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" };
+  }
+  if (lowerCode.includes("commerce")) {
+    return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" };
+  }
+  if (lowerCode.includes("procédure") || lowerCode.includes("procedure")) {
+    return { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" };
+  }
+
+  // Default
+  return { bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200" };
+}
+
+// Format court decision display
+function formatCourtDecision(source: Source): string {
+  // Extract case number from article_number (e.g., "Arret 23-12.483" -> "23-12.483")
+  const caseNumber = source.article_number.replace(/^Arret\s+/i, "");
+
+  // code_name contains jurisdiction and chambre (e.g., "Cass. civ. 1ère")
+  const jurisdiction = source.code_name;
+
+  return `${jurisdiction}, n° ${caseNumber}`;
+}
+
+// Sources display component
+function SourcesDisplay({ sources }: { sources: Source[] }) {
+  const articles = sources.filter((s) => s.type === "article");
+  const jurisprudence = sources.filter((s) => s.type === "jurisprudence");
+  const groupedArticles = groupArticlesByCode(sources);
+
+  return (
+    <div className="space-y-3 pl-1">
+      {/* Articles de loi */}
+      {articles.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-[#475569]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            ARTICLES DE LOI
+          </div>
+
+          <div className="space-y-2">
+            {Object.entries(groupedArticles).map(([codeName, codeArticles]) => {
+              const colors = getCodeColor(codeName);
+              return (
+                <div key={codeName} className={`border ${colors.border} ${colors.bg} rounded-lg p-3`}>
+                  <div className={`text-[12px] font-semibold ${colors.text} mb-2`}>
+                    {codeName}
+                  </div>
+                  <div className="space-y-1.5">
+                    {codeArticles.map((source, idx) => (
+                      <a
+                        key={idx}
+                        href={source.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex items-center gap-2 text-[13px] ${colors.text} hover:underline group`}
+                      >
+                        <span className="text-[#94A3B8]">•</span>
+                        <span className="font-medium">{source.article_number}</span>
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                          <polyline points="15 3 21 3 21 9" />
+                          <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Jurisprudence */}
+      {jurisprudence.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-[#475569]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="M12 3v18" />
+              <path d="M3 12h18" />
+            </svg>
+            JURISPRUDENCE
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+            {jurisprudence.map((source, idx) => (
+              <a
+                key={idx}
+                href={source.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-2 text-[13px] text-slate-700 hover:text-slate-900 group"
+              >
+                <span className="text-[#94A3B8] mt-0.5">•</span>
+                <span className="flex-1">
+                  <span className="font-medium hover:underline">
+                    {formatCourtDecision(source)}
+                  </span>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="inline ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 const loadingSteps = [
@@ -406,33 +571,7 @@ function ChatPageContent() {
 
                     {/* Sources for assistant messages */}
                     {msg.role === "assistant" && msg.sources && msg.sources.length > 0 && (
-                      <div className="flex flex-wrap gap-2 pl-1">
-                        {msg.sources.map((source, index) => (
-                          <a
-                            key={index}
-                            href={source.source_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EFF6FF] text-[#2563EB] rounded-full text-[13px] font-medium hover:bg-[#DBEAFE] transition-all duration-200"
-                          >
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                              <polyline points="15 3 21 3 21 9" />
-                              <line x1="10" y1="14" x2="21" y2="3" />
-                            </svg>
-                            {source.article_number}
-                          </a>
-                        ))}
-                      </div>
+                      <SourcesDisplay sources={msg.sources} />
                     )}
 
                     {/* Timestamp */}
