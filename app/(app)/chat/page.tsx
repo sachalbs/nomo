@@ -72,7 +72,8 @@ function formatTime(dateString: string): string {
 
 // Group articles by code name
 function groupArticlesByCode(sources: Source[]): Record<string, Source[]> {
-  const articles = sources.filter((s) => s.type === "article");
+  // Everything that's not jurisprudence is an article (handles legacy messages)
+  const articles = sources.filter((s) => s.type !== "jurisprudence");
   const grouped: Record<string, Source[]> = {};
 
   articles.forEach((article) => {
@@ -122,9 +123,16 @@ function formatCourtDecision(source: Source): string {
 
 // Sources display component
 function SourcesDisplay({ sources }: { sources: Source[] }) {
-  const articles = sources.filter((s) => s.type === "article");
+  // Debug: log sources to see what we receive
+  console.log("[SourcesDisplay] Received sources:", JSON.stringify(sources, null, 2));
+
+  // Filter: jurisprudence has type="jurisprudence", everything else is an article
+  // This handles legacy messages that don't have the type field
   const jurisprudence = sources.filter((s) => s.type === "jurisprudence");
+  const articles = sources.filter((s) => s.type !== "jurisprudence");
   const groupedArticles = groupArticlesByCode(sources);
+
+  console.log("[SourcesDisplay] Articles:", articles.length, "Jurisprudence:", jurisprudence.length);
 
   return (
     <div className="space-y-3 pl-1">

@@ -1190,6 +1190,9 @@ export async function POST(request: NextRequest) {
     // Total max 5 sources
     const sourcesForResponse = [...articleSources, ...jurisprudenceSources].slice(0, 5);
 
+    // Debug: log sources being sent
+    console.log("[CHAT API] Sources for response:", JSON.stringify(sourcesForResponse, null, 2));
+
     // Save assistant message with sources
     const { error: assistantMsgError } = await supabase.from("messages").insert({
       conversation_id: currentConversationId,
