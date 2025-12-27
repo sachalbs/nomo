@@ -1566,8 +1566,8 @@ export async function POST(request: NextRequest) {
         if (jurisprudenceResult.error) {
           console.error("[RAG] Error searching court decisions:", jurisprudenceResult.error);
         } else {
-          let allJurisprudence = jurisprudenceResult.data || [];
-          console.log(`[RAG] Jurisprudence found (before filtering): ${allJurisprudence.length}`, allJurisprudence.map(j => j.case_number));
+          let allJurisprudence: CourtDecisionSource[] = jurisprudenceResult.data || [];
+          console.log(`[RAG] Jurisprudence found (before filtering): ${allJurisprudence.length}`, allJurisprudence.map((j: CourtDecisionSource) => j.case_number));
 
           // Filter by relevant chambers based on analysis
           const chambresRelevantes = analysis.domaines.length > 0 ? getChambresFromDomaines(analysis.domaines) : [];
@@ -1827,6 +1827,7 @@ export async function POST(request: NextRequest) {
     let assistantMessage = "";
 
     try {
+      console.log("[RESPONSE] Generating final response with max_tokens: 4096");
       const claudeResponse = await anthropic.messages.create({
         model: "claude-sonnet-4-20250514",
         max_tokens: 4096,  // Increased for complete legal analysis
@@ -1845,10 +1846,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // =========================================================================
+    // FILTER SOURCES: Only keep articles actually cited in the response
+    // =========================================================================
+
+    // Extract article numbers cited in the response text
+    const extractCitedArticles = (text: string): string[] => {
+      const patterns = [
+        /article\s+(\d+[-\d]*)/gi,
+        /art\.\s*(\d+[-\d]*)/gi,
+        /L\.\s*(\d+[-\d]*)/gi,
+        /R\.\s*(\d+[-\d]*)/gi,
+      ];
+
+      const cited: string[] = [];
+      for (const pattern of patterns) {
+        const matches = text.matchAll(pattern);
+        for (const match of matches) {
+          cited.push(match[1]);
+        }
+      }
+      return [...new Set(cited)]; // Deduplicate
+    };
+
+    const citedArticleNumbers = extractCitedArticles(assistantMessage);
+    console.log("[SOURCES] Articles cités dans la réponse:", citedArticleNumbers);
+
+    // Filter sources to only keep those actually cited
+    const filteredSources = sources.filter(article => {
+      const articleNum = article.article_number.replace(/Article\s*/i, "").trim();
+      return citedArticleNumbers.some(cited =>
+        articleNum.includes(cited) || cited.includes(articleNum.replace(/[-\s]/g, ""))
+      );
+    });
+
+    console.log("[SOURCES] Articles filtrés:", filteredSources.length, "/", sources.length);
+
+    // Use filtered sources, or fallback to first 3 RAG results if none matched
+    const sourcesToUse = filteredSources.length > 0 ? filteredSources : sources.slice(0, 3);
+
     // Format sources for response (articles + jurisprudence)
     // Deduplicate articles by article_number
     const seenArticles = new Set<string>();
-    const articleSources = sources
+    const articleSources = sourcesToUse
       .filter((s) => {
         if (seenArticles.has(s.article_number)) return false;
         seenArticles.add(s.article_number);
