@@ -1854,7 +1854,6 @@ export async function POST(request: NextRequest) {
     });
 
     let assistantMessage = "";
-    let citedDocumentIndices = new Set<number>();
 
     try {
       console.log("[RESPONSE] Generating final response with max_tokens: 8192 and citations");
@@ -1885,27 +1884,12 @@ export async function POST(request: NextRequest) {
         ],
       });
 
-      // Extract text and citations from response
+      // Extract text from response
       for (const block of claudeResponse.content) {
         if (block.type === "text") {
           assistantMessage += block.text;
-
-          // Check for citations in the block (Citations API)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const blockAny = block as any;
-          if (blockAny.citations && Array.isArray(blockAny.citations)) {
-            for (const citation of blockAny.citations) {
-              // Document citations have document_index
-              const docIndex = citation.document_index;
-              if (docIndex !== undefined && typeof docIndex === "number") {
-                citedDocumentIndices.add(docIndex);
-              }
-            }
-          }
         }
       }
-
-      console.log("[CITATIONS] Documents cités par Claude:", [...citedDocumentIndices]);
     } catch (error) {
       console.error("Claude API error:", error);
       return NextResponse.json(
@@ -1915,40 +1899,79 @@ export async function POST(request: NextRequest) {
     }
 
     // =========================================================================
-    // FILTER SOURCES BASED ON CITATIONS
+    // EXTRACT CITED ARTICLES FROM RESPONSE TEXT
     // =========================================================================
 
-    // Map cited document indices back to sources
-    const citedSources: { type: "article" | "jurisprudence"; data: LawArticleSource | CourtDecisionSource }[] = [];
+    // Parse le texte pour trouver les articles cités (article 1244, art. 1186, L. 121-1, etc.)
+    const extractCitedArticles = (text: string): string[] => {
+      const patterns = [
+        /article\s+(\d+(?:-\d+)?(?:-\d+)?)/gi,
+        /art\.\s*(\d+(?:-\d+)?(?:-\d+)?)/gi,
+        /articles?\s+(\d+(?:-\d+)?)\s+(?:et|,)\s+(\d+(?:-\d+)?)/gi,
+        /L\.?\s*(\d+(?:-\d+)?(?:-\d+)?)/gi,
+        /R\.?\s*(\d+(?:-\d+)?(?:-\d+)?)/gi,
+      ];
 
-    for (const index of citedDocumentIndices) {
-      if (index < sources.length) {
-        citedSources.push({ type: "article", data: sources[index] });
-      } else {
-        const jurisIndex = index - sources.length;
-        if (jurisIndex < jurisprudence.length) {
-          citedSources.push({ type: "jurisprudence", data: jurisprudence[jurisIndex] });
+      const cited = new Set<string>();
+      for (const pattern of patterns) {
+        const matches = text.matchAll(pattern);
+        for (const match of matches) {
+          // Ajouter tous les groupes capturés (pour "articles 1224 et 1226")
+          for (let i = 1; i < match.length; i++) {
+            if (match[i]) {
+              cited.add(match[i]);
+            }
+          }
         }
       }
-    }
 
-    console.log("[CITATIONS] Sources filtrées:", citedSources.length);
+      return [...cited];
+    };
 
-    // Fallback: if no citations, use first RAG results
+    const citedArticleNumbers = extractCitedArticles(assistantMessage);
+    console.log("[CITATIONS] Articles extraits du texte:", citedArticleNumbers);
+
+    // Matcher avec les sources RAG
+    const matchedSources = sources.filter((article) => {
+      const articleNum = article.article_number
+        .replace(/Article\s*/i, "")
+        .replace(/\s+/g, "")
+        .trim();
+
+      return citedArticleNumbers.some((cited) => {
+        const citedClean = cited.replace(/\s+/g, "");
+        return (
+          articleNum.includes(citedClean) ||
+          citedClean.includes(articleNum.replace(/-/g, "")) ||
+          articleNum === citedClean
+        );
+      });
+    });
+
+    // Matcher jurisprudence (si le numéro d'arrêt est mentionné)
+    const matchedJurisprudence = jurisprudence.filter((j) => {
+      return assistantMessage.includes(j.case_number);
+    });
+
+    console.log(
+      "[CITATIONS] Sources matchées:",
+      matchedSources.length,
+      "articles,",
+      matchedJurisprudence.length,
+      "arrêts"
+    );
+
+    // Utiliser les sources matchées, ou fallback sur RAG
     let sourcesToUse: LawArticleSource[];
     let jurisprudenceToUse: CourtDecisionSource[];
 
-    if (citedSources.length === 0) {
-      console.log("[CITATIONS] Aucune citation, fallback sur RAG");
-      sourcesToUse = sources.slice(0, 3);
-      jurisprudenceToUse = jurisprudence.slice(0, 2);
+    if (matchedSources.length > 0) {
+      sourcesToUse = matchedSources;
+      jurisprudenceToUse = matchedJurisprudence.length > 0 ? matchedJurisprudence : jurisprudence.slice(0, 2);
     } else {
-      sourcesToUse = citedSources
-        .filter((s) => s.type === "article")
-        .map((s) => s.data as LawArticleSource);
-      jurisprudenceToUse = citedSources
-        .filter((s) => s.type === "jurisprudence")
-        .map((s) => s.data as CourtDecisionSource);
+      console.log("[CITATIONS] Aucun match, utilisation des sources RAG par défaut");
+      sourcesToUse = sources.slice(0, 5);
+      jurisprudenceToUse = jurisprudence.slice(0, 2);
     }
 
     // Format sources for response (articles + jurisprudence)
