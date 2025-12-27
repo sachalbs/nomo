@@ -81,49 +81,13 @@ function formatCourtDecision(source: Source): string {
   return `${jurisdiction}, n° ${caseNumber}`;
 }
 
-// Sources display component
-// Helper to detect if a source is jurisprudence (arrêt) vs article de loi
+// Helper: si article_number commence par "Arr" → c'est un arrêt
 function isJurisprudence(source: Source): boolean {
-  const articleNum = (source.article_number || "").toLowerCase();
-  const codeName = (source.code_name || "").toLowerCase();
-
-  // Log all checks for debugging
-  const checks = {
-    type: source.type,
-    typeIsJurisp: source.type === "jurisprudence",
-    articleNum: source.article_number,
-    startsWithArret: articleNum.startsWith("arret") || articleNum.startsWith("arrêt"),
-    hasPourvoi: /\d{2}-\d{2}\.\d{3}/.test(articleNum),
-    codeName: source.code_name,
-    hasCass: codeName.includes("cass"),
-  };
-  console.log("isJurisprudence checks:", checks);
-
-  // 1. Type field (most reliable)
-  if (source.type === "jurisprudence") return true;
-  if (source.type === "article") return false;
-
-  // 2. article_number starts with "Arret" or "Arrêt"
-  if (articleNum.startsWith("arret") || articleNum.startsWith("arrêt")) return true;
-
-  // 3. Contains pourvoi pattern XX-XX.XXX
-  if (/\d{2}-\d{2}\.\d{3}/.test(source.article_number || "")) return true;
-
-  // 4. code_name contains court indicators
-  if (codeName.includes("cass")) return true;
-  if (codeName.includes("cour d'appel")) return true;
-
-  return false;
+  const text = source.article_number || "";
+  return text.toLowerCase().startsWith("arr");
 }
 
 function SourcesDisplay({ sources }: { sources: Source[] }) {
-  // DEBUG: Log each source to see exact structure
-  console.log("=== SOURCES DEBUG ===");
-  sources.forEach((s, i) => {
-    console.log(`Source [${i}]:`, JSON.stringify(s, null, 2));
-    console.log(`  -> isJurisprudence: ${isJurisprudence(s)}`);
-  });
-  console.log("=== END SOURCES DEBUG ===");
 
   return (
     <div className="flex flex-wrap gap-2 mt-2">
