@@ -702,6 +702,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // EARLY EXIT: Simple confirmation messages (no RAG needed)
+    const isSimpleConfirmation = /^(ok|okay|d'accord|merci|thanks|parfait|super|cool|bien|oui|non|entendu|compris|alright|got it|top|nickel|g[eé]nial|ah|oh|h+m+)[\s.,!?]*$/i.test(message.trim());
+
+    if (isSimpleConfirmation) {
+      console.log("[SIMPLE CONFIRMATION] Detected, skipping RAG");
+
+      // Get conversation history for context
+      const { data: history } = await supabase
+        .from("messages")
+        .select("role, content")
+        .eq("conversation_id", currentConversationId)
+        .order("created_at", { ascending: true })
+        .limit(10);
+
+      const conversationHistory = history?.slice(-6) || [];
+
+      // Simple conversational response
+      const anthropicClient = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const response = await anthropicClient.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        system: "Tu es Nomo, un assistant juridique pour étudiants en droit français. Réponds de manière naturelle et brève aux messages de confirmation ou remerciements. Sois amical mais concis.",
+        messages: [
+          ...conversationHistory.map((msg) => ({
+            role: msg.role as "user" | "assistant",
+            content: msg.content,
+          })),
+          { role: "user" as const, content: message },
+        ],
+      });
+
+      const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
+
+      // Save assistant message
+      await supabase.from("messages").insert({
+        conversation_id: currentConversationId,
+        role: "assistant",
+        content: assistantMessage,
+        sources: [],
+      });
+
+      // Update conversation timestamp
+      await supabase
+        .from("conversations")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", currentConversationId);
+
+      // Increment message count
+      await supabase.rpc("increment_message_count", { user_id: user.id });
+
+      return NextResponse.json({
+        response: assistantMessage,
+        conversationId: currentConversationId,
+        sources: [],
+      });
+    }
+
     // Check if this is definitely NOT a legal question
     // New approach: BLACKLIST instead of WHITELIST
     // By default, we search for all questions EXCEPT obvious non-legal ones
