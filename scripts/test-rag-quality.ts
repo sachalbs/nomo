@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Test RAG Quality - Jurisprudences Landmarks
  *

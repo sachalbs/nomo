@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Script de test de qualite pour Nomo
  * Teste directement le RAG (Mistral embeddings + Supabase) et Claude
