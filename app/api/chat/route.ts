@@ -1811,33 +1811,101 @@ export async function POST(request: NextRequest) {
     console.log(systemPrompt);
     console.log("========== END SYSTEM PROMPT DEBUG ==========\n");
 
-    // Build messages for Claude (history + current message)
-    const claudeMessages = [
-      ...(history || []).map((msg) => ({
-        role: msg.role as "user" | "assistant",
-        content: msg.content,
-      })),
-    ];
+    // =========================================================================
+    // CLAUDE API WITH CITATIONS
+    // =========================================================================
 
-    // Call Claude API
+    // Prepare documents for Claude Citations API
+    const documentsForClaude: Anthropic.DocumentBlockParam[] = sources.map((article) => ({
+      type: "document" as const,
+      source: {
+        type: "text" as const,
+        media_type: "text/plain" as const,
+        data: `${article.article_number} (${article.code_name}):\n${article.content}`,
+      },
+      title: article.article_number,
+      context: article.code_name,
+    }));
+
+    // Add jurisprudence as documents
+    const jurisprudenceForClaude: Anthropic.DocumentBlockParam[] = jurisprudence.map((j) => ({
+      type: "document" as const,
+      source: {
+        type: "text" as const,
+        media_type: "text/plain" as const,
+        data: `${j.jurisdiction}${j.chambre ? ` - ${j.chambre}` : ""}, ${j.date_decision}, n°${j.case_number}:\n${j.summary}`,
+      },
+      title: `${j.jurisdiction} ${j.case_number}`,
+      context: `Décision du ${j.date_decision}`,
+    }));
+
+    const allDocuments = [...documentsForClaude, ...jurisprudenceForClaude];
+    console.log("[CITATIONS] Nombre de documents fournis à Claude:", allDocuments.length);
+
+    // Build conversation history for multi-turn
+    const historyMessages: Anthropic.MessageParam[] = (history || []).map((msg) => ({
+      role: msg.role as "user" | "assistant",
+      content: msg.content,
+    }));
+
+    // Call Claude API with Citations
     const anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
     let assistantMessage = "";
+    let citedDocumentIndices = new Set<number>();
 
     try {
-      console.log("[RESPONSE] Generating final response with max_tokens: 4096");
+      console.log("[RESPONSE] Generating final response with max_tokens: 8192 and citations");
+
+      // Build the user message with documents + question
+      const userContentBlocks: Anthropic.ContentBlockParam[] = [
+        // First, all documents
+        ...allDocuments,
+        // Then the question
+        {
+          type: "text" as const,
+          text: message,
+        },
+      ];
+
       const claudeResponse = await anthropic.messages.create({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 4096,  // Increased for complete legal analysis
+        max_tokens: 8192,
         system: systemPrompt,
-        messages: claudeMessages,
+        messages: [
+          // Include history if any
+          ...historyMessages,
+          // Current user message with documents
+          {
+            role: "user" as const,
+            content: userContentBlocks,
+          },
+        ],
       });
 
-      // Extract text response
-      const textContent = claudeResponse.content.find((c) => c.type === "text");
-      assistantMessage = textContent?.text || "";
+      // Extract text and citations from response
+      for (const block of claudeResponse.content) {
+        if (block.type === "text") {
+          assistantMessage += block.text;
+
+          // Check for citations in the block (Citations API)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const blockAny = block as any;
+          if (blockAny.citations && Array.isArray(blockAny.citations)) {
+            for (const citation of blockAny.citations) {
+              // Document citations have document_index
+              const docIndex = citation.document_index;
+              if (docIndex !== undefined && typeof docIndex === "number") {
+                citedDocumentIndices.add(docIndex);
+              }
+            }
+          }
+        }
+      }
+
+      console.log("[CITATIONS] Documents cités par Claude:", [...citedDocumentIndices]);
     } catch (error) {
       console.error("Claude API error:", error);
       return NextResponse.json(
@@ -1847,43 +1915,41 @@ export async function POST(request: NextRequest) {
     }
 
     // =========================================================================
-    // FILTER SOURCES: Only keep articles actually cited in the response
+    // FILTER SOURCES BASED ON CITATIONS
     // =========================================================================
 
-    // Extract article numbers cited in the response text
-    const extractCitedArticles = (text: string): string[] => {
-      const patterns = [
-        /article\s+(\d+[-\d]*)/gi,
-        /art\.\s*(\d+[-\d]*)/gi,
-        /L\.\s*(\d+[-\d]*)/gi,
-        /R\.\s*(\d+[-\d]*)/gi,
-      ];
+    // Map cited document indices back to sources
+    const citedSources: { type: "article" | "jurisprudence"; data: LawArticleSource | CourtDecisionSource }[] = [];
 
-      const cited: string[] = [];
-      for (const pattern of patterns) {
-        const matches = text.matchAll(pattern);
-        for (const match of matches) {
-          cited.push(match[1]);
+    for (const index of citedDocumentIndices) {
+      if (index < sources.length) {
+        citedSources.push({ type: "article", data: sources[index] });
+      } else {
+        const jurisIndex = index - sources.length;
+        if (jurisIndex < jurisprudence.length) {
+          citedSources.push({ type: "jurisprudence", data: jurisprudence[jurisIndex] });
         }
       }
-      return [...new Set(cited)]; // Deduplicate
-    };
+    }
 
-    const citedArticleNumbers = extractCitedArticles(assistantMessage);
-    console.log("[SOURCES] Articles cités dans la réponse:", citedArticleNumbers);
+    console.log("[CITATIONS] Sources filtrées:", citedSources.length);
 
-    // Filter sources to only keep those actually cited
-    const filteredSources = sources.filter(article => {
-      const articleNum = article.article_number.replace(/Article\s*/i, "").trim();
-      return citedArticleNumbers.some(cited =>
-        articleNum.includes(cited) || cited.includes(articleNum.replace(/[-\s]/g, ""))
-      );
-    });
+    // Fallback: if no citations, use first RAG results
+    let sourcesToUse: LawArticleSource[];
+    let jurisprudenceToUse: CourtDecisionSource[];
 
-    console.log("[SOURCES] Articles filtrés:", filteredSources.length, "/", sources.length);
-
-    // Use filtered sources, or fallback to first 3 RAG results if none matched
-    const sourcesToUse = filteredSources.length > 0 ? filteredSources : sources.slice(0, 3);
+    if (citedSources.length === 0) {
+      console.log("[CITATIONS] Aucune citation, fallback sur RAG");
+      sourcesToUse = sources.slice(0, 3);
+      jurisprudenceToUse = jurisprudence.slice(0, 2);
+    } else {
+      sourcesToUse = citedSources
+        .filter((s) => s.type === "article")
+        .map((s) => s.data as LawArticleSource);
+      jurisprudenceToUse = citedSources
+        .filter((s) => s.type === "jurisprudence")
+        .map((s) => s.data as CourtDecisionSource);
+    }
 
     // Format sources for response (articles + jurisprudence)
     // Deduplicate articles by article_number
@@ -1902,9 +1968,9 @@ export async function POST(request: NextRequest) {
         source_url: s.source_url,
       }));
 
-    // Deduplicate jurisprudence by case_number
+    // Deduplicate jurisprudence by case_number (using filtered jurisprudenceToUse)
     const seenCases = new Set<string>();
-    const jurisprudenceSources = jurisprudence
+    const jurisprudenceSources = jurisprudenceToUse
       .filter((j) => {
         if (seenCases.has(j.case_number)) return false;
         seenCases.add(j.case_number);
