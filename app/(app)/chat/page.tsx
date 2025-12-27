@@ -70,44 +70,6 @@ function formatTime(dateString: string): string {
   });
 }
 
-// Group articles by code name (expects already-filtered articles)
-function groupArticlesByCode(articles: Source[]): Record<string, Source[]> {
-  const grouped: Record<string, Source[]> = {};
-
-  articles.forEach((article) => {
-    if (!grouped[article.code_name]) {
-      grouped[article.code_name] = [];
-    }
-    grouped[article.code_name].push(article);
-  });
-
-  return grouped;
-}
-
-// Get color badge for each code
-function getCodeColor(codeName: string): { bg: string; text: string; border: string } {
-  const lowerCode = codeName.toLowerCase();
-
-  if (lowerCode.includes("civil")) {
-    return { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" };
-  }
-  if (lowerCode.includes("pénal") || lowerCode.includes("penal")) {
-    return { bg: "bg-red-50", text: "text-red-700", border: "border-red-200" };
-  }
-  if (lowerCode.includes("travail")) {
-    return { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" };
-  }
-  if (lowerCode.includes("commerce")) {
-    return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" };
-  }
-  if (lowerCode.includes("procédure") || lowerCode.includes("procedure")) {
-    return { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" };
-  }
-
-  // Default
-  return { bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200" };
-}
-
 // Format court decision display
 function formatCourtDecision(source: Source): string {
   // Extract case number from article_number (e.g., "Arret 23-12.483" -> "23-12.483")
@@ -120,121 +82,86 @@ function formatCourtDecision(source: Source): string {
 }
 
 // Sources display component
-// Helper to detect if a source is jurisprudence based on article_number
+// Helper to detect if a source is jurisprudence (arrêt) vs article de loi
 function isJurisprudence(source: Source): boolean {
-  // Check type field first
+  // 1. Check type field first (from API)
   if (source.type === "jurisprudence") return true;
-  // Fallback: detect by article_number pattern (starts with "Arret" or "Arrêt")
-  if (source.article_number?.match(/^Arr[eê]t\s+/i)) return true;
-  // Also detect pourvoi number pattern (XX-XX.XXX)
-  if (source.article_number?.match(/^\d{2}-\d{2}\.\d{3}/)) return true;
+  if (source.type === "article") return false;
+
+  // 2. Check article_number pattern
+  const articleNum = source.article_number || "";
+
+  // Starts with "Arret" or "Arrêt" (case insensitive)
+  if (/^arr[eê]t/i.test(articleNum)) return true;
+
+  // Contains pourvoi number pattern XX-XX.XXX (e.g., "93-18.632")
+  if (/\d{2}-\d{2}\.\d{3}/.test(articleNum)) return true;
+
+  // 3. Check code_name for court indicators
+  const codeName = (source.code_name || "").toLowerCase();
+  if (codeName.includes("cass.") || codeName.includes("cassation")) return true;
+  if (codeName.includes("cour d'appel") || codeName.includes("ca ")) return true;
+
   return false;
 }
 
 function SourcesDisplay({ sources }: { sources: Source[] }) {
-  // Debug: log sources to see what we receive
-  console.log("[SourcesDisplay] Received sources:", JSON.stringify(sources, null, 2));
-
-  // Filter: use smart detection for jurisprudence vs articles
-  const jurisprudence = sources.filter((s) => isJurisprudence(s));
-  const articles = sources.filter((s) => !isJurisprudence(s));
-  const groupedArticles = groupArticlesByCode(articles);
-
-  console.log("[SourcesDisplay] Articles:", articles.length, "Jurisprudence:", jurisprudence.length);
+  // Debug log (can be removed in production)
+  if (process.env.NODE_ENV === "development") {
+    const articles = sources.filter((s) => !isJurisprudence(s));
+    const jurisprudence = sources.filter((s) => isJurisprudence(s));
+    console.log("[SourcesDisplay] Total:", sources.length, "| Articles:", articles.length, "| Jurisprudence:", jurisprudence.length);
+    sources.forEach((s, i) => {
+      console.log(`  [${i}] type=${s.type}, article_number=${s.article_number}, isJurisp=${isJurisprudence(s)}`);
+    });
+  }
 
   return (
-    <div className="space-y-3 pl-1">
-      {/* Articles de loi - Style bleu avec icône livre */}
-      {articles.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-blue-700">
-            <span className="text-base">📜</span>
-            ARTICLES DE LOI
-          </div>
+    <div className="flex flex-wrap gap-2 mt-2">
+      {/* Render each source with appropriate style */}
+      {sources.map((source, idx) => {
+        const isArret = isJurisprudence(source);
 
-          <div className="space-y-2">
-            {Object.entries(groupedArticles).map(([codeName, codeArticles]) => {
-              const colors = getCodeColor(codeName);
-              return (
-                <div key={codeName} className={`border ${colors.border} ${colors.bg} rounded-lg p-3`}>
-                  <div className={`text-[12px] font-semibold ${colors.text} mb-2`}>
-                    {codeName}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {codeArticles.map((source, idx) => (
-                      <a
-                        key={idx}
-                        href={source.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-all group"
-                      >
-                        <span className="text-sm">📜</span>
-                        <span className="font-medium">{source.article_number}</span>
-                        <svg
-                          width="11"
-                          height="11"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-50 group-hover:opacity-100 transition-opacity"
-                        >
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                          <polyline points="15 3 21 3 21 9" />
-                          <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Jurisprudence - Style orange/amber distinct */}
-      {jurisprudence.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-amber-700">
-            <span className="text-base">⚖️</span>
-            JURISPRUDENCE
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {jurisprudence.map((source, idx) => (
-              <a
-                key={idx}
-                href={source.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-all group"
-              >
-                <span className="text-sm">⚖️</span>
-                <span className="font-medium">{formatCourtDecision(source)}</span>
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="opacity-50 group-hover:opacity-100 transition-opacity"
-                >
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+        if (isArret) {
+          // ARRÊT - Style amber/orange avec ⚖️
+          return (
+            <a
+              key={idx}
+              href={source.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 rounded-full text-sm transition-colors"
+            >
+              <span>⚖️</span>
+              <span className="font-medium">{formatCourtDecision(source)}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-50">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          );
+        } else {
+          // ARTICLE - Style bleu avec 📜
+          return (
+            <a
+              key={idx}
+              href={source.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-full text-sm transition-colors"
+            >
+              <span>📜</span>
+              <span className="font-medium">{source.article_number}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-50">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          );
+        }
+      })}
     </div>
   );
 }
