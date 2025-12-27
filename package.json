@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "import:codes": "npx tsx scripts/import-codes.ts",
+    "import:cgi": "npx tsx scripts/import-cgi.ts",
     "import:judilibre": "npx tsx scripts/import-judilibre.ts",
     "import:legifrance": "npx tsx scripts/import-legifrance.ts",
     "import:procedure-penale": "npx tsx scripts/import-procedure-penale.ts",
