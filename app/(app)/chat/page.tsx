@@ -70,10 +70,8 @@ function formatTime(dateString: string): string {
   });
 }
 
-// Group articles by code name
-function groupArticlesByCode(sources: Source[]): Record<string, Source[]> {
-  // Everything that's not jurisprudence is an article (handles legacy messages)
-  const articles = sources.filter((s) => s.type !== "jurisprudence");
+// Group articles by code name (expects already-filtered articles)
+function groupArticlesByCode(articles: Source[]): Record<string, Source[]> {
   const grouped: Record<string, Source[]> = {};
 
   articles.forEach((article) => {
@@ -122,15 +120,25 @@ function formatCourtDecision(source: Source): string {
 }
 
 // Sources display component
+// Helper to detect if a source is jurisprudence based on article_number
+function isJurisprudence(source: Source): boolean {
+  // Check type field first
+  if (source.type === "jurisprudence") return true;
+  // Fallback: detect by article_number pattern (starts with "Arret" or "Arrêt")
+  if (source.article_number?.match(/^Arr[eê]t\s+/i)) return true;
+  // Also detect pourvoi number pattern (XX-XX.XXX)
+  if (source.article_number?.match(/^\d{2}-\d{2}\.\d{3}/)) return true;
+  return false;
+}
+
 function SourcesDisplay({ sources }: { sources: Source[] }) {
   // Debug: log sources to see what we receive
   console.log("[SourcesDisplay] Received sources:", JSON.stringify(sources, null, 2));
 
-  // Filter: jurisprudence has type="jurisprudence", everything else is an article
-  // This handles legacy messages that don't have the type field
-  const jurisprudence = sources.filter((s) => s.type === "jurisprudence");
-  const articles = sources.filter((s) => s.type !== "jurisprudence");
-  const groupedArticles = groupArticlesByCode(sources);
+  // Filter: use smart detection for jurisprudence vs articles
+  const jurisprudence = sources.filter((s) => isJurisprudence(s));
+  const articles = sources.filter((s) => !isJurisprudence(s));
+  const groupedArticles = groupArticlesByCode(articles);
 
   console.log("[SourcesDisplay] Articles:", articles.length, "Jurisprudence:", jurisprudence.length);
 
