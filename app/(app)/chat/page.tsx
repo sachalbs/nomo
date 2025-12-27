@@ -123,18 +123,31 @@ function SourcesDisplay({ sources }: { sources: Source[] }) {
         const isArret = isJurisprudence(source);
 
         if (isArret) {
-          // ARRÊT - Style amber/orange avec ⚖️
+          // ARRÊT - Style orange avec ⚖️ (inline styles car amber pas compilé par Tailwind)
           return (
             <a
               key={idx}
               href={source.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 rounded-full text-sm transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors"
+              style={{
+                backgroundColor: '#fffbeb',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: '#fcd34d',
+                color: '#b45309'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#fef3c7';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#fffbeb';
+              }}
             >
               <span>⚖️</span>
               <span className="font-medium">{formatCourtDecision(source)}</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="opacity-50">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ opacity: 0.5 }}>
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                 <polyline points="15 3 21 3 21 9" />
                 <line x1="10" y1="14" x2="21" y2="3" />
