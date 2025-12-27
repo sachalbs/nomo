@@ -1,0 +1,767 @@
+{
+  "imported": [],
+  "not_found": [],
+  "already_exists": [
+    {
+      "nom": "Baldus",
+      "numero": "98-11.381"
+    },
+    {
+      "nom": "Poussin I",
+      "numero": "76-11.551"
+    },
+    {
+      "nom": "Poussin II",
+      "numero": "81-14.967"
+    },
+    {
+      "nom": "Fragonard",
+      "numero": "86-12.387"
+    },
+    {
+      "nom": "Chronopost II",
+      "numero": "99-12.554"
+    },
+    {
+      "nom": "Faurecia I",
+      "numero": "05-17.407"
+    },
+    {
+      "nom": "Faurecia II",
+      "numero": "09-11.841"
+    },
+    {
+      "nom": "Manoukian",
+      "numero": "00-10.243"
+    },
+    {
+      "nom": "Huard",
+      "numero": "90-18.547"
+    },
+    {
+      "nom": "Bordas",
+      "numero": "00-12.932"
+    },
+    {
+      "nom": "Consorts Cruz",
+      "numero": "91-10.199"
+    },
+    {
+      "nom": "Tocqueville",
+      "numero": "96-21.485"
+    },
+    {
+      "nom": "Vilgrain",
+      "numero": "90-14.349"
+    },
+    {
+      "nom": "Petit",
+      "numero": "93-13.550"
+    },
+    {
+      "nom": "Les Maréchaux",
+      "numero": "10-26.454"
+    },
+    {
+      "nom": "Société Point Club Vidéo",
+      "numero": "94-14.800"
+    },
+    {
+      "nom": "Defrenois",
+      "numero": "91-10.970"
+    },
+    {
+      "nom": "Société Française de Factoring",
+      "numero": "88-12.539"
+    },
+    {
+      "nom": "Sté Sicra",
+      "numero": "91-14.468"
+    },
+    {
+      "nom": "Alcatel",
+      "numero": "91-15.999"
+    },
+    {
+      "nom": "Besses",
+      "numero": "04-16.535"
+    },
+    {
+      "nom": "Oracle",
+      "numero": "09-14.838"
+    },
+    {
+      "nom": "Société Française de Gastronomie",
+      "numero": "11-19.047"
+    },
+    {
+      "nom": "Crédicas",
+      "numero": "88-15.717"
+    },
+    {
+      "nom": "Blieck",
+      "numero": "89-15.231"
+    },
+    {
+      "nom": "Costedoat",
+      "numero": "97-17.378"
+    },
+    {
+      "nom": "Cousin",
+      "numero": "00-82.066"
+    },
+    {
+      "nom": "Bertrand",
+      "numero": "94-21.111"
+    },
+    {
+      "nom": "Levert",
+      "numero": "99-11.287"
+    },
+    {
+      "nom": "Fullenwarth",
+      "numero": "80-14.994"
+    },
+    {
+      "nom": "Gabillet",
+      "numero": "79-16.612"
+    },
+    {
+      "nom": "Derguini",
+      "numero": "80-93.481"
+    },
+    {
+      "nom": "Lemaire",
+      "numero": "80-93.031"
+    },
+    {
+      "nom": "Desmares",
+      "numero": "81-12.850"
+    },
+    {
+      "nom": "Perruche",
+      "numero": "99-13.701"
+    },
+    {
+      "nom": "Héro",
+      "numero": "87-82.654"
+    },
+    {
+      "nom": "Samda",
+      "numero": "94-10.618"
+    },
+    {
+      "nom": "Notre-Dame-des-Flots",
+      "numero": "95-83.956"
+    },
+    {
+      "nom": "Letisserand",
+      "numero": "80-93.398"
+    },
+    {
+      "nom": "Dangereux",
+      "numero": "68-10.276"
+    },
+    {
+      "nom": "Société France Quick",
+      "numero": "00-10.628"
+    },
+    {
+      "nom": "Thibault",
+      "numero": "04-17.314"
+    },
+    {
+      "nom": "Arrêt des Chemins de Fer",
+      "numero": "50-04.580"
+    },
+    {
+      "nom": "Société Axa France",
+      "numero": "02-16.165"
+    },
+    {
+      "nom": "Société des laboratoires Cassenne",
+      "numero": "00-21.311"
+    },
+    {
+      "nom": "Commune de Puyricard",
+      "numero": "08-10.899"
+    },
+    {
+      "nom": "Association sportive Nîmes Olympique",
+      "numero": "06-11.611"
+    },
+    {
+      "nom": "Sté Axa Assurances",
+      "numero": "03-15.731"
+    },
+    {
+      "nom": "Société générale",
+      "numero": "93-46.448"
+    },
+    {
+      "nom": "Labanne",
+      "numero": "96-20.732"
+    },
+    {
+      "nom": "Île de la Tentation",
+      "numero": "08-40.981"
+    },
+    {
+      "nom": "Take Eat Easy",
+      "numero": "17-20.079"
+    },
+    {
+      "nom": "Uber",
+      "numero": "19-13.316"
+    },
+    {
+      "nom": "Air France",
+      "numero": "14-28.175"
+    },
+    {
+      "nom": "Abram",
+      "numero": "05-41.155"
+    },
+    {
+      "nom": "Sainte-Marthe",
+      "numero": "89-41.030"
+    },
+    {
+      "nom": "Clavaud",
+      "numero": "87-41.804"
+    },
+    {
+      "nom": "Bull",
+      "numero": "94-13.187"
+    },
+    {
+      "nom": "Spileers",
+      "numero": "96-40.112"
+    },
+    {
+      "nom": "Nikon",
+      "numero": "99-42.942"
+    },
+    {
+      "nom": "Casino de Cannes",
+      "numero": "02-40.662"
+    },
+    {
+      "nom": "Soc. Caterpillar",
+      "numero": "04-41.016"
+    },
+    {
+      "nom": "Kéolis",
+      "numero": "07-40.690"
+    },
+    {
+      "nom": "Securitas",
+      "numero": "06-46.095"
+    },
+    {
+      "nom": "Soc. Jungheinrich",
+      "numero": "09-40.462"
+    },
+    {
+      "nom": "Soc. Compagnie IBM",
+      "numero": "05-44.016"
+    },
+    {
+      "nom": "Stés Wolters Kluwer",
+      "numero": "02-45.146"
+    },
+    {
+      "nom": "Soc. Neiman",
+      "numero": "01-43.578"
+    },
+    {
+      "nom": "Soc. Goodyear Dunlop",
+      "numero": "12-21.136"
+    },
+    {
+      "nom": "Soc. Orange",
+      "numero": "13-17.485"
+    },
+    {
+      "nom": "Soc. Sanofi-Aventis",
+      "numero": "09-42.577"
+    },
+    {
+      "nom": "Soc. Flodor",
+      "numero": "08-41.412"
+    },
+    {
+      "nom": "Soc. Pages Jaunes",
+      "numero": "08-40.276"
+    },
+    {
+      "nom": "Soc. Framatome et Cogema",
+      "numero": "99-44.037"
+    },
+    {
+      "nom": "Pain Quotidien",
+      "numero": "08-40.306"
+    },
+    {
+      "nom": "Mme X c/ Sté Olympia",
+      "numero": "06-46.260"
+    },
+    {
+      "nom": "Soc. Sédimeca",
+      "numero": "10-17.178"
+    },
+    {
+      "nom": "Soc. Eurocopter",
+      "numero": "10-17.427"
+    },
+    {
+      "nom": "Mennesson",
+      "numero": "13-50.005"
+    },
+    {
+      "nom": "Flandin",
+      "numero": "81-17.044"
+    },
+    {
+      "nom": "Six",
+      "numero": "72-14.830"
+    },
+    {
+      "nom": "Métaleurop",
+      "numero": "04-19.716"
+    },
+    {
+      "nom": "Jacques Vabre",
+      "numero": "73-13.556"
+    },
+    {
+      "nom": "Royer",
+      "numero": "74-93.162"
+    },
+    {
+      "nom": "Sté Sécuridev",
+      "numero": "01-02.881"
+    },
+    {
+      "nom": "Sté Générale",
+      "numero": "09-66.255"
+    },
+    {
+      "nom": "Sté Cogefat",
+      "numero": "96-14.689"
+    },
+    {
+      "nom": "Sté Alain Manoukian",
+      "numero": "96-12.314"
+    },
+    {
+      "nom": "Sté Eurodif",
+      "numero": "89-80.153"
+    },
+    {
+      "nom": "Sté Sidel",
+      "numero": "02-10.677"
+    },
+    {
+      "nom": "Sté Labo Industrie",
+      "numero": "96-16.817"
+    },
+    {
+      "nom": "Sté Fruehauf",
+      "numero": "02-11.268"
+    },
+    {
+      "nom": "Sté CGIP",
+      "numero": "97-13.715"
+    },
+    {
+      "nom": "Sté Parfums Rochas",
+      "numero": "81-14.059"
+    },
+    {
+      "nom": "Dame Dol et Laurent"
+    },
+    {
+      "nom": "Compagnie des messageries maritimes"
+    },
+    {
+      "nom": "Mercier"
+    },
+    {
+      "nom": "Teyssier"
+    },
+    {
+      "nom": "Sté Ficom",
+      "numero": "11-27.086"
+    },
+    {
+      "nom": "Sté Metaleurop",
+      "numero": "12-13.256"
+    },
+    {
+      "nom": "Sté Crédit Martiniquais",
+      "numero": "91-20.554"
+    },
+    {
+      "nom": "Sté Laroche",
+      "numero": "92-15.989"
+    },
+    {
+      "nom": "Sté Perrier",
+      "numero": "91-19.568"
+    },
+    {
+      "nom": "Société SCGP",
+      "numero": "04-12.388"
+    },
+    {
+      "nom": "Sté Conforama",
+      "numero": "95-14.421"
+    },
+    {
+      "nom": "Sté Cartier",
+      "numero": "90-19.610"
+    },
+    {
+      "nom": "Sté Volkswagen France",
+      "numero": "00-13.111"
+    },
+    {
+      "nom": "Sté Kigalex",
+      "numero": "13-23.859"
+    },
+    {
+      "nom": "Sté Nausicaa",
+      "numero": "95-12.107"
+    },
+    {
+      "nom": "Macron",
+      "numero": "95-13.972"
+    },
+    {
+      "nom": "Sté Caisse d'épargne",
+      "numero": "11-27.454"
+    },
+    {
+      "nom": "Sté Crédit Lyonnais",
+      "numero": "97-15.059"
+    },
+    {
+      "nom": "Sté BNP",
+      "numero": "99-17.925"
+    },
+    {
+      "nom": "Erika",
+      "numero": "10-82.938"
+    },
+    {
+      "nom": "Xynthia",
+      "numero": "13-84.153"
+    },
+    {
+      "nom": "Amiante",
+      "numero": "99-18.389"
+    },
+    {
+      "nom": "Carrefour",
+      "numero": "05-14.380"
+    },
+    {
+      "nom": "Coca-Cola",
+      "numero": "13-25.326"
+    },
+    {
+      "nom": "Expedia",
+      "numero": "14-16.548"
+    },
+    {
+      "nom": "Deliveroo",
+      "numero": "20-15.820"
+    },
+    {
+      "nom": "Frichti",
+      "numero": "20-14.870"
+    },
+    {
+      "nom": "Sté Apple Sales",
+      "numero": "16-26.115"
+    },
+    {
+      "nom": "Sté SFR",
+      "numero": "12-13.900"
+    },
+    {
+      "nom": "Sté Free Mobile",
+      "numero": "15-24.971"
+    },
+    {
+      "nom": "Sté Booking.com",
+      "numero": "18-14.662"
+    },
+    {
+      "nom": "Sté Eiffage",
+      "numero": "11-12.456"
+    },
+    {
+      "nom": "Sté Décathlon",
+      "numero": "12-29.696"
+    },
+    {
+      "nom": "Sté Buffalo Grill",
+      "numero": "03-12.496"
+    },
+    {
+      "nom": "Sté Yves Rocher",
+      "numero": "01-17.802"
+    },
+    {
+      "nom": "Maif c/ Sté Fiat",
+      "numero": "04-11.049"
+    },
+    {
+      "nom": "Sté Volkswagen",
+      "numero": "17-27.552"
+    },
+    {
+      "nom": "Sté Renault",
+      "numero": "14-22.692"
+    },
+    {
+      "nom": "Sté Toyota",
+      "numero": "15-26.602"
+    },
+    {
+      "nom": "Sté GSK",
+      "numero": "12-27.770"
+    },
+    {
+      "nom": "Sté Sanofi Pasteur",
+      "numero": "16-23.636"
+    },
+    {
+      "nom": "Affaire Médiator",
+      "numero": "18-14.410"
+    },
+    {
+      "nom": "Sté Servier",
+      "numero": "18-20.389"
+    },
+    {
+      "nom": "Levothyrox",
+      "numero": "18-24.537"
+    },
+    {
+      "nom": "Affaire Tapie",
+      "numero": "14-10.739"
+    },
+    {
+      "nom": "Sté Alstom",
+      "numero": "12-24.012"
+    },
+    {
+      "nom": "Sté Vivendi",
+      "numero": "07-20.428"
+    },
+    {
+      "nom": "Sté EADS",
+      "numero": "12-82.535"
+    },
+    {
+      "nom": "Sté Uber BV",
+      "numero": "20-23.692"
+    },
+    {
+      "nom": "Sté Kapten",
+      "numero": "20-15.883"
+    },
+    {
+      "nom": "Stuart",
+      "numero": "21-18.333"
+    },
+    {
+      "nom": "Vincent Lambert",
+      "numero": "17-20.119"
+    },
+    {
+      "nom": "GPA Ukraine",
+      "numero": "18-50.088"
+    },
+    {
+      "nom": "Enfant GPA",
+      "numero": "18-11.815"
+    },
+    {
+      "nom": "Changement sexe",
+      "numero": "19-11.038"
+    },
+    {
+      "nom": "Divorce",
+      "numero": "17-11.316"
+    },
+    {
+      "nom": "Sté Google France",
+      "numero": "18-24.099"
+    },
+    {
+      "nom": "Sté Louis Vuitton",
+      "numero": "16-25.807"
+    },
+    {
+      "nom": "Sté Hermès",
+      "numero": "17-26.572"
+    },
+    {
+      "nom": "Sté Cartier",
+      "numero": "15-10.691"
+    },
+    {
+      "nom": "Sté Chanel",
+      "numero": "13-28.349"
+    },
+    {
+      "nom": "Kerviel c/ SG",
+      "numero": "12-87.416"
+    },
+    {
+      "nom": "UBS France",
+      "numero": "18-85.636"
+    },
+    {
+      "nom": "BNP Paribas",
+      "numero": "18-18.030"
+    },
+    {
+      "nom": "Crédit Mutuel",
+      "numero": "16-15.462"
+    },
+    {
+      "nom": "Sté Amazon",
+      "numero": "18-14.675"
+    },
+    {
+      "nom": "Sté Cdiscount",
+      "numero": "18-20.078"
+    },
+    {
+      "nom": "Sté Facebook",
+      "numero": "19-13.754"
+    },
+    {
+      "nom": "Sté Microsoft",
+      "numero": "14-25.617"
+    },
+    {
+      "nom": "Sté Lactalis",
+      "numero": "17-86.970"
+    },
+    {
+      "nom": "Sté Spanghero",
+      "numero": "15-83.175"
+    },
+    {
+      "nom": "Sté Findus",
+      "numero": "14-84.871"
+    },
+    {
+      "nom": "Sté Carrefour",
+      "numero": "17-24.990"
+    },
+    {
+      "nom": "Sté Leclerc",
+      "numero": "17-10.448"
+    },
+    {
+      "nom": "Sté Casino",
+      "numero": "15-27.325"
+    },
+    {
+      "nom": "Sté Système U",
+      "numero": "14-26.693"
+    },
+    {
+      "nom": "Sté Air France",
+      "numero": "17-10.934"
+    },
+    {
+      "nom": "Sté La Poste",
+      "numero": "17-23.655"
+    },
+    {
+      "nom": "Sté Renault",
+      "numero": "16-15.623"
+    },
+    {
+      "nom": "Sté Continental",
+      "numero": "17-17.688"
+    },
+    {
+      "nom": "Sté Maaf",
+      "numero": "11-17.738"
+    },
+    {
+      "nom": "Sté Axa",
+      "numero": "13-14.448"
+    },
+    {
+      "nom": "Sté Allianz",
+      "numero": "16-17.767"
+    },
+    {
+      "nom": "Sté Covéa",
+      "numero": "18-17.912"
+    },
+    {
+      "nom": "PIP",
+      "numero": "17-18.608"
+    },
+    {
+      "nom": "Dépakine",
+      "numero": "19-18.741"
+    },
+    {
+      "nom": "Glyphosate",
+      "numero": "20-17.185"
+    },
+    {
+      "nom": "Chlordécone",
+      "numero": "21-25.689"
+    },
+    {
+      "nom": "Lubrizol",
+      "numero": "20-15.456"
+    },
+    {
+      "nom": "Notre-Dame-des-Landes",
+      "numero": "16-21.687"
+    },
+    {
+      "nom": "Sivens",
+      "numero": "15-14.687"
+    },
+    {
+      "nom": "Bitcoin",
+      "numero": "18-22.528"
+    },
+    {
+      "nom": "NFT",
+      "numero": "22-14.547"
+    }
+  ],
+  "errors": [
+    {
+      "nom": "Chronopost I",
+      "numero": "93-18.632",
+      "error": "duplicate key value violates unique constraint \"unique_case_number\""
+    },
+    {
+      "nom": "Boot Shop Myr'ho",
+      "numero": "05-13.255",
+      "error": "duplicate key value violates unique constraint \"unique_case_number\""
+    },
+    {
+      "nom": "Labassée",
+      "numero": "14-21.323",
+      "error": "duplicate key value violates unique constraint \"unique_case_number\""
+    }
+  ]
+}
