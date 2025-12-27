@@ -55,7 +55,7 @@ export async function middleware(request: NextRequest) {
   if (pathname === "/api/chat" && request.method === "POST" && user) {
     // Get user profile with subscription status and message count
     const { data: profile } = await supabase
-      .from("users")
+      .from("profiles")
       .select("is_subscribed, message_count")
       .eq("id", user.id)
       .single();

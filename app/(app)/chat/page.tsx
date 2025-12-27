@@ -203,7 +203,7 @@ function ChatPageContent() {
       }
 
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from("profiles")
           .select("message_count, is_subscribed")
           .eq("id", user.id)
@@ -212,6 +212,16 @@ function ChatPageContent() {
         if (profile) {
           setMessageCount(profile.message_count || 0);
           setIsSubscribed(profile.is_subscribed || false);
+        } else if (error) {
+          // Profile doesn't exist, create it
+          console.log("[PROFILE] Creating profile for user:", user.id);
+          await supabase.from("profiles").insert({
+            id: user.id,
+            message_count: 0,
+            is_subscribed: false,
+          });
+          setMessageCount(0);
+          setIsSubscribed(false);
         }
       }
     };
