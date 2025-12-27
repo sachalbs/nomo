@@ -256,6 +256,361 @@ function extractKeywords(message: string): string[] {
   return Array.from(new Set([...multiWordTerms, ...words])).slice(0, 7); // Increased limit for better matching
 }
 
+// ============================================================================
+// STEP 0: Question Analysis by Claude (BEFORE RAG)
+// ============================================================================
+
+interface QuestionAnalysis {
+  isLegalQuestion: boolean;
+  domaines: string[]; // ["pénal", "civil", "fiscal", "travail", "commercial", "procédure"]
+  problematiques: string[]; // ["dégradation de biens", "homicide involontaire", ...]
+  qualificationsRecherchees: string[]; // ["destruction", "violence", "légitime défense", ...]
+  articlesConnus: string[]; // ["322-1", "221-6", "122-5", ...] si Claude les connaît
+  codesARechercher: string[]; // ["Code pénal", "Code de procédure pénale", ...]
+  motsClesRecherche: string[]; // mots-clés pour la recherche vectorielle
+  isCasPratique: boolean; // Si c'est un cas pratique avec faits à analyser
+  structureRecommandee: string; // Structure de réponse adaptée au domaine
+}
+
+async function analyzeQuestion(message: string): Promise<QuestionAnalysis> {
+  const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  });
+
+  const systemPrompt = `Tu es un expert en droit français. Analyse cette question/cas pratique et identifie les éléments juridiques.
+
+IMPORTANT :
+- Lis l'ENSEMBLE du texte avant de répondre
+- Identifie TOUS les domaines de droit concernés (un cas peut être transversal)
+- Pour le pénal, identifie les infractions possibles et leurs articles
+- Pour le civil, identifie les responsabilités et fondements
+- Pour le fiscal, identifie les impôts/taxes concernés
+- Ignore les mots qui ne sont pas juridiques (exemple: "SA" dans "SA voiture" n'est PAS une Société Anonyme)
+
+Détermine aussi :
+- Si c'est un cas pratique (énoncé avec faits à analyser juridiquement)
+- La structure de réponse à utiliser
+
+Pour la structure :
+- Si UN SEUL domaine clairement identifié, utilise la structure spécifique :
+  * Pénal : "Pour chaque infraction : Élément légal (article) → Élément matériel (acte/résultat) → Élément moral (intention) → Faits justificatifs éventuels"
+  * Obligations/Contrats : "Qualification contrat → Validité → Effets → Responsabilité"
+  * Travail : "Qualification relation → Obligations → Rupture → Contentieux"
+  * Procédure pénale : "Cadre procédural → Validité actes → Nullités"
+  * Administratif : "Compétence → Recevabilité → Légalité externe → Légalité interne"
+
+- Si TRANSVERSAL (plusieurs domaines) ou PAS CLAIR : utilise la structure simple :
+  "1. Qualification des faits → 2. Problème de droit → 3. Majeure (règle + articles) → 4. Mineure (En l'espèce...) → 5. Conclusion"
+
+La structure simple est le DÉFAUT si tu hésites.
+
+MÉTHODE D'ANALYSE EXHAUSTIVE :
+
+Pour chaque domaine de droit détecté, utilise la checklist correspondante pour identifier TOUTES les problématiques juridiques possibles. Ne te limite pas aux questions évidentes.
+
+=== DROIT DES SOCIÉTÉS / COMMERCIAL ===
+- Action sociale : ut singuli ou ut universi ?
+  * Action ut singuli : SEULEMENT contre dirigeant de DROIT, pas de fait
+  * Si dirigeant de fait visé : passer par mandataire ad hoc ou action ut universi
+  * Nécessite mise en cause de la société (mandataire ad hoc si conflit)
+- Action individuelle : existe-t-il un préjudice personnel DISTINCT du préjudice social ?
+  * Préjudice personnel DISTINCT du préjudice social ? (sinon échec)
+  * Perte valeur titres, absence dividendes = préjudice INDIRECT → action vouée à l'échec
+  * Fondement : Art. 1240 Code civil
+- Qualité du dirigeant : de droit ou de fait ? (l'action ut singuli ne vise que le dirigeant de droit)
+- Conventions réglementées : Art. L. 225-38 et suivants applicables ?
+  * Autorisation préalable CA + approbation AG ?
+  * Sanctions : nullité si préjudice / responsabilité dirigeants
+- Abus : de majorité, de minorité, d'égalité ?
+- Devoir de loyauté : dirigeant OUI, actionnaire NON (sauf clause statutaire)
+  * Arrêt Vilgrain : actionnaire n'a pas de devoir de loyauté
+  * Exception : clause statutaire expresse ou concurrence déloyale
+- Transformation de société : effet sur les mandats en cours ?
+  * Cessation automatique ≠ révocation
+  * Clauses d'indemnité de révocation : NON applicables à une transformation
+  * Sauf si transformation = révocation déguisée (but d'évincer)
+- Raison d'être statutaire (Art. 1835) : respect ou violation ?
+  * Sa violation NE permet PAS d'annuler contrat avec tiers
+  * Seule sanction : responsabilité dirigeants
+- Cession de fonds de commerce : éléments inclus/exclus ? transmission des contrats ?
+  * Stock : inclus par défaut SAUF clause contraire expresse
+  * Contrats en cours : NON transmis par principe, sauf exceptions légales (bail L.145-16, travail L.1224-1) ou clause expresse
+  * Contrat de distribution : JAMAIS transmis automatiquement, clause expresse nécessaire
+- Procédure collective évoquée : action en insuffisance d'actif (L. 651-2), extension de procédure, dirigeant de fait ?
+  * Insuffisance actif : contre dirigeant droit ET fait
+  * Seul liquidateur peut l'exercer (pas associé)
+- Mandataire ad hoc nécessaire en cas de conflit d'intérêts ?
+- Prescription : délai applicable (souvent 3 ans en droit des sociétés) ?
+
+=== DROIT PÉNAL ===
+- Pour chaque fait : quelle infraction potentielle ?
+- Élément légal : quel texte d'incrimination ?
+- Élément matériel : acte + résultat + lien de causalité ?
+- Élément moral : intention (dol général/spécial), imprudence, négligence ?
+- Faits justificatifs : légitime défense (122-5), état de nécessité (122-7), ordre de la loi (122-4), consentement de la victime ?
+- Causes de non-imputabilité : trouble mental (122-1), contrainte (122-2), erreur de droit (122-3), minorité ?
+- Tentative : punissable pour cette infraction ? commencement d'exécution ?
+- Complicité : aide, assistance, instigation ?
+- Concours d'infractions : réel ou idéal ?
+- Récidive applicable ?
+- Prescription de l'action publique : délai selon la nature de l'infraction ?
+
+=== DROIT DES OBLIGATIONS / CONTRATS ===
+- Qualification du contrat : nommé ou innommé ? synallagmatique ou unilatéral ?
+- Formation : offre et acceptation valables ?
+- Consentement : erreur (1132), dol (1137), violence (1140), lésion ?
+- Capacité des parties ?
+- Contenu : licite et certain ?
+- Exécution : conforme, inexécution totale/partielle ?
+- Inexécution : exception d'inexécution, exécution forcée, réduction du prix, résolution ?
+- Force majeure (1218) applicable ?
+- Imprévision (1195) applicable ?
+- Responsabilité contractuelle vs délictuelle : non-cumul ?
+- Nullité : relative ou absolue ? effets ?
+- Résolution vs résiliation : effets différents ?
+- Prescription : 5 ans droit commun, exceptions ?
+- Cession de contrat : accord du cédé nécessaire sauf exceptions légales
+  * Principe : accord du cédé (cocontractant) obligatoire
+  * Exceptions légales : bail commercial (L.145-16), contrat travail (L.1224-1)
+  * Contrats intuitu personae : incessibles sans accord exprès
+  * Transmission automatique : UNIQUEMENT bail commercial et contrat de travail
+
+=== DROIT DU TRAVAIL ===
+- Qualification de la relation : CDI, CDD, intérim, stage ?
+- Lien de subordination caractérisé ?
+- Contrat : clauses essentielles, clauses abusives ?
+- Exécution : modification du contrat vs changement des conditions de travail ?
+- Suspension : maladie, maternité, grève ?
+- Durée du travail : heures supplémentaires, repos ?
+- Rupture : démission, licenciement (personnel/économique), rupture conventionnelle, prise d'acte ?
+- Licenciement : cause réelle et sérieuse ? faute simple/grave/lourde ?
+- Procédure de licenciement respectée ?
+- Indemnités dues : légales, conventionnelles, dommages-intérêts ?
+- Contentieux prud'homal : délais, compétence, procédure ?
+
+=== DROIT ADMINISTRATIF ===
+- Acte administratif : unilatéral ou contrat ?
+- Recours : REP, plein contentieux, référé ?
+- Compétence : TA, CAA, CE ?
+- Recevabilité : délai (2 mois), intérêt à agir, décision préalable ?
+- Légalité externe : compétence, procédure, forme ?
+- Légalité interne : violation de la loi, erreur de fait/droit, détournement de pouvoir ?
+- Responsabilité administrative : faute de service, faute personnelle, sans faute ?
+- Police administrative vs police judiciaire ?
+
+=== DROIT FISCAL ===
+- Impôt concerné : IR, IS, TVA, IFI, droits d'enregistrement ?
+- Fait générateur et exigibilité ?
+- Assiette et taux ?
+- Régime applicable : réel, micro, forfait ?
+- Déductions, réductions, crédits d'impôt ?
+- Plus-values : régime applicable, exonérations ?
+- Procédure : contrôle fiscal, garanties du contribuable ?
+- Contentieux fiscal : réclamation préalable, délais ?
+- Abus de droit fiscal ?
+- Prix de transfert si groupe international ?
+
+=== DROIT DE LA FAMILLE ===
+- Mariage : conditions, effets, régime matrimonial ?
+- Divorce : par consentement mutuel, pour faute, pour altération définitive du lien conjugal ?
+- Prestation compensatoire ?
+- Filiation : établissement, contestation ?
+- Autorité parentale : exercice, délégation, retrait ?
+- Obligation alimentaire ?
+- Succession : dévolution légale, testament, réserve héréditaire ?
+- Libéralités : donation, legs, rapport, réduction ?
+
+=== PROCÉDURE CIVILE ===
+- Compétence : matérielle (TJ, TC, CPH) et territoriale ?
+- Action en justice : intérêt, qualité, capacité ?
+- Demande : principale, reconventionnelle, incidente ?
+- Moyens de défense : exceptions, fins de non-recevoir, défenses au fond ?
+- Preuves : charge, modes, loyauté ?
+- Jugement : autorité de chose jugée, exécution provisoire ?
+- Voies de recours : appel (délai 1 mois), opposition, pourvoi ?
+- Procédures spéciales : référé, requête, injonction de payer ?
+
+=== PROCÉDURE PÉNALE ===
+- Phase d'enquête : flagrance, préliminaire, pouvoirs OPJ/APJ ?
+- Mesures coercitives : garde à vue (Art. 62-2), perquisition, écoutes ?
+- Instruction : mise en examen, témoin assisté, contrôle judiciaire, détention provisoire ?
+- Jugement : tribunal de police, correctionnel, cour d'assises ?
+- Action publique : prescription, extinction ?
+- Action civile : constitution de partie civile, préjudice ?
+- Voies de recours : appel, pourvoi ?
+- Usage des armes par la police (L. 435-1 CSI) ?
+
+=== FALLBACK SI MATIÈRE NON RECONNUE ===
+Si la matière n'est pas clairement identifiable ou est transversale :
+- Identifier tous les acteurs et leurs relations juridiques
+- Pour chaque relation : qualifier juridiquement (contrat, délit, statut...)
+- Pour chaque acteur : quelles actions possibles ? contre qui ?
+- Quels préjudices ? quels fondements juridiques ?
+- Quelles prescriptions applicables ?
+- Utiliser le syllogisme : Qualification → Problème de droit → Majeure → Mineure → Conclusion
+
+RÈGLES DE SÉLECTION DES ARTICLES :
+
+1. ÉVITE les articles de PRINCIPE GÉNÉRAL sauf s'ils sont directement applicables :
+   - Art. 1103 (force obligatoire) → Trop général, ne cite que si vraiment nécessaire
+   - Art. 1104 (bonne foi) → Trop général
+   - Art. 1217 (liste des sanctions) → Préfère l'article spécifique de la sanction visée
+
+2. PRÉFÈRE les articles OPÉRATIONNELS qui décrivent le MÉCANISME juridique :
+   - Au lieu de 1217 (liste des sanctions) → Cite 1224, 1226, 1229 (résolution)
+   - Au lieu de 1240 seul → Ajoute 1241, 1242, 1243, 1244 selon le fait générateur
+   - Au lieu de "responsabilité contractuelle" → Cite 1231-1 à 1231-7
+
+3. IDENTIFIE LE MÉCANISME JURIDIQUE PRÉCIS et ses articles :
+
+   RÉSOLUTION DE CONTRAT :
+   - 1224 : modes de résolution (clause, juge, unilatérale)
+   - 1225 : clause résolutoire
+   - 1226 : résolution unilatérale (conditions : gravité, mise en demeure, notification)
+   - 1227 : résolution judiciaire
+   - 1228 : choix du mode
+   - 1229 : effets de la résolution (date, restitutions)
+   - 1230 : résolution partielle
+
+   RESPONSABILITÉ CONTRACTUELLE :
+   - 1231-1 : dommages-intérêts pour inexécution
+   - 1231-2 : dommages-intérêts = perte + gain manqué
+   - 1231-3 : limitation aux dommages prévisibles
+   - 1231-4 : lien de causalité direct et immédiat
+   - 1231-5 : clause pénale
+
+   CONTRATS INTERDÉPENDANTS :
+   - 1186 : caducité dans les ensembles contractuels
+   - 1187 : effets de la caducité
+
+   INEXÉCUTION :
+   - 1219 : exception d'inexécution
+   - 1220 : exception d'inexécution anticipée
+   - 1221 : exécution forcée en nature
+   - 1222 : exécution par un tiers
+   - 1223 : réduction du prix
+
+   FORCE MAJEURE / EXONÉRATION :
+   - 1218 : définition et effets de la force majeure
+   - 1231-1 : absence de mise en demeure si inexécution définitive
+
+   RESPONSABILITÉ EXTRACONTRACTUELLE :
+   - 1240 : fait personnel (faute prouvée)
+   - 1241 : négligence/imprudence
+   - 1242 al. 1 : fait des choses (présomption)
+   - 1242 al. 4 : fait d'autrui (commettant/préposé)
+   - 1243 : fait des animaux
+   - 1244 : ruine des bâtiments (défaut entretien/vice construction)
+   - 1245+ : produits défectueux
+
+4. POSE-TOI CES QUESTIONS pour chaque problème :
+
+   a) Quel est le MÉCANISME juridique en jeu ?
+      → Résolution ? Responsabilité ? Nullité ? Caducité ?
+
+   b) Quelles sont les CONDITIONS de ce mécanisme ?
+      → Quels articles les décrivent ?
+
+   c) Quels sont les EFFETS de ce mécanisme ?
+      → Quels articles les décrivent ?
+
+   d) Existe-t-il des EXCEPTIONS ou EXONÉRATIONS ?
+      → Quels articles les prévoient ?
+
+5. SOIS EXHAUSTIF : pour chaque mécanisme, liste TOUS les articles de la chaîne logique
+
+   Exemple pour une résolution unilatérale :
+   - Principe : 1224
+   - Conditions : 1226 (gravité + mise en demeure sauf urgence + notification motivée)
+   - Effets : 1229 (date de prise d'effet, restitutions)
+   - Exception : 1218 si force majeure invoquée
+
+6. DISTINGUE selon le FONDEMENT de l'action :
+
+   - Si CONTRACTUEL → 1231-1 et suivants (pas 1240)
+   - Si DÉLICTUEL → 1240 à 1244 (pas 1231)
+   - Si TIERS au contrat → Arrêt Bootshop : 1240 pour manquement contractuel causant préjudice au tiers
+
+INSTRUCTION FINALE :
+
+Quand tu identifies les articlesConnus, demande-toi : "Est-ce que cet article décrit le MÉCANISME PRÉCIS applicable ou juste un PRINCIPE GÉNÉRAL ?"
+
+- Si PRINCIPE GÉNÉRAL seul → Cherche l'article OPÉRATIONNEL correspondant
+- Si MÉCANISME PRÉCIS → Garde-le ET ajoute les articles connexes (conditions, effets, exceptions)
+
+L'objectif est de fournir au RAG une liste d'articles qui permettront de répondre avec PRÉCISION, pas avec des généralités.
+
+Après avoir appliqué la/les checklist(s) pertinente(s), liste dans articlesConnus TOUS les articles que tu connais qui pourraient s'appliquer, même indirectement. Sois EXHAUSTIF.
+
+Pour les problematiques, formule-les de manière PRÉCISE et ACTIONNABLE, pas vague.
+
+Exemples :
+- MAUVAIS : "responsabilité du dirigeant"
+- BON : "action sociale ut singuli contre le dirigeant de droit pour faute de gestion"
+
+- MAUVAIS : "problème pénal"
+- BON : "qualification de destruction de bien d'autrui (322-1 CP), recherche des éléments constitutifs et faits justificatifs possibles"
+
+Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans backticks) :
+{
+  "isLegalQuestion": true/false,
+  "domaines": ["pénal", "civil", ...],
+  "problematiques": ["description problème 1", "description problème 2", ...],
+  "qualificationsRecherchees": ["dégradation", "homicide involontaire", "violences", ...],
+  "articlesConnus": ["322-1", "221-6", "L435-1 CSI", ...],
+  "codesARechercher": ["Code pénal", "Code civil", ...],
+  "motsClesRecherche": ["mot1", "mot2", ...],
+  "isCasPratique": true/false,
+  "structureRecommandee": "la structure choisie"
+}`;
+
+  try {
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1500,  // Increased for exhaustive analysis with checklists
+      system: systemPrompt,
+      messages: [{ role: "user", content: message }]
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+
+    try {
+      const analysis = JSON.parse(text);
+      console.log('[ANALYSIS] Successfully parsed analysis');
+      return analysis;
+    } catch (parseError) {
+      console.error('[ANALYSIS] JSON parse error:', parseError);
+      console.error('[ANALYSIS] Response text:', text);
+      // Fallback si le JSON est invalide
+      return {
+        isLegalQuestion: true,
+        domaines: [],
+        problematiques: [],
+        qualificationsRecherchees: [],
+        articlesConnus: [],
+        codesARechercher: [],
+        motsClesRecherche: [],
+        isCasPratique: false,
+        structureRecommandee: "1. Qualification des faits → 2. Problème de droit → 3. Majeure (règle + articles) → 4. Mineure (En l'espèce...) → 5. Conclusion"
+      };
+    }
+  } catch (error) {
+    console.error('[ANALYSIS] Error calling Claude:', error);
+    // Fallback en cas d'erreur API
+    return {
+      isLegalQuestion: true,
+      domaines: [],
+      problematiques: [],
+      qualificationsRecherchees: [],
+      articlesConnus: [],
+      codesARechercher: [],
+      motsClesRecherche: [],
+      isCasPratique: false,
+      structureRecommandee: "1. Qualification des faits → 2. Problème de droit → 3. Majeure (règle + articles) → 4. Mineure (En l'espèce...) → 5. Conclusion"
+    };
+  }
+}
+
 const CRFPA_COMPLEMENT = `
 ## COMPLÉMENT MÉTHODOLOGIQUE CRFPA
 
@@ -410,6 +765,33 @@ function detectRelevantCodes(message: string): string[] | null {
   return Array.from(codes);
 }
 
+// Get relevant court chambers based on legal domains
+function getChambresFromDomaines(domaines: string[]): string[] {
+  const chambres: string[] = [];
+
+  // Criminal law
+  if (domaines.some(d => ["pénal", "penal", "procédure pénale", "procedure penale", "criminel"].includes(d.toLowerCase()))) {
+    chambres.push("criminelle", "cr", "CRIM", "Crim.", "Chambre criminelle");
+  }
+
+  // Civil law
+  if (domaines.some(d => ["civil", "obligations", "contrats", "famille", "responsabilité civile", "responsabilite civile"].includes(d.toLowerCase()))) {
+    chambres.push("civ1", "civ2", "civ3", "civile", "CIV1", "CIV2", "CIV3", "Civ. 1", "Civ. 2", "Civ. 3", "1re chambre civile", "2e chambre civile", "3e chambre civile");
+  }
+
+  // Commercial law
+  if (domaines.some(d => ["commercial", "affaires", "sociétés", "societes", "commerce"].includes(d.toLowerCase()))) {
+    chambres.push("commerciale", "comm", "COMM", "Com.", "Chambre commerciale");
+  }
+
+  // Labor law
+  if (domaines.some(d => ["travail", "social"].includes(d.toLowerCase()))) {
+    chambres.push("sociale", "soc", "SOC", "Soc.", "Chambre sociale");
+  }
+
+  return chambres;
+}
+
 // Fallback keyword search when vector search fails
 async function keywordSearch(
   supabase: any,
@@ -522,7 +904,8 @@ async function keywordSearch(
 function buildSystemPrompt(
   sources: LawArticleSource[],
   jurisprudence: CourtDecisionSource[],
-  casPratiqueDetection: CasPratiqueDetection = "none"
+  casPratiqueDetection: CasPratiqueDetection = "none",
+  analysis?: QuestionAnalysis
 ): string {
   const hasArticles = sources.length > 0;
   const hasJurisprudence = jurisprudence.length > 0;
@@ -597,8 +980,96 @@ PUIS donne une réponse courte et directe à la question en utilisant les source
 
 ` : '';
 
-  return `Tu es Nomo, un assistant juridique pour les etudiants en droit francais.
+  // Build analysis section if provided
+  const analysisSection = analysis && (analysis.domaines.length > 0 || analysis.problematiques.length > 0) ? `
 
+ANALYSE PRÉALABLE DU SUJET :
+${analysis.domaines.length > 0 ? `- Domaines de droit : ${analysis.domaines.join(', ')}` : ''}
+${analysis.problematiques.length > 0 ? `- Problématiques identifiées : ${analysis.problematiques.join(', ')}` : ''}
+${analysis.qualificationsRecherchees.length > 0 ? `- Qualifications à examiner : ${analysis.qualificationsRecherchees.join(', ')}` : ''}
+` : '';
+
+  // Build structure section if it's a cas pratique
+  const structureSection = analysis && analysis.isCasPratique && analysis.structureRecommandee ? `
+
+===== STRUCTURE OBLIGATOIRE =====
+
+${analysis.structureRecommandee}
+
+Pour chaque point :
+- MAJEURE : Cite l'article précis + énonce le principe juridique
+- MINEURE : Commence par "En l'espèce..." + applique aux faits
+- CONCLUSION : Tranche clairement
+
+Tu DOIS respecter cette structure. Utilise I. II. III. pour les grandes parties.
+
+=================================
+` : '';
+
+  // Build legal rules section
+  const legalRulesSection = `
+
+RÈGLES JURIDIQUES IMPORTANTES À RESPECTER :
+
+Ces règles sont des principes établis que tu DOIS appliquer correctement :
+
+=== DROIT DES SOCIÉTÉS ===
+
+TRANSFORMATION DE SOCIÉTÉ :
+- La transformation entraîne la CESSATION AUTOMATIQUE des mandats (pas une révocation)
+- Une cessation ≠ une révocation → les clauses d'indemnité de révocation ne s'appliquent PAS
+- Exception : si la transformation vise UNIQUEMENT à évincer un dirigeant = révocation déguisée
+
+ACTION SOCIALE UT SINGULI :
+- Possible UNIQUEMENT contre les dirigeants de DROIT (pas de fait)
+- Contre un dirigeant de FAIT → il faut passer par un mandataire ad hoc ou l'action sociale ut universi
+- Nécessite de mettre en cause la société (mandataire ad hoc si conflit d'intérêts)
+
+ACTION INDIVIDUELLE DE L'ASSOCIÉ :
+- Fondement : Art. 1240 Code civil
+- Condition STRICTE : préjudice PERSONNEL et DISTINCT du préjudice social
+- La perte de valeur des titres, l'absence de dividendes = préjudice INDIRECT → action vouée à l'échec
+
+DEVOIR DE LOYAUTÉ :
+- Le DIRIGEANT a un devoir de loyauté envers la société
+- L'ACTIONNAIRE n'a PAS de devoir de loyauté (arrêt Vilgrain, Cass. com. 27 févr. 1996)
+- Exception : clause statutaire ou actes de concurrence déloyale caractérisés
+
+INSUFFISANCE D'ACTIF (Art. L. 651-2) :
+- Action possible contre dirigeants de droit ET de fait
+- Requiert : faute de gestion + contribution à l'insuffisance d'actif
+- Seul le liquidateur peut l'exercer (pas l'associé directement)
+
+=== CESSION DE FONDS DE COMMERCE ===
+
+ÉLÉMENTS DU FONDS :
+- Éléments corporels : matériel, outillage, marchandises/stock
+- Éléments incorporels : clientèle, nom commercial, droit au bail, contrats spéciaux
+- Le stock est inclus SAUF stipulation contraire expresse dans l'acte
+
+TRANSMISSION DES CONTRATS :
+- Principe : les contrats NE SE TRANSMETTENT PAS automatiquement
+- Exceptions légales : bail commercial (Art. L. 145-16), contrats de travail (Art. L. 1224-1)
+- Le contrat de distribution N'EST PAS transmis automatiquement, même essentiel à l'activité
+- Exception : clause contractuelle EXPRESSE de transmission au cessionnaire
+
+=== CONVENTIONS RÉGLEMENTÉES ===
+
+PROCÉDURE :
+- Autorisation PRÉALABLE du conseil d'administration
+- Approbation ULTÉRIEURE par l'assemblée générale
+
+SANCTIONS :
+- Défaut d'autorisation préalable → nullité possible SI préjudice pour la société
+- Défaut d'approbation AG seule → convention reste valable (sauf fraude), responsabilité des dirigeants
+
+RAISON D'ÊTRE (Art. 1835 C. civ.) :
+- Sa violation ne permet PAS d'annuler un contrat avec un tiers
+- Seule sanction : responsabilité civile des dirigeants pour faute de gestion
+`;
+
+  return `Tu es Nomo, un assistant juridique expert pour les etudiants en droit francais niveau CRFPA.
+${analysisSection}${structureSection}${legalRulesSection}
 ⚠️ INSTRUCTION OBLIGATOIRE : Tu DOIS utiliser les sources ci-dessous pour repondre. Des sources pertinentes ont ete trouvees pour cette question.
 
 REGLES STRICTES :
@@ -606,6 +1077,7 @@ REGLES STRICTES :
 2. Ne dis JAMAIS "je n'ai pas trouve" si des sources sont presentes ci-dessous
 3. Cite explicitement les articles et arrets dans ta reponse
 4. N'invente rien, utilise uniquement le contenu des sources
+${analysis && analysis.problematiques.length > 0 ? `5. Analyse CHAQUE problématique identifiée ci-dessus` : ''}
 ${casPratiqueMethodology}
 FORMAT DE REPONSE :
 - ${casPratiqueDetection === "explicit" ? 'SUIS STRICTEMENT la méthodologie du cas pratique ci-dessus (5 étapes obligatoires)' : casPratiqueDetection === "uncertain" ? 'Demande d\'abord le format souhaité, puis donne une réponse courte' : 'Commence par repondre directement a la question'}
@@ -799,13 +1271,113 @@ export async function POST(request: NextRequest) {
     // By default, we search for all questions EXCEPT obvious non-legal ones
     const isNonLegal = isDefinitelyNotLegal(message);
 
+    // ============================================================================
+    // STEP 0: ANALYZE QUESTION WITH CLAUDE (NEW!)
+    // ============================================================================
+    console.log('[STEP 0] Analyzing question with Claude...');
+    const analysis = await analyzeQuestion(message);
+    console.log('[ANALYSIS] Domaines:', analysis.domaines);
+    console.log('[ANALYSIS] Problématiques:', analysis.problematiques);
+    console.log('[ANALYSIS] Articles connus:', analysis.articlesConnus);
+    console.log('[ANALYSIS] Codes à rechercher:', analysis.codesARechercher);
+    console.log('[ANALYSIS] Is legal question:', analysis.isLegalQuestion);
+    console.log('[ANALYSIS] Est un cas pratique:', analysis.isCasPratique);
+    console.log('[ANALYSIS] Structure recommandée:', analysis.structureRecommandee);
+
+    // If Claude determined it's not a legal question, skip RAG
+    if (!analysis.isLegalQuestion && isNonLegal) {
+      console.log('[ANALYSIS] Not a legal question, skipping RAG');
+
+      const anthropicClient = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const response = await anthropicClient.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        system: "Tu es Nomo, un assistant juridique pour étudiants en droit français. Réponds de manière naturelle et brève aux questions non-juridiques.",
+        messages: [{ role: "user", content: message }],
+      });
+
+      const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
+
+      await supabase.from("messages").insert({
+        conversation_id: currentConversationId,
+        role: "assistant",
+        content: assistantMessage,
+        sources: [],
+      });
+
+      await supabase
+        .from("conversations")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", currentConversationId);
+
+      await supabase.rpc("increment_message_count", { user_id: user.id });
+
+      return NextResponse.json({
+        response: assistantMessage,
+        conversationId: currentConversationId,
+        sources: [],
+      });
+    }
+
     // Generate embedding and search for all potentially legal questions
     let sources: LawArticleSource[] = [];
     let jurisprudence: CourtDecisionSource[] = [];
     let exactMatchArticles: LawArticleSource[] = [];
+    let articlesFromAnalysis: LawArticleSource[] = [];
     let searchTimedOut = false;
 
     if (!isNonLegal) {
+      // STEP 0.5: Search for articles identified by Claude analysis (HIGHEST PRIORITY)
+      if (analysis.articlesConnus && analysis.articlesConnus.length > 0) {
+        console.log('[STEP 0.5] Searching for articles identified by Claude:', analysis.articlesConnus);
+
+        for (const articleRef of analysis.articlesConnus.slice(0, 10)) {
+          try {
+            // Clean article reference (remove "Art.", "article", etc.)
+            const cleanNum = articleRef.replace(/^(Art\.?|Article)\s*/i, '').trim();
+
+            // Extract code name if present (e.g., "L435-1 CSI" → code = "Code de la sécurité intérieure")
+            let targetCode: string | null = null;
+            if (articleRef.includes('CSI')) {
+              targetCode = "Code de la sécurité intérieure";
+            } else if (analysis.codesARechercher.length > 0) {
+              // Use first code from analysis as hint
+              targetCode = analysis.codesARechercher[0];
+            }
+
+            let query = supabase
+              .from('law_articles')
+              .select('id, code_name, article_number, content, source_url')
+              .ilike('article_number', `%${cleanNum}%`);
+
+            if (targetCode) {
+              query = query.eq('code_name', targetCode);
+            }
+
+            const { data, error } = await query.limit(2);
+
+            if (error) {
+              console.error(`[STEP 0.5] Error searching for ${articleRef}:`, error);
+            } else if (data && data.length > 0) {
+              articlesFromAnalysis.push(...data.map((a: any) => ({
+                ...a,
+                similarity: 1.0, // Highest priority
+              })));
+              console.log(`[STEP 0.5] Found ${data.length} articles for ${articleRef}:`, data.map((a: any) => a.article_number));
+            } else {
+              console.log(`[STEP 0.5] No articles found for ${articleRef}`);
+            }
+          } catch (error) {
+            console.error(`[STEP 0.5] Exception searching for ${articleRef}:`, error);
+          }
+        }
+
+        console.log(`[STEP 0.5] Total articles found from analysis: ${articlesFromAnalysis.length}`);
+      }
+
       // STEP 1: Exact search (separate from vector search)
       const articleNumber = extractArticleNumber(message);
       const codeName = extractCodeName(message);
@@ -935,11 +1507,13 @@ export async function POST(request: NextRequest) {
         const queryEmbedding = await generateEmbedding(message);
         console.log(`[RAG] Embedding generated in ${Date.now() - startTime}ms`);
 
-        // Detect relevant codes for optimized search
-        const relevantCodes = detectRelevantCodes(message);
+        // Use codes from Claude analysis, fallback to old detection
+        const relevantCodes = analysis.codesARechercher && analysis.codesARechercher.length > 0
+          ? analysis.codesARechercher
+          : detectRelevantCodes(message);
 
         if (relevantCodes) {
-          console.log(`[VECTOR SEARCH] Filtering on ${relevantCodes.length} codes: ${relevantCodes.join(', ')}`);
+          console.log(`[VECTOR SEARCH] Filtering on ${relevantCodes.length} codes (from ${analysis.codesARechercher.length > 0 ? 'Claude analysis' : 'keyword detection'}): ${relevantCodes.join(', ')}`);
         } else {
           console.log('[VECTOR SEARCH] No filter → searching all codes');
         }
@@ -992,8 +1566,24 @@ export async function POST(request: NextRequest) {
         if (jurisprudenceResult.error) {
           console.error("[RAG] Error searching court decisions:", jurisprudenceResult.error);
         } else {
-          jurisprudence = jurisprudenceResult.data || [];
-          console.log(`[RAG] Jurisprudence found: ${jurisprudence.length}`, jurisprudence.map(j => j.case_number));
+          let allJurisprudence = jurisprudenceResult.data || [];
+          console.log(`[RAG] Jurisprudence found (before filtering): ${allJurisprudence.length}`, allJurisprudence.map(j => j.case_number));
+
+          // Filter by relevant chambers based on analysis
+          const chambresRelevantes = analysis.domaines.length > 0 ? getChambresFromDomaines(analysis.domaines) : [];
+
+          if (chambresRelevantes.length > 0) {
+            console.log('[JURISPRUDENCE] Filtrage sur chambres:', chambresRelevantes);
+            jurisprudence = allJurisprudence.filter(j =>
+              chambresRelevantes.some(chambre =>
+                j.chambre?.toLowerCase().includes(chambre.toLowerCase())
+              )
+            );
+            console.log(`[JURISPRUDENCE] Après filtrage: ${jurisprudence.length}/${allJurisprudence.length} arrêts conservés`);
+          } else {
+            jurisprudence = allJurisprudence;
+            console.log('[JURISPRUDENCE] Pas de filtrage (domaines non identifiés)');
+          }
         }
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
@@ -1021,11 +1611,19 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // STEP 4: Combine exact matches, concept matches, and vector/keyword results
-      // Priority order: exact matches (1.0) > concept matches (0.98) > vector/keyword (variable)
+      // STEP 4: Combine all sources with priority ordering
+      // NEW Priority order: analysis articles (1.0) > exact matches (1.0) > concept matches (0.98) > vector/keyword (variable)
       const allArticleNumbers = new Set<string>();
 
-      // 1. Add exact matches first (highest priority)
+      // 0. Add articles from Claude analysis FIRST (absolute highest priority)
+      const dedupedAnalysisArticles = articlesFromAnalysis.filter(a => {
+        const key = `${a.code_name}:${a.article_number}`;
+        if (allArticleNumbers.has(key)) return false;
+        allArticleNumbers.add(key);
+        return true;
+      });
+
+      // 1. Add exact matches (second highest priority)
       const dedupedExactMatches = exactMatchArticles.filter(a => {
         const key = `${a.code_name}:${a.article_number}`;
         if (allArticleNumbers.has(key)) return false;
@@ -1033,7 +1631,7 @@ export async function POST(request: NextRequest) {
         return true;
       });
 
-      // 2. Add concept matches (second priority)
+      // 2. Add concept matches (third priority)
       const dedupedConceptMatches = conceptMatchArticles.filter(a => {
         const key = `${a.code_name}:${a.article_number}`;
         if (allArticleNumbers.has(key)) return false;
@@ -1049,14 +1647,15 @@ export async function POST(request: NextRequest) {
         return true;
       });
 
-      // Combine all sources with priority ordering
+      // Combine all sources with NEW priority ordering
       sources = [
+        ...dedupedAnalysisArticles,
         ...dedupedExactMatches,
         ...dedupedConceptMatches,
         ...dedupedVectorArticles
       ].slice(0, 5);
 
-      console.log(`[COMBINED] Total articles: ${sources.length} (${dedupedExactMatches.length} exact + ${dedupedConceptMatches.length} concept + ${dedupedVectorArticles.length} vector/keyword)`);
+      console.log(`[COMBINED] Total articles: ${sources.length} (${dedupedAnalysisArticles.length} analysis + ${dedupedExactMatches.length} exact + ${dedupedConceptMatches.length} concept + ${dedupedVectorArticles.length} vector/keyword)`);
       if (sources.length > 0) {
         console.log(`[COMBINED] Final order:`, sources.map(s => `${s.article_number} (${s.code_name}, sim: ${s.similarity.toFixed(2)})`));
       }
@@ -1192,8 +1791,8 @@ export async function POST(request: NextRequest) {
       console.log("[CAS PRATIQUE] Uncertain - will ask user for preference");
     }
 
-    // Build system prompt with dynamic content
-    const systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection);
+    // Build system prompt with dynamic content (including Claude's analysis)
+    const systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection, analysis);
 
     // DEBUG: Log system prompt
     console.log("\n========== SYSTEM PROMPT DEBUG ==========");
@@ -1230,7 +1829,7 @@ export async function POST(request: NextRequest) {
     try {
       const claudeResponse = await anthropic.messages.create({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 1024,
+        max_tokens: 4096,  // Increased for complete legal analysis
         system: systemPrompt,
         messages: claudeMessages,
       });
