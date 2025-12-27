@@ -136,14 +136,11 @@ function SourcesDisplay({ sources }: { sources: Source[] }) {
 
   return (
     <div className="space-y-3 pl-1">
-      {/* Articles de loi */}
+      {/* Articles de loi - Style bleu avec icône livre */}
       {articles.length > 0 && (
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-[#475569]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-            </svg>
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-blue-700">
+            <span className="text-base">📜</span>
             ARTICLES DE LOI
           </div>
 
@@ -191,28 +188,24 @@ function SourcesDisplay({ sources }: { sources: Source[] }) {
         </div>
       )}
 
-      {/* Jurisprudence */}
+      {/* Jurisprudence - Style orange/amber distinct */}
       {jurisprudence.length > 0 && (
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-[#475569]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 3v18h18" />
-              <path d="M12 3v18" />
-              <path d="M3 12h18" />
-            </svg>
+          <div className="flex items-center gap-2 text-[13px] font-semibold text-amber-700">
+            <span className="text-base">⚖️</span>
             JURISPRUDENCE
           </div>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
             {jurisprudence.map((source, idx) => (
               <a
                 key={idx}
                 href={source.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-2 text-[13px] text-slate-700 hover:text-slate-900 group"
+                className="flex items-start gap-2 text-[13px] text-amber-800 hover:text-amber-900 group"
               >
-                <span className="text-[#94A3B8] mt-0.5">•</span>
+                <span className="text-amber-400 mt-0.5">•</span>
                 <span className="flex-1">
                   <span className="font-medium hover:underline">
                     {formatCourtDecision(source)}
