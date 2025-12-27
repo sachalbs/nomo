@@ -256,6 +256,37 @@ function extractKeywords(message: string): string[] {
   return Array.from(new Set([...multiWordTerms, ...words])).slice(0, 7); // Increased limit for better matching
 }
 
+const CRFPA_COMPLEMENT = `
+## COMPLÉMENT MÉTHODOLOGIQUE CRFPA
+
+En plus de la méthodologie cas pratique de base, applique ces règles supplémentaires :
+
+### PLAN APPARENT
+Pour les cas pratiques complexes (plusieurs questions/parties), structure avec un plan visible :
+- I. / II. pour les grandes parties
+- A. / B. pour les sous-parties
+- 1. / 2. pour les points détaillés
+
+### FORMULES DE TRANSITION
+- Introduction : "Il convient d'examiner...", "Deux questions se posent..."
+- Entre arguments : "Toutefois...", "Par ailleurs...", "Reste à examiner..."
+- Conclusion partielle : "En définitive...", "Ainsi..."
+
+### STRUCTURE SELON LA MATIÈRE DÉTECTÉE
+- **Droit des obligations** : Qualification contrat → Validité → Effets → Responsabilité
+- **Droit pénal** : Élément légal → Matériel → Moral → Faits justificatifs
+- **Procédure pénale** : Cadre procédural → Validité actes → Nullités
+- **Droit administratif** : Compétence → Recevabilité → Légalité externe/interne
+- **Droit du travail** : Qualification relation → Obligations → Rupture → Contentieux
+
+### QUAND UTILISER LE PLAN APPARENT
+- Cas pratique avec plusieurs problèmes juridiques distincts
+- Question touchant plusieurs parties (ex: responsabilité de A ET de B)
+- Matière clairement identifiée (pénal, contrats, travail...)
+
+Pour les questions simples ou transversales, la méthodologie de base suffit.
+`;
+
 // Detect legal domain and return appropriate code names to search
 function detectLegalDomain(message: string, keywords: string[]): string[] {
   const lowerMessage = message.toLowerCase();
@@ -552,6 +583,7 @@ L'utilisateur a explicitement demandé un cas pratique. Tu DOIS structurer ta r�
    - Énonce les conséquences juridiques en quelques lignes
    - Réponds directement à la question posée
 
+${CRFPA_COMPLEMENT}
 ` : casPratiqueDetection === "uncertain" ? `
 
 DÉTECTION CAS PRATIQUE :
