@@ -84,37 +84,46 @@ function formatCourtDecision(source: Source): string {
 // Sources display component
 // Helper to detect if a source is jurisprudence (arrêt) vs article de loi
 function isJurisprudence(source: Source): boolean {
-  // 1. Check type field first (from API)
+  const articleNum = (source.article_number || "").toLowerCase();
+  const codeName = (source.code_name || "").toLowerCase();
+
+  // Log all checks for debugging
+  const checks = {
+    type: source.type,
+    typeIsJurisp: source.type === "jurisprudence",
+    articleNum: source.article_number,
+    startsWithArret: articleNum.startsWith("arret") || articleNum.startsWith("arrêt"),
+    hasPourvoi: /\d{2}-\d{2}\.\d{3}/.test(articleNum),
+    codeName: source.code_name,
+    hasCass: codeName.includes("cass"),
+  };
+  console.log("isJurisprudence checks:", checks);
+
+  // 1. Type field (most reliable)
   if (source.type === "jurisprudence") return true;
   if (source.type === "article") return false;
 
-  // 2. Check article_number pattern
-  const articleNum = source.article_number || "";
+  // 2. article_number starts with "Arret" or "Arrêt"
+  if (articleNum.startsWith("arret") || articleNum.startsWith("arrêt")) return true;
 
-  // Starts with "Arret" or "Arrêt" (case insensitive)
-  if (/^arr[eê]t/i.test(articleNum)) return true;
+  // 3. Contains pourvoi pattern XX-XX.XXX
+  if (/\d{2}-\d{2}\.\d{3}/.test(source.article_number || "")) return true;
 
-  // Contains pourvoi number pattern XX-XX.XXX (e.g., "93-18.632")
-  if (/\d{2}-\d{2}\.\d{3}/.test(articleNum)) return true;
-
-  // 3. Check code_name for court indicators
-  const codeName = (source.code_name || "").toLowerCase();
-  if (codeName.includes("cass.") || codeName.includes("cassation")) return true;
-  if (codeName.includes("cour d'appel") || codeName.includes("ca ")) return true;
+  // 4. code_name contains court indicators
+  if (codeName.includes("cass")) return true;
+  if (codeName.includes("cour d'appel")) return true;
 
   return false;
 }
 
 function SourcesDisplay({ sources }: { sources: Source[] }) {
-  // Debug log (can be removed in production)
-  if (process.env.NODE_ENV === "development") {
-    const articles = sources.filter((s) => !isJurisprudence(s));
-    const jurisprudence = sources.filter((s) => isJurisprudence(s));
-    console.log("[SourcesDisplay] Total:", sources.length, "| Articles:", articles.length, "| Jurisprudence:", jurisprudence.length);
-    sources.forEach((s, i) => {
-      console.log(`  [${i}] type=${s.type}, article_number=${s.article_number}, isJurisp=${isJurisprudence(s)}`);
-    });
-  }
+  // DEBUG: Log each source to see exact structure
+  console.log("=== SOURCES DEBUG ===");
+  sources.forEach((s, i) => {
+    console.log(`Source [${i}]:`, JSON.stringify(s, null, 2));
+    console.log(`  -> isJurisprudence: ${isJurisprudence(s)}`);
+  });
+  console.log("=== END SOURCES DEBUG ===");
 
   return (
     <div className="flex flex-wrap gap-2 mt-2">
