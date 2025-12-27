@@ -154,9 +154,9 @@ function SourcesDisplay({ sources }: { sources: Source[] }) {
 
 const loadingSteps = [
   "Analyse de votre question...",
-  "Recherche dans 24 000 articles de loi...",
-  "Identification des sources pertinentes...",
-  "Redaction de la reponse...",
+  "Recherche dans les articles de loi...",
+  "Consultation de la jurisprudence...",
+  "Rédaction de la réponse...",
 ];
 
 function ChatPageContent() {
@@ -185,9 +185,9 @@ function ChatPageContent() {
     // Step 0 immediately, then progress through steps
     const timers: NodeJS.Timeout[] = [];
 
-    timers.push(setTimeout(() => setLoadingStep(1), 800));
-    timers.push(setTimeout(() => setLoadingStep(2), 2500));
-    timers.push(setTimeout(() => setLoadingStep(3), 4000));
+    timers.push(setTimeout(() => setLoadingStep(1), 1500));  // 1.5s
+    timers.push(setTimeout(() => setLoadingStep(2), 3000));  // 3s
+    timers.push(setTimeout(() => setLoadingStep(3), 4500));  // 4.5s
 
     return () => {
       timers.forEach(clearTimeout);
