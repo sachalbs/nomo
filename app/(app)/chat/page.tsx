@@ -160,27 +160,27 @@ function SourcesDisplay({ sources }: { sources: Source[] }) {
                   <div className={`text-[12px] font-semibold ${colors.text} mb-2`}>
                     {codeName}
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {codeArticles.map((source, idx) => (
                       <a
                         key={idx}
                         href={source.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center gap-2 text-[13px] ${colors.text} hover:underline group`}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-all group"
                       >
-                        <span className="text-[#94A3B8]">•</span>
+                        <span className="text-sm">📜</span>
                         <span className="font-medium">{source.article_number}</span>
                         <svg
-                          width="12"
-                          height="12"
+                          width="11"
+                          height="11"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="2"
+                          strokeWidth="2.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="opacity-50 group-hover:opacity-100 transition-opacity"
                         >
                           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                           <polyline points="15 3 21 3 21 9" />
@@ -204,36 +204,32 @@ function SourcesDisplay({ sources }: { sources: Source[] }) {
             JURISPRUDENCE
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+          <div className="flex flex-wrap gap-2">
             {jurisprudence.map((source, idx) => (
               <a
                 key={idx}
                 href={source.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-2 text-[13px] text-amber-800 hover:text-amber-900 group"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-all group"
               >
-                <span className="text-amber-400 mt-0.5">•</span>
-                <span className="flex-1">
-                  <span className="font-medium hover:underline">
-                    {formatCourtDecision(source)}
-                  </span>
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="inline ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </span>
+                <span className="text-sm">⚖️</span>
+                <span className="font-medium">{formatCourtDecision(source)}</span>
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-50 group-hover:opacity-100 transition-opacity"
+                >
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
               </a>
             ))}
           </div>
