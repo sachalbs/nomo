@@ -8,11 +8,15 @@
  * Usage: npm run evaluate
  */
 
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
+import { fullRagSearch, analyzeQuestion } from '../lib/rag-pipeline';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,20 +65,9 @@ async function generateEmbedding(text: string): Promise<number[]> {
   return data.data[0].embedding;
 }
 
-async function searchArticles(query: string, embedding: number[]): Promise<string[]> {
-  const { data, error } = await supabase.rpc('match_law_articles_filtered', {
-    query_embedding: embedding,
-    match_threshold: 0.3,
-    match_count: 10,
-    filter_codes: null
-  });
-
-  if (error) {
-    console.error('Search error:', error);
-    return [];
-  }
-
-  return data.map((a: any) => a.article_number.replace(/^Article\s*/i, ''));
+async function searchArticles(query: string, embedding: number[], analysis?: any): Promise<string[]> {
+  const results = await fullRagSearch(supabase, query, embedding, 10, analysis);
+  return results.map(a => a.article_number.replace(/^Article\s*/i, ''));
 }
 
 function calculateRecall(expected: string[], found: string[]): { recall: number; missing: string[] } {
@@ -112,6 +105,11 @@ async function evaluate() {
     process.exit(1);
   }
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('Missing ANTHROPIC_API_KEY');
+    process.exit(1);
+  }
+
   // Load dataset
   const datasetPath = 'data/evaluation-dataset.json';
   if (!fs.existsSync(datasetPath)) {
@@ -132,8 +130,9 @@ async function evaluate() {
     process.stdout.write(`[${q.id.padStart(2)}] ${q.question.substring(0, 45).padEnd(45)}...`);
 
     try {
+      const analysis = await analyzeQuestion(q.question, process.env.ANTHROPIC_API_KEY!);
       const embedding = await generateEmbedding(q.question);
-      const foundArticles = await searchArticles(q.question, embedding);
+      const foundArticles = await searchArticles(q.question, embedding, analysis);
       const { recall, missing } = calculateRecall(q.expectedArticles, foundArticles);
 
       results.push({

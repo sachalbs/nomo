@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateEmbedding } from "@/lib/embeddings";
 import Anthropic from "@anthropic-ai/sdk";
 import { LEGAL_CONCEPTS } from "@/lib/legal-concepts";
+import { extractArticleNumber, matchLegalConcepts, generateQueryVariants, extractKeywords } from '@/lib/rag-pipeline';
 
 interface LawArticleSource {
   id: string;
@@ -135,23 +136,6 @@ function detectCasPratique(message: string): CasPratiqueDetection {
   return "none";
 }
 
-function extractArticleNumber(message: string): string | null {
-  // Match patterns like "article 108", "Article 1240", "art. 123", "art 456"
-  const patterns = [
-    /\barticle\s+(\d+(?:[.-]\d+)*)/i,
-    /\bart\.?\s+(\d+(?:[.-]\d+)*)/i,
-  ];
-
-  for (const pattern of patterns) {
-    const match = message.match(pattern);
-    if (match) {
-      return match[1];
-    }
-  }
-
-  return null;
-}
-
 function extractCodeName(message: string): string | null {
   const lowerMessage = message.toLowerCase();
 
@@ -191,69 +175,6 @@ function extractCodeName(message: string): string | null {
   }
 
   return null;
-}
-
-// Extract important keywords from question for fallback search
-function extractKeywords(message: string): string[] {
-  const lowerMessage = message.toLowerCase();
-
-  // Remove common words (stop words) - including generic legal terms that are too broad
-  const stopWords = new Set([
-    "le", "la", "les", "un", "une", "des", "de", "du", "et", "ou", "à", "a",
-    "est", "sont", "peut", "quelle", "quel", "quels", "quelles", "comment",
-    "pourquoi", "qui", "que", "quoi", "où", "dans", "sur", "pour", "par",
-    "avec", "sans", "sous", "c'est", "cest", "qu'est-ce", "quest-ce",
-    "expliquer", "explique", "définir", "définition",
-    // Generic terms that match too many articles
-    "delai", "delais", "délai", "délais", "quand", "agit", "sont"
-  ]);
-
-  // Extract multi-word legal terms (n-grams) - PRIORITY SEARCH
-  const multiWordTerms: string[] = [];
-  const legalPhrases = [
-    // Criminal law - commercial offenses
-    /\b(abus de biens sociaux)\b/g,
-    /\b(abus de confiance)\b/g,
-    /\b(detournement de fonds)\b/g,
-    /\b(détournement de fonds)\b/g,
-    // Liability concepts
-    /\b(responsabilit[eé] civile)\b/g,
-    /\b(responsabilit[eé] p[eé]nale)\b/g,
-    /\b(responsabilit[eé] contractuelle)\b/g,
-    /\b(responsabilit[eé] d[eé]lictuelle)\b/g,
-    // Contract law
-    /\b(contrat de travail)\b/g,
-    /\b(contrat de vente)\b/g,
-    /\b(contrat de bail)\b/g,
-    /\b(clause abusive)\b/g,
-    /\b(clause l[eé]onine)\b/g,
-    // Prescription and time limits
-    /\b(prescription [a-zàâäéèêëïîôùûüÿæœç]+)\b/g, // "prescription pénale", "prescription civile", etc.
-    /\b(d[eé]lai de prescription)\b/g,
-    // Other important phrases
-    /\b(vice du consentement)\b/g,
-    /\b(droit de r[eé]tractation)\b/g,
-    /\b(ordre public)\b/g,
-    /\b(bonne foi)\b/g,
-    /\b(faute lourde)\b/g,
-    /\b(force majeure)\b/g,
-  ];
-
-  legalPhrases.forEach(pattern => {
-    const matches = lowerMessage.match(pattern);
-    if (matches) {
-      multiWordTerms.push(...matches);
-    }
-  });
-
-  // Split into words and filter - only keep specific legal terms
-  const words = lowerMessage
-    .replace(/[^\w\sàâäéèêëïîôùûüÿæœç-]/g, " ") // Keep accents and hyphens
-    .split(/\s+/)
-    .filter(word => word.length > 4 && !stopWords.has(word)); // Increased min length to 5
-
-  // Combine with priority to multi-word terms
-  return Array.from(new Set([...multiWordTerms, ...words])).slice(0, 7); // Increased limit for better matching
 }
 
 // ============================================================================
@@ -1012,55 +933,6 @@ async function hybridSearch(
   return results;
 }
 
-// Generate query variants for RAG-Fusion
-function generateQueryVariants(query: string): string[] {
-  const variants: string[] = [];
-
-  // Extract key legal terms
-  const legalTerms: Record<string, string[]> = {
-    "responsabilité": ["1240", "1241", "faute", "dommage", "préjudice"],
-    "contrat": ["1103", "obligation", "inexécution", "résolution"],
-    "abus de confiance": ["314-1", "détournement", "pénal"],
-    "abus de biens sociaux": ["L241-3", "L242-6", "dirigeant", "société"],
-    "cdd": ["L1242-1", "durée déterminée", "travail", "terme"],
-    "licenciement": ["L1234", "faute grave", "préavis", "indemnité"],
-    "sarl": ["L223-1", "société", "gérant", "parts sociales"],
-    "sas": ["L227-1", "président", "actions simplifiée"],
-    "prescription": ["délai", "action", "années"],
-    "légitime défense": ["122-5", "pénal", "justificatif"],
-    "homicide": ["221-6", "involontaire", "imprudence"],
-    "garde à vue": ["62-2", "procédure pénale", "retenue"],
-    "dol": ["1137", "vice", "consentement", "tromperie"],
-    "caducité": ["1186", "1187", "ensemble contractuel"]
-  };
-
-  // Check if query contains any legal terms
-  const queryLower = query.toLowerCase();
-  for (const [term, relatedTerms] of Object.entries(legalTerms)) {
-    if (queryLower.includes(term.toLowerCase())) {
-      // Add variant with related terms
-      variants.push(relatedTerms.join(' '));
-    }
-  }
-
-  // Add a simplified version (remove question words)
-  const simplified = query
-    .replace(/qu'est-ce que?|quels? sont|quelles? sont|comment|quel est le/gi, '')
-    .replace(/\?/g, '')
-    .trim();
-  if (simplified !== query) {
-    variants.push(simplified);
-  }
-
-  // Add article number extraction variant
-  const articleMatch = query.match(/(\d+(?:-\d+)?)/g);
-  if (articleMatch) {
-    variants.push(`article ${articleMatch.join(' ')}`);
-  }
-
-  return variants.slice(0, 4); // Max 4 variants to avoid slowdown
-}
-
 // RAG-Fusion: Generate query variants and combine results
 async function ragFusion(
   supabase: any,
@@ -1576,6 +1448,11 @@ export async function POST(request: NextRequest) {
     console.log('[ANALYSIS] Est un cas pratique:', analysis.isCasPratique);
     console.log('[ANALYSIS] Structure recommandée:', analysis.structureRecommandee);
 
+    // Déterminer la limite d'articles selon la complexité (défini ici pour être accessible partout)
+    const isCasPratique = analysis?.isCasPratique || message.toLowerCase().includes('cas pratique');
+    const maxArticles = isCasPratique ? 15 : 10;
+    console.log('[ANALYSIS] Max articles:', maxArticles, `(cas pratique: ${isCasPratique})`);
+
     // If Claude determined it's not a legal question, skip RAG
     if (!analysis.isLegalQuestion && isNonLegal) {
       console.log('[ANALYSIS] Not a legal question, skipping RAG');
@@ -1935,26 +1812,40 @@ export async function POST(request: NextRequest) {
         return true;
       });
 
-      // Combine all sources
-      let combinedSources = [
-        ...dedupedAnalysisArticles,
+      // Séparer les articles de l'analyse Claude (ceux-ci sont PROTÉGÉS et jamais éliminés par le rerank)
+      const analysisArticleIds = new Set(dedupedAnalysisArticles.map(a => a.id));
+
+      // Articles à rerank : seulement les articles NON issus de l'analyse Claude
+      const articlesToRerank = [
         ...dedupedExactMatches,
         ...dedupedConceptMatches,
         ...dedupedVectorArticles
-      ];
+      ].filter(a => !analysisArticleIds.has(a.id));
 
-      console.log(`[COMBINED] Total articles before rerank: ${combinedSources.length} (${dedupedAnalysisArticles.length} analysis + ${dedupedExactMatches.length} exact + ${dedupedConceptMatches.length} concept + ${dedupedVectorArticles.length} vector/keyword)`);
+      console.log('[RERANK] Articles from Claude analysis (protected):', dedupedAnalysisArticles.length);
+      console.log('[RERANK] Articles to rerank:', articlesToRerank.length);
 
-      // Rerank with Cohere if we have enough documents
-      if (combinedSources.length > 3) {
-        combinedSources = await rerankWithCohere(message, combinedSources, 5);
+      // Rerank seulement les articles non-protégés
+      let rerankedOthers: typeof articlesToRerank = [];
+      if (articlesToRerank.length > 0) {
+        rerankedOthers = await rerankWithCohere(message, articlesToRerank, 6);
       }
 
-      sources = combinedSources.slice(0, 5);
+      // Combiner : articles de l'analyse Claude en premier (max 10), puis reranked (max 5)
+      // Note: maxArticles est défini plus haut (15 pour cas pratiques, 10 sinon)
+      const finalArticles = [
+        ...dedupedAnalysisArticles.slice(0, 10),  // Les articles que Claude a identifiés pour CE cas spécifique
+        ...rerankedOthers.slice(0, 5)
+      ].slice(0, maxArticles);
 
-      console.log(`[COMBINED] Total articles after rerank: ${sources.length}`);
+      sources = finalArticles;
+
+      console.log('[FINAL] Protected analysis articles:', Math.min(dedupedAnalysisArticles.length, 10));
+      console.log('[FINAL] Reranked articles added:', Math.min(rerankedOthers.length, 5));
+      console.log('[FINAL] Max articles limit:', maxArticles);
+      console.log('[FINAL] Total articles:', sources.length);
       if (sources.length > 0) {
-        console.log(`[COMBINED] Final order:`, sources.map(s => `${s.article_number} (${s.code_name}, sim: ${s.similarity.toFixed(2)})`));
+        console.log('[FINAL] Final order:', sources.map(s => `${s.article_number} (${s.code_name}, sim: ${s.similarity.toFixed(2)})`));
       }
 
       // STEP 5: RÈGLES SPÉCIALES - Articles fondamentaux
@@ -2040,8 +1931,8 @@ export async function POST(request: NextRequest) {
             const ruleNumbers = new Set(ruleSources.map(r => r.article_number));
             sources = sources.filter(s => !ruleNumbers.has(s.article_number));
 
-            // Ajouter en PREMIER (priorité maximale)
-            sources = [...ruleSources, ...sources].slice(0, 5);
+            // Ajouter en PREMIER (priorité maximale), utiliser maxArticles au lieu de limite fixe
+            sources = [...ruleSources, ...sources].slice(0, maxArticles);
             console.log(`[SPECIAL RULE] Added ${ruleArticles.length} articles for ${rule.ruleName} in priority`);
           }
         }
@@ -2298,7 +2189,7 @@ export async function POST(request: NextRequest) {
       jurisprudenceToUse = matchedJurisprudence.length > 0 ? matchedJurisprudence : jurisprudence.slice(0, 2);
     } else {
       console.log("[CITATIONS] Aucun match, utilisation des sources RAG par défaut");
-      sourcesToUse = sources.slice(0, 5);
+      sourcesToUse = sources.slice(0, maxArticles);
       jurisprudenceToUse = jurisprudence.slice(0, 2);
     }
 
