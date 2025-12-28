@@ -185,6 +185,7 @@ interface QuestionAnalysis {
   isLegalQuestion: boolean;
   domaines: string[]; // ["pénal", "civil", "fiscal", "travail", "commercial", "procédure"]
   problematiques: string[]; // ["dégradation de biens", "homicide involontaire", ...]
+  themes?: { titre: string; problematiques: number[] }[]; // Regroupement des problématiques en 2-3 thèmes principaux
   qualificationsRecherchees: string[]; // ["destruction", "violence", "légitime défense", ...]
   articlesConnus: string[]; // ["322-1", "221-6", "122-5", ...] si Claude les connaît
   codesARechercher: string[]; // ["Code pénal", "Code de procédure pénale", ...]
@@ -278,6 +279,9 @@ Pour chaque domaine de droit détecté, utilise la checklist correspondante pour
 
 === DROIT DES OBLIGATIONS / CONTRATS ===
 - Qualification du contrat : nommé ou innommé ? synallagmatique ou unilatéral ?
+- Négociations précontractuelles / Pourparlers : Art. 1112 (liberté + bonne foi)
+  * Triggers : "pourparlers", "négociations précontractuelles", "accord de principe", "rupture de pourparlers", "phase précontractuelle"
+  * Liberté de rompre les pourparlers + obligation de bonne foi
 - Formation : offre et acceptation valables ?
 - Consentement : erreur (1132), dol (1137), violence (1140), lésion ?
 - Capacité des parties ?
@@ -487,11 +491,82 @@ Exemples :
 - MAUVAIS : "problème pénal"
 - BON : "qualification de destruction de bien d'autrui (322-1 CP), recherche des éléments constitutifs et faits justificatifs possibles"
 
+=== RÈGLES DE REGROUPEMENT DES PROBLÉMATIQUES ===
+
+IMPORTANT : Tu dois regrouper les sous-questions en problématiques THÉMATIQUES, pas créer une problématique par micro-question.
+
+RÈGLES :
+1. REGROUPE les questions connexes en UNE problématique :
+   - "offre" + "acceptation" + "rétractation" → "Formation du contrat"
+   - "force majeure" + "exonération" → "Force majeure comme cause d'exonération"
+   - "clause pénale" + "modération" → "Validité et modération de la clause pénale"
+
+2. LIMITE-TOI à 5-7 problématiques MAXIMUM par cas pratique
+   - Un cas pratique bien structuré = 5-7 grandes questions, pas 10+
+
+3. ÉLIMINE les fausses problématiques :
+   - ❌ "Bonne foi contractuelle" seule (c'est un argument, pas une problématique)
+   - ❌ "Clause abusive" si le contexte est B2B (non applicable)
+   - ❌ Arguments subsidiaires ou de renfort
+
+4. STRUCTURE LOGIQUE pour les contrats multiples :
+   - D'abord le contrat 1 (ex: formation, validité, effets)
+   - Puis le contrat 2 (ex: inexécution, sanctions)
+
+EXEMPLE - Cas avec 2 contrats :
+❌ MAUVAIS (9 problématiques) :
+1. Formation du contrat
+2. Qualification de l'offre
+3. Validité de l'acceptation
+4. Rétractation
+5. Responsabilité précontractuelle
+6. Force majeure
+7. Clause pénale
+8. Déchéance du terme
+9. Délai de grâce
+
+✅ BON (6 problématiques regroupées) :
+1. Formation du contrat par échange de courriels (offre, acceptation, rétractation)
+2. Responsabilité pour rupture des pourparlers
+3. Force majeure face aux clauses du prêt (art. 6 et 7)
+4. Modération de la clause pénale de majoration
+5. Déchéance du terme et exigibilité anticipée
+6. Délai de grâce judiciaire
+
+RÈGLE DE REGROUPEMENT EN 3 THÈMES :
+
+Après avoir identifié toutes les problématiques, tu DOIS les regrouper en 2-3 THÈMES principaux.
+
+Ajoute un champ "themes" dans ta réponse JSON avec cette structure :
+"themes": [
+  {
+    "titre": "Formation du contrat",
+    "problematiques": [0, 1, 2]  // indices des problématiques qui vont dans ce thème
+  },
+  {
+    "titre": "Inexécution et sanctions",
+    "problematiques": [3, 4, 5]
+  },
+  {
+    "titre": "Remèdes",
+    "problematiques": [6, 7]
+  }
+]
+
+Les thèmes classiques sont :
+- Droit des contrats : Formation → Exécution/Inexécution → Responsabilité/Remèdes
+- Droit pénal : Qualification → Éléments constitutifs → Sanctions/Faits justificatifs
+- Droit des sociétés : Vie sociale → Responsabilité → Actions
+
 Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans backticks) :
 {
   "isLegalQuestion": true/false,
   "domaines": ["pénal", "civil", ...],
   "problematiques": ["description problème 1", "description problème 2", ...],
+  "themes": [
+    {"titre": "Formation du contrat", "problematiques": [0, 1, 2]},
+    {"titre": "Inexécution", "problematiques": [3, 4]}
+  ],
   "qualificationsRecherchees": ["dégradation", "homicide involontaire", "violences", ...],
   "articlesConnus": ["322-1", "221-6", "L435-1 CSI", ...],
   "codesARechercher": ["Code pénal", "Code civil", ...],
@@ -552,11 +627,46 @@ const CRFPA_COMPLEMENT = `
 
 En plus de la méthodologie cas pratique de base, applique ces règles supplémentaires :
 
-### PLAN APPARENT
-Pour les cas pratiques complexes (plusieurs questions/parties), structure avec un plan visible :
-- I. / II. pour les grandes parties
-- A. / B. pour les sous-parties
-- 1. / 2. pour les points détaillés
+### PLAN APPARENT - STRUCTURE OBLIGATOIRE
+
+Pour TOUS les cas pratiques, tu DOIS utiliser un plan en **3 GRANDES PARTIES MAXIMUM** :
+
+STRUCTURE TYPE :
+I. [Premier grand thème - ex: Formation du contrat]
+   A. [Première problématique]
+   B. [Deuxième problématique]
+
+II. [Deuxième grand thème - ex: Exécution/Inexécution]
+   A. [Troisième problématique]
+   B. [Quatrième problématique]
+   C. [Cinquième problématique si besoin]
+
+III. [Troisième grand thème si nécessaire - ex: Responsabilité/Remèdes]
+   A. [Sixième problématique]
+   B. [Septième problématique]
+
+RÈGLES :
+- JAMAIS plus de 3 grandes parties (I, II, III)
+- Chaque grande partie = un THÈME (pas une micro-question)
+- Chaque sous-partie (A, B, C) = une PROBLÉMATIQUE avec son syllogisme
+- Si seulement 2-3 problématiques → 2 grandes parties suffisent
+- Si 7+ problématiques → les répartir dans 3 grandes parties
+
+EXEMPLE CONCRET (cas M. Samy/ImpactNet) :
+
+I. LA FORMATION DU CONTRAT IMPACTNET
+   A. La validité de l'offre par courriel (art. 1113, 1127-3)
+   B. L'acceptation et la rétractation (art. 1118)
+   C. La responsabilité pour rupture des pourparlers (art. 1112, 1240)
+
+II. L'EXÉCUTION DU CONTRAT DE PRÊT FACE À LA FORCE MAJEURE
+   A. La qualification de la force majeure (art. 1218)
+   B. Les effets sur la clause de majoration (art. 1231-5)
+   C. Les effets sur la clause de déchéance du terme
+
+III. LES REMÈDES À L'INEXÉCUTION
+   A. Le délai de grâce judiciaire (art. 1343-5)
+   B. La modération de la clause pénale (art. 1231-5)
 
 ### FORMULES DE TRANSITION
 - Introduction : "Il convient d'examiner...", "Deux questions se posent..."
@@ -564,18 +674,11 @@ Pour les cas pratiques complexes (plusieurs questions/parties), structure avec u
 - Conclusion partielle : "En définitive...", "Ainsi..."
 
 ### STRUCTURE SELON LA MATIÈRE DÉTECTÉE
-- **Droit des obligations** : Qualification contrat → Validité → Effets → Responsabilité
+- **Droit des obligations** : Formation → Validité/Effets → Inexécution/Responsabilité
 - **Droit pénal** : Élément légal → Matériel → Moral → Faits justificatifs
 - **Procédure pénale** : Cadre procédural → Validité actes → Nullités
 - **Droit administratif** : Compétence → Recevabilité → Légalité externe/interne
 - **Droit du travail** : Qualification relation → Obligations → Rupture → Contentieux
-
-### QUAND UTILISER LE PLAN APPARENT
-- Cas pratique avec plusieurs problèmes juridiques distincts
-- Question touchant plusieurs parties (ex: responsabilité de A ET de B)
-- Matière clairement identifiée (pénal, contrats, travail...)
-
-Pour les questions simples ou transversales, la méthodologie de base suffit.
 
 ## NUANCES JURIDIQUES OBLIGATOIRES
 
@@ -770,6 +873,11 @@ function getChambresFromDomaines(domaines: string[]): string[] {
   // Civil law
   if (domaines.some(d => ["civil", "obligations", "contrats", "famille", "responsabilité civile", "responsabilite civile"].includes(d.toLowerCase()))) {
     chambres.push("civ1", "civ2", "civ3", "civile", "CIV1", "CIV2", "CIV3", "Civ. 1", "Civ. 2", "Civ. 3", "Civ.1", "Civ.2", "Civ.3", "1re chambre civile", "2e chambre civile", "3e chambre civile", "Première chambre civile", "Deuxième chambre civile", "Troisième chambre civile");
+  }
+
+  // FIX 3: Obligations/Contrats peuvent aussi être jugés par chambre commerciale (ex: prêts, contrats bancaires)
+  if (domaines.some(d => ["obligations", "contrats"].includes(d.toLowerCase()))) {
+    chambres.push("commerciale", "comm", "COMM", "Com.", "Com", "chambre commerciale", "Chambre commerciale");
   }
 
   // Commercial law
@@ -1227,13 +1335,13 @@ async function hybridSearch(
   // 2. Vector Search
   console.log('[VECTOR DEBUG] Embedding length:', queryEmbedding?.length);
   console.log('[VECTOR DEBUG] Embedding sample:', queryEmbedding?.slice(0, 5));
-  console.log('[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2');
+  console.log('[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.4');
   console.log('[VECTOR DEBUG] Filter codes:', filterCodes);
 
   const { data: vectorResults, error: vectorError } = await supabase
     .rpc('match_law_articles_filtered', {
       query_embedding: queryEmbedding,
-      match_threshold: 0.2,
+      match_threshold: 0.4,  // QUICK WIN #5: Augmenté de 0.2 à 0.4 pour réduire le bruit
       match_count: 20,
       filter_codes: filterCodes
     });
@@ -1483,6 +1591,31 @@ L'utilisateur a explicitement demandé un cas pratique. Tu DOIS structurer ta r�
    - Énonce les conséquences juridiques en quelques lignes
    - Réponds directement à la question posée
 
+=== CONSEILS DE STRUCTURE ===
+
+NOMBRE DE PARTIES :
+- Cas simple (1 contrat, 2-3 questions) : 3-4 parties
+- Cas moyen (1-2 contrats, 4-5 questions) : 5-6 parties
+- Cas complexe (2+ contrats, 6+ questions) : 6-7 parties MAX
+
+REGROUPEMENTS COURANTS :
+- Formation du contrat = offre + acceptation + vices du consentement
+- Inexécution = manquement + sanctions + exonération
+- Clauses contractuelles = validité + effets + modération judiciaire
+
+ORDRE LOGIQUE :
+1. Formation/Validité du contrat
+2. Effets du contrat
+3. Inexécution et ses conséquences
+4. Responsabilité (contractuelle puis délictuelle)
+5. Remèdes et actions
+
+NE JAMAIS FAIRE :
+❌ Une partie "Bonne foi" seule
+❌ Une partie "Ordre public" seule
+❌ Plus de 7 parties
+❌ Répéter le même article dans 3+ parties différentes
+
 ${CRFPA_COMPLEMENT}
 ` : '';
 
@@ -1498,16 +1631,53 @@ ${analysis.qualificationsRecherchees.length > 0 ? `- Qualifications à examiner 
   // Build verification section for problematiques
   const verificationSection = analysis && analysis.problematiques?.length ? `
 
-⚠️ VÉRIFICATION OBLIGATOIRE :
-Tu as identifié les problématiques suivantes. Tu DOIS traiter CHACUNE d'elles dans ta réponse avec une partie dédiée :
-${analysis.problematiques?.map((p, i) => `${i+1}. ${p}`).join('\n') || 'Aucune problématique identifiée'}
+⚠️ STRUCTURE OBLIGATOIRE - PLAN EN 3 PARTIES MAXIMUM :
 
-AVANT de conclure, vérifie que tu as bien traité TOUTES les ${analysis.problematiques?.length || 0} problématiques ci-dessus.
-Si une problématique n'a pas de partie dédiée, tu DOIS l'ajouter.
+Tu as identifié ${analysis.problematiques.length} problématiques à traiter :
+${analysis.problematiques.map((p, i) => `${i+1}. ${p}`).join('\n')}
+
+RÈGLES DE STRUCTURE STRICTES :
+
+1. **MAXIMUM 3 GRANDES PARTIES** (I, II, III)
+   - Regroupe les problématiques par THÈME JURIDIQUE
+   - Exemple : Formation contrat = I, Inexécution = II, Remèdes = III
+
+2. **SOUS-PARTIES** (A, B, C) pour chaque problématique
+   - Chaque problématique = une sous-partie
+   - Chaque sous-partie suit le syllogisme
+
+3. **FORMAT OBLIGATOIRE** :
+   I. [Thème regroupant plusieurs problématiques]
+      A. [Problématique 1]
+         - Majeure (règle de droit + articles)
+         - Mineure (En l'espèce...)
+         - Conclusion
+      B. [Problématique 2]
+         ...
+   II. [Autre thème]
+      A. ...
+      B. ...
+   III. [Dernier thème si nécessaire]
+      ...
+
+4. **REGROUPEMENTS CLASSIQUES** :
+   - Formation du contrat : offre, acceptation, rétractation, vices du consentement
+   - Exécution/Inexécution : force majeure, exception d'inexécution, résolution
+   - Responsabilité et remèdes : dommages-intérêts, délai de grâce, clause pénale
+
+❌ INTERDIT :
+- Plus de 3 grandes parties (I, II, III, IV, V... = FAUX)
+- Une grande partie par micro-problématique
+- Parties sans sous-parties
+
+✅ OBLIGATOIRE :
+- Traiter TOUTES les ${analysis.problematiques.length} problématiques
+- Les répartir dans 2-3 grandes parties thématiques
+- Utiliser des sous-parties (A, B, C) dans chaque grande partie
 ` : '';
 
   if (verificationSection) {
-    console.log('[PROMPT] Injection vérification', analysis.problematiques?.length || 0, 'problématiques');
+    console.log('[PROMPT] Injection vérification', analysis?.problematiques?.length || 0, 'problématiques');
   }
 
   // Build structure section if it's a cas pratique
@@ -1814,7 +1984,15 @@ export async function POST(request: NextRequest) {
     // STEP 0: ANALYZE QUESTION WITH CLAUDE (NEW!)
     // ============================================================================
     console.log('[STEP 0] Analyzing question with Claude...');
-    const analysis = await analyzeQuestion(message);
+    // QUICK WIN #4: Timeout adaptatif selon longueur message
+    const analysisTimeout = Math.min(30000 + (message.length * 20), 120000);
+    console.log(`[STEP 0] Timeout adapté: ${analysisTimeout}ms pour ${message.length} caractères`);
+    const analysis = await Promise.race([
+      analyzeQuestion(message),
+      new Promise<QuestionAnalysis>((_, reject) =>
+        setTimeout(() => reject(new Error('Analysis timeout')), analysisTimeout)
+      )
+    ]);
     console.log('[ANALYSIS] Domaines:', analysis.domaines);
     console.log('[ANALYSIS] Problématiques:', analysis.problematiques);
     console.log('[ANALYSIS] Articles connus:', analysis.articlesConnus);
@@ -1823,10 +2001,48 @@ export async function POST(request: NextRequest) {
     console.log('[ANALYSIS] Est un cas pratique:', analysis.isCasPratique);
     console.log('[ANALYSIS] Structure recommandée:', analysis.structureRecommandee);
 
+    // CORRECTION MÉTHODOLOGIE : Limiter et nettoyer les problématiques
+    if (analysis.problematiques && analysis.problematiques.length > 7) {
+      console.log(`[STEP 0] Trop de problématiques (${analysis.problematiques.length}), filtrage...`);
+
+      // Filtrer les fausses problématiques (arguments subsidiaires)
+      const falseProblematiques = [
+        'bonne foi',
+        'loyauté',
+        'clause abusive', // Souvent hors sujet en B2B
+        'ordre public',
+        'proportionnalité' // Argument, pas problématique
+      ];
+
+      analysis.problematiques = analysis.problematiques.filter(p => {
+        const isSubsidiary = falseProblematiques.some(fp =>
+          p.toLowerCase().includes(fp) && p.split(' ').length < 6
+        );
+        if (isSubsidiary) {
+          console.log(`[STEP 0] Problématique filtrée (argument subsidiaire): ${p}`);
+        }
+        return !isSubsidiary;
+      });
+
+      // Si encore trop, garder les 7 premières (les plus importantes)
+      if (analysis.problematiques.length > 7) {
+        console.log(`[STEP 0] Limitation à 7 problématiques (était ${analysis.problematiques.length})`);
+        analysis.problematiques = analysis.problematiques.slice(0, 7);
+      }
+    }
+
+    console.log(`[STEP 0] Problématiques finales (${analysis.problematiques?.length || 0}):`, analysis.problematiques);
+
     // Déterminer la limite d'articles selon la complexité (défini ici pour être accessible partout)
     const isCasPratique = analysis?.isCasPratique || message.toLowerCase().includes('cas pratique');
-    const maxArticles = isCasPratique ? 20 : 12;
-    console.log('[ANALYSIS] Max articles:', maxArticles, `(cas pratique: ${isCasPratique})`);
+
+    // QUICK WIN #1: Adapter maxArticles au nombre de problématiques
+    const articlesPerProblem = 4;
+    const baseArticles = 10;
+    const maxArticles = analysis.isCasPratique && analysis.problematiques?.length > 0
+      ? Math.min(baseArticles + (analysis.problematiques.length * articlesPerProblem), 30)
+      : 10;
+    console.log(`[FINAL] maxArticles adapté: ${maxArticles} (${analysis.problematiques?.length || 0} problématiques)`);
 
     // If Claude determined it's not a legal question, skip RAG
     if (!analysis.isLegalQuestion && isNonLegal) {
@@ -1955,7 +2171,24 @@ export async function POST(request: NextRequest) {
       const articleNumber = extractArticleNumber(message);
       const codeName = extractCodeName(message);
 
+      // FIX 2: Éviter faux positifs "article X du contrat"
+      let shouldSkipExactMatch = false;
       if (articleNumber) {
+        const articleNumValue = parseInt(articleNumber);
+        if (articleNumValue >= 1 && articleNumValue <= 12) {
+          const articleIndex = message.toLowerCase().indexOf(`article ${articleNumber.toLowerCase()}`);
+          if (articleIndex !== -1) {
+            const contextAfter = message.toLowerCase().substring(articleIndex, articleIndex + 50);
+            const contractKeywords = ['du contrat', 'du prêt', 'du bail', 'de la convention', 'de l\'accord', 'du pacte'];
+            if (contractKeywords.some(kw => contextAfter.includes(kw))) {
+              console.log(`[EXACT MATCH] Skipping article ${articleNumber} - reference to contract clause, not code article`);
+              shouldSkipExactMatch = true;
+            }
+          }
+        }
+      }
+
+      if (articleNumber && !shouldSkipExactMatch) {
         console.log(`[EXACT MATCH] Detected article number: ${articleNumber}`);
         if (codeName) {
           console.log(`[EXACT MATCH] Detected code: ${codeName}`);
@@ -2088,11 +2321,11 @@ export async function POST(request: NextRequest) {
         );
 
         // Search for similar court decisions
-        console.log('[VECTOR DEBUG] Calling match_court_decisions with threshold: 0.2');
+        console.log('[VECTOR DEBUG] Calling match_court_decisions with threshold: 0.5');
         const jurisprudencePromise = supabase.rpc("match_court_decisions", {
           query_embedding: queryEmbedding,
-          match_threshold: 0.2,
-          match_count: 2,
+          match_threshold: 0.5,  // QUICK WIN #6: Augmenté de 0.2 à 0.5 pour meilleure pertinence
+          match_count: 20,  // QUICK WIN #7: Augmenté de 2 à 20 pour cas multi-problématiques
         });
 
         // Dynamic timeout based on code filtering
@@ -2130,12 +2363,20 @@ export async function POST(request: NextRequest) {
 
         // FIX 7: Protéger les articles avec haute similarité
         const HIGH_SCORE_THRESHOLD = 0.75;
+        // FIX 4: Articles généraux du Code civil à exclure de la protection automatique
+        const EXCLUDED_GENERAL_ARTICLES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '6-1', '6-2', '16-1', '16-2', '16-3'];
+
         highScoreArticles = vectorArticles
           .filter((a: any) => (a.similarity || a.score || 0) >= HIGH_SCORE_THRESHOLD)
+          .filter((a: any) => {
+            // Exclure les articles généraux
+            const articleNum = (a.article_number || '').replace('Article ', '').trim();
+            return !EXCLUDED_GENERAL_ARTICLES.includes(articleNum);
+          })
           .slice(0, 5);
 
         if (highScoreArticles.length > 0) {
-          console.log('[VECTOR] Articles haute similarité protégés:',
+          console.log('[VECTOR] Articles haute similarité protégés (hors articles généraux):',
             highScoreArticles.map((a: any) => a.article_number + ' (' + ((a.similarity || a.score) * 100).toFixed(0) + '%)').join(', ')
           );
         }
@@ -2253,7 +2494,10 @@ export async function POST(request: NextRequest) {
       // Rerank seulement les articles non-protégés
       let rerankedOthers: typeof articlesToRerank = [];
       if (articlesToRerank.length > 0) {
-        rerankedOthers = await rerankWithCohere(rerankContext, articlesToRerank, 6);
+        // QUICK WIN #3: Adapter top_n au nombre de problématiques
+        const topNRerank = Math.min(10 + (analysis.problematiques?.length || 0) * 2, 20);
+        console.log(`[RERANK] top_n adapté: ${topNRerank}`);
+        rerankedOthers = await rerankWithCohere(rerankContext, articlesToRerank, topNRerank);
       }
 
       // FILTRE DE PERTINENCE THÉMATIQUE après reranking
@@ -2293,15 +2537,16 @@ export async function POST(request: NextRequest) {
 
       // Combiner : articles de l'analyse Claude en premier, puis haute similarité, puis reranked
       // Note: maxArticles est défini plus haut (15 pour cas pratiques, 10 sinon)
-      // FIX 7: Ajouter les articles haute similarité pour s'assurer qu'ils sont inclus même si mal classés par reranker
+      // FIX 4: Ne protéger QUE les articles haute similarité qui sont AUSSI dans analysisArticles (Claude STEP 0)
+      // Cela évite de protéger des articles généraux (1-16) qui ont haute similarité par EXACT MATCH mais sont hors-sujet
       const dedupedHighScore = highScoreArticles.filter(hs =>
-        !dedupedAnalysisArticles.some(da => da.id === hs.id)
+        dedupedAnalysisArticles.some(da => da.id === hs.id)
       );
 
       let finalArticles = [
         ...dedupedAnalysisArticles.slice(0, 15),  // Les articles que Claude a identifiés pour CE cas spécifique
         ...dedupedHighScore.slice(0, 3),  // Articles haute similarité protégés
-        ...rerankedOthers.slice(0, 5)
+        ...rerankedOthers.slice(0, 10)  // QUICK WIN #2: Augmenté de 5 à 10
       ].slice(0, maxArticles);
 
       if (dedupedHighScore.length > 0) {

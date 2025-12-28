@@ -1,0 +1,460 @@
+{
+  "jurisprudence": {
+    "total": 13262,
+    "byJurisdiction": [
+      {
+        "jurisdiction": "cc",
+        "count": 843
+      },
+      {
+        "jurisdiction": "Cass. com.",
+        "count": 59
+      },
+      {
+        "jurisdiction": "Cass. soc.",
+        "count": 34
+      },
+      {
+        "jurisdiction": "Cass. civ. 1re",
+        "count": 28
+      },
+      {
+        "jurisdiction": "Cass. civ. 2e",
+        "count": 11
+      },
+      {
+        "jurisdiction": "Cass. crim.",
+        "count": 11
+      },
+      {
+        "jurisdiction": "Cass. Ass. plén.",
+        "count": 6
+      },
+      {
+        "jurisdiction": "Cass. civ. 3e",
+        "count": 4
+      },
+      {
+        "jurisdiction": "Cass. civ.",
+        "count": 3
+      },
+      {
+        "jurisdiction": "Cass. Ch. mixte",
+        "count": 1
+      }
+    ],
+    "byChambre": [
+      {
+        "chambre": "Chambre commerciale",
+        "count": 941
+      },
+      {
+        "chambre": "Assemblée plénière",
+        "count": 50
+      },
+      {
+        "chambre": "Assemblee",
+        "count": 5
+      },
+      {
+        "chambre": "Assemblee pleniere",
+        "count": 2
+      },
+      {
+        "chambre": "Chambre civile",
+        "count": 2
+      }
+    ],
+    "byYear": [
+      {
+        "year": 1973,
+        "count": 30
+      },
+      {
+        "year": 1972,
+        "count": 218
+      },
+      {
+        "year": 1971,
+        "count": 206
+      },
+      {
+        "year": 1970,
+        "count": 193
+      },
+      {
+        "year": 1969,
+        "count": 35
+      },
+      {
+        "year": 1968,
+        "count": 54
+      },
+      {
+        "year": 1967,
+        "count": 46
+      },
+      {
+        "year": 1966,
+        "count": 30
+      },
+      {
+        "year": 1965,
+        "count": 96
+      },
+      {
+        "year": 1964,
+        "count": 32
+      },
+      {
+        "year": 1963,
+        "count": 33
+      },
+      {
+        "year": 1962,
+        "count": 2
+      },
+      {
+        "year": 1960,
+        "count": 1
+      },
+      {
+        "year": 1958,
+        "count": 1
+      },
+      {
+        "year": 1957,
+        "count": 3
+      },
+      {
+        "year": 1956,
+        "count": 2
+      },
+      {
+        "year": 1954,
+        "count": 3
+      },
+      {
+        "year": 1951,
+        "count": 2
+      },
+      {
+        "year": 1950,
+        "count": 3
+      },
+      {
+        "year": 1942,
+        "count": 1
+      },
+      {
+        "year": 1941,
+        "count": 1
+      },
+      {
+        "year": 1936,
+        "count": 1
+      },
+      {
+        "year": 1933,
+        "count": 1
+      },
+      {
+        "year": 1930,
+        "count": 1
+      },
+      {
+        "year": 1919,
+        "count": 1
+      },
+      {
+        "year": 1903,
+        "count": 1
+      },
+      {
+        "year": 1876,
+        "count": 1
+      },
+      {
+        "year": 1873,
+        "count": 2
+      }
+    ],
+    "thematique": {
+      "formation": 352,
+      "responsabilite": 328,
+      "forceMajeure": 21,
+      "inexecution": 103,
+      "clausePenale": 4,
+      "delaiGrace": 5,
+      "vice": 80
+    },
+    "sample": [
+      {
+        "case_number": "24-14.129",
+        "chambre": "civ2",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"INDEMNISATION DES VICTIMES D'INFRACTION\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-15.747",
+        "chambre": "civ2",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"CESSION DE CREANCE\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-20.480",
+        "chambre": "civ3",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"BAIL EMPHYTEOTIQUE\"],\"summary\":\"L'emphytéote, qui ne profite de l'accession que pendant "
+      },
+      {
+        "case_number": "24-22.805",
+        "chambre": "civ2",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"EXPERT JUDICIAIRE\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "23-23.352",
+        "chambre": "civ2",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"ACCIDENT DE LA CIRCULATION\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-15.759",
+        "chambre": "civ3",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"PRESCRIPTION ACQUISITIVE\",\"Prescription de dix à vingt ans\",\"Conditions\",\"Juste titre\",\""
+      },
+      {
+        "case_number": "23-23.751",
+        "chambre": "civ2",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"AVOCAT\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-19.042",
+        "chambre": "civ3",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"SOCIETE COOPERATIVE\",\"Coopérative agricole\",\"Statuts\",\"Sanctions statutaires\",\"Clause re"
+      },
+      {
+        "case_number": "24-10.767",
+        "chambre": "civ3",
+        "date_decision": "2025-12-18",
+        "title": "{\"titles\":[\"BAIL COMMERCIAL\",\"Vente de la chose louée\",\"Droit de préférence du preneur à bail\",\"Viol"
+      },
+      {
+        "case_number": "18-20.473",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"PROCEDURE CIVILE\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "23-15.451",
+        "chambre": "civ1",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"ETAT CIVIL\"],\"summary\":\"Un intérêt d'ordre public s'attachant à ce que toute personne ay"
+      },
+      {
+        "case_number": "23-16.430",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"ENTREPRISE EN DIFFICULTE (loi du 26 juillet 2005)\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-11.295",
+        "chambre": "civ1",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"PROTECTION DES CONSOMMATEURS\"],\"summary\":\"Prive sa décision de base légale, la cour d'ap"
+      },
+      {
+        "case_number": "24-12.019",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"SOCIETE ANONYME\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-12.599",
+        "chambre": "civ1",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"NATIONALITE\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-16.423",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"DOUANES\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-16.851",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"CAUTIONNEMENT\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      },
+      {
+        "case_number": "24-17.415",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"IMPOTS ET TAXES\"],\"summary\":\"Selon l'article 720 du code civil, les successions s'ouvren"
+      },
+      {
+        "case_number": "24-20.154",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"RESPONSABILITE DELICTUELLE OU QUASI DELICTUELLE\"],\"summary\":\"Le tiers à un contrat qui i"
+      },
+      {
+        "case_number": "24-22.646",
+        "chambre": "comm",
+        "date_decision": "2025-12-17",
+        "title": "{\"titles\":[\"SOCIETE (règles générales)\"],\"summary\":\" \",\"secondaryTitles\":[]}"
+      }
+    ]
+  },
+  "articles": {
+    "total": 34700,
+    "byCode": [
+      {
+        "code_name": "Code civil",
+        "count": 732
+      },
+      {
+        "code_name": "Code du travail",
+        "count": 122
+      },
+      {
+        "code_name": "Code de commerce",
+        "count": 101
+      },
+      {
+        "code_name": "Code pénal",
+        "count": 43
+      },
+      {
+        "code_name": "Code de procédure pénale",
+        "count": 2
+      }
+    ],
+    "criticalSections": {
+      "formation_1112_1127": [
+        "Article 1112",
+        "Article 1112-1",
+        "Article 1112-2",
+        "Article 1113",
+        "Article 1114",
+        "Article 1115",
+        "Article 1116",
+        "Article 1117",
+        "Article 1118",
+        "Article 1119",
+        "Article 1120",
+        "Article 1121",
+        "Article 1122",
+        "Article 1123",
+        "Article 1124",
+        "Article 1125",
+        "Article 1126",
+        "Article 1127",
+        "Article 1127-1",
+        "Article 1127-2",
+        "Article 1127-3",
+        "Article 1127-4"
+      ],
+      "responsabilite_1240_1244": [
+        "Article 1240",
+        "Article 1241",
+        "Article 1242",
+        "Article 1243",
+        "Article 1244"
+      ],
+      "inexecution_1217_1231": [
+        "Article 1217",
+        "Article 1218",
+        "Article 1219",
+        "Article 1220",
+        "Article 1221",
+        "Article 1222",
+        "Article 1223",
+        "Article 1224",
+        "Article 1225",
+        "Article 1226",
+        "Article 1227",
+        "Article 1228",
+        "Article 1229",
+        "Article 1230",
+        "Article 1231",
+        "Article 1231-1",
+        "Article 1231-2",
+        "Article 1231-3",
+        "Article 1231-4",
+        "Article 1231-5",
+        "Article 1231-6",
+        "Article 1231-7"
+      ],
+      "paiement_1342_1352": [
+        "Article 1342",
+        "Article 1342-1",
+        "Article 1342-10",
+        "Article 1342-2",
+        "Article 1342-3",
+        "Article 1342-4",
+        "Article 1342-5",
+        "Article 1342-6",
+        "Article 1342-7",
+        "Article 1342-8",
+        "Article 1342-9",
+        "Article 1343",
+        "Article 1343-1",
+        "Article 1343-2",
+        "Article 1343-3",
+        "Article 1343-4",
+        "Article 1343-5",
+        "Article 1344",
+        "Article 1344-1",
+        "Article 1344-2",
+        "Article 1345",
+        "Article 1345-1",
+        "Article 1345-2",
+        "Article 1345-3",
+        "Article 1346",
+        "Article 1346-1",
+        "Article 1346-2",
+        "Article 1346-3",
+        "Article 1346-4",
+        "Article 1346-5",
+        "Article 1347",
+        "Article 1347-1",
+        "Article 1347-2",
+        "Article 1347-3",
+        "Article 1347-4",
+        "Article 1347-5",
+        "Article 1347-6",
+        "Article 1347-7",
+        "Article 1348",
+        "Article 1348-1",
+        "Article 1348-2",
+        "Article 1349",
+        "Article 1349-1",
+        "Article 1350",
+        "Article 1350-1",
+        "Article 1350-2",
+        "Article 1351",
+        "Article 1351-1",
+        "Article 1352",
+        "Article 1352-1",
+        "Article 1352-2",
+        "Article 1352-3",
+        "Article 1352-4",
+        "Article 1352-5",
+        "Article 1352-6",
+        "Article 1352-7",
+        "Article 1352-8",
+        "Article 1352-9"
+      ]
+    },
+    "article1112": {
+      "present": true,
+      "content": "L'initiative, le déroulement et la rupture des négociations précontractuelles sont libres. Ils doivent impérativement satisfaire aux exigences de la bonne foi. En cas de faute commise dans les négociations, la réparation du préjudice qui en résulte ne peut avoir pour objet de compenser ni la perte des avantages attendus du contrat non conclu, ni la perte de chance d'obtenir ces avantages."
+    }
+  }
+}
