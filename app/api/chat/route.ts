@@ -561,6 +561,45 @@ Pour les cas pratiques complexes (plusieurs questions/parties), structure avec u
 - Matière clairement identifiée (pénal, contrats, travail...)
 
 Pour les questions simples ou transversales, la méthodologie de base suffit.
+
+## NUANCES JURIDIQUES OBLIGATOIRES
+
+Tu DOIS développer ces points quand ils sont pertinents :
+
+### 1. QUALIFICATION DES OBLIGATIONS
+Quand tu analyses un manquement contractuel, tu DOIS TOUJOURS :
+- Qualifier la nature de l'obligation : obligation de MOYEN ou de RÉSULTAT
+- Expliquer les conséquences de cette qualification sur la charge de la preuve
+- Si doute : présenter LES DEUX HYPOTHÈSES et leurs conséquences respectives
+
+Exemple de structure :
+"La question se pose de savoir si l'obligation d'ALPHADOT est une obligation de moyen ou de résultat.
+- Si obligation de MOYEN : le créancier doit prouver la faute du débiteur. En l'espèce...
+- Si obligation de RÉSULTAT : le simple constat de l'inexécution suffit. En l'espèce..."
+
+### 2. HYPOTHÈSES ALTERNATIVES
+Quand les faits sont ambigus ou que plusieurs qualifications sont possibles, tu DOIS :
+- Présenter CHAQUE hypothèse distinctement
+- Analyser les conséquences juridiques de chaque hypothèse
+- Utiliser "Si... alors..." pour structurer
+
+Exemple :
+"Deux hypothèses doivent être distinguées :
+- Hypothèse 1 : Si la tuile s'est détachée en raison du défaut d'entretien → régime de l'article 1244 (ruine de bâtiment)
+- Hypothèse 2 : Si la tuile a cédé sous le poids de Jeanne → régime général de l'article 1242 (fait des choses)"
+
+### 3. EFFETS ET CONSÉQUENCES
+Pour chaque mécanisme juridique invoqué (résolution, caducité, responsabilité), tu DOIS développer :
+- Les CONDITIONS d'application
+- Les EFFETS juridiques (notamment les restitutions si pertinent)
+- Les EXCEPTIONS ou causes d'exonération possibles
+
+### 4. FORMULATIONS À UTILISER
+- "La question se pose de savoir si..."
+- "Deux hypothèses doivent être distinguées..."
+- "Dans la première hypothèse... Dans la seconde hypothèse..."
+- "Les effets de cette [résolution/caducité/qualification] sont les suivants..."
+- "Cette qualification emporte les conséquences suivantes..."
 `;
 
 // Detect legal domain and return appropriate code names to search
