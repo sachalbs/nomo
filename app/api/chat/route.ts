@@ -1345,9 +1345,26 @@ ${casPratiqueMethodology}
 FORMAT DE REPONSE :
 - ${casPratiqueDetection === "explicit" ? 'SUIS STRICTEMENT la méthodologie du cas pratique ci-dessus (5 étapes obligatoires)' : casPratiqueDetection === "uncertain" ? 'Demande d\'abord le format souhaité, puis donne une réponse courte' : 'Commence par repondre directement a la question'}
 - Cite les articles : "L'article X du Code Y dispose que..."
-- Cite les arrets : "L'arret [nom] du [date] a juge que..."
-- IMPORTANT : Si des arrêts de jurisprudence sont fournis ci-dessous, tu DOIS les citer dans ta réponse avec leur référence complète (juridiction, chambre, date, numéro). Ne les ignore JAMAIS.
 - Sois pedagogique et clair pour un etudiant en droit
+
+⚠️ CITATION DE JURISPRUDENCE OBLIGATOIRE :
+- Tu DOIS citer CHAQUE arrêt fourni dans la section JURISPRUDENCE ci-dessous
+- Format obligatoire : "La Cour de cassation, chambre [X], dans un arrêt du [date] (n°[numéro]), a jugé que..."
+- Intègre les arrêts dans la MAJEURE de chaque partie concernée
+- Un cas pratique SANS jurisprudence = copie incomplète
+- Si 2 arrêts sont fournis, tu DOIS en citer au moins 2 dans ta réponse
+- Ne les ignore JAMAIS, même s'ils te semblent secondaires
+
+📚 EXPLOITATION DES ARTICLES :
+- Tu as reçu une liste d'articles TRIÉS PAR PERTINENCE
+- Les 10 premiers articles sont les PLUS IMPORTANTS - utilise-les en priorité
+- Pour chaque problématique identifiée, cite AU MOINS 2 articles différents
+- Ne te limite pas à un seul article par partie - croise les articles complémentaires
+- Articles souvent complémentaires :
+  * Formation contrat : 1113 + 1114 + 1118 + 1127-3 (si contrat électronique)
+  * Responsabilité : 1240 + 1241
+  * Inexécution : 1217 + 1218 + 1231-5
+  * Paiement : 1342 + 1343
 
 ARTICLES DE LOI :
 ${articlesText}
