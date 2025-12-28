@@ -1,0 +1,1407 @@
+
+> nomo@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.0.0.2:3000
+- Environments: .env.local
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 773ms
+ GET /chat?id=d01fb29c-914d-440c-89ef-ef208c0fb300 200 in 899ms (compile: 225ms, proxy.ts: 561ms, render: 113ms)
+[RAG] Question potentiellement juridique: "refais le cas pratique"
+[STEP 0] Analyzing question with Claude...
+[ANALYSIS] JSON parse error: SyntaxError: Unexpected token 'J', "Je ne vois"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at analyzeQuestion (app/api/chat/route.ts:499:29)
+    at async POST (app/api/chat/route.ts:1595:22)
+  497 |
+  498 |     try {
+> 499 |       const analysis = JSON.parse(text);
+      |                             ^
+  500 |       console.log('[ANALYSIS] Successfully parsed analysis');
+  501 |       return analysis;
+  502 |     } catch (parseError) {
+[ANALYSIS] Response text: Je ne vois pas de cas pratique dans votre message. Pourriez-vous me fournir l'énoncé du cas pratique que vous souhaitez que j'analyse ?
+
+Une fois que vous m'aurez donné le texte du cas pratique, je pourrai :
+- Identifier les domaines de droit concernés
+- Analyser les problématiques juridiques
+- Déterminer les articles applicables
+- Proposer la structure de réponse appropriée
+
+Merci de copier-coller l'énoncé complet du cas pratique.
+[ANALYSIS] Domaines: []
+[ANALYSIS] Problématiques: []
+[ANALYSIS] Articles connus: []
+[ANALYSIS] Codes à rechercher: []
+[ANALYSIS] Is legal question: true
+[ANALYSIS] Est un cas pratique: false
+[ANALYSIS] Structure recommandée: 1. Qualification des faits → 2. Problème de droit → 3. Majeure (règle + articles) → 4. Mineure (En l'espèce...) → 5. Conclusion
+[ANALYSIS] Max articles: 20 (cas pratique: true)
+[CONCEPT MATCH] Analyzing message for legal concepts...
+[CONCEPT MATCH] No matching concepts found
+[RAG] Embedding generated in 389ms
+[CODE DETECTION] No specific code detected → searching all codes
+[VECTOR SEARCH] No filter → searching all codes
+[MULTI-QUERY] Generating query variations...
+[MULTI-QUERY] Variations: [
+  "Réexaminer l'espèce juridique soumise à analyse",
+  "Reprendre l'étude de l'affaire contentieuse",
+  'Procéder à une nouvelle qualification juridique des faits',
+  'Effectuer une seconde analyse jurisprudentielle du litige'
+]
+[HyDE] Generating hypothetical answer...
+[HyDE] Generated hypothetical answer (976 chars)
+[MULTI-QUERY + HyDE] Searching with 6 queries (1 original + 4 variations + 1 HyDE)
+[EMBEDDING] Throttling 248ms
+[EMBEDDING] Throttling 247ms
+[EMBEDDING] Throttling 247ms
+[EMBEDDING] Throttling 247ms
+[EMBEDDING] Throttling 246ms
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.053131103515625,
+  0.028564453125,
+  0.035980224609375,
+  -0.00899505615234375,
+  0.0233154296875
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.0283660888671875,
+  0.0243988037109375,
+  0.047882080078125,
+  0.01690673828125,
+  0.0255279541015625
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.019287109375,
+  0.03778076171875,
+  0.04278564453125,
+  0.01526641845703125,
+  0.0211944580078125
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.01885986328125,
+  0.0240631103515625,
+  0.04425048828125,
+  0.0029010772705078125,
+  -0.003551483154296875
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.00324249267578125,
+  0.03741455078125,
+  0.0306396484375,
+  0.01447296142578125,
+  0.01123046875
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.0235443115234375,
+  0.0176544189453125,
+  0.04217529296875,
+  0.0080413818359375,
+  0.0199127197265625
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"9531a467-77b1-4bc0-ad48-aadcb752b098","code_name":"Code de procédure civile","article_number":"Article 1217","content":"Hors les cas prévus aux articles 390 , 391 , 442 , 485 et au troisième alinéa de l'article 494-3 du code civil, le juge est saisi par requête remise ou adressée au greffe de la juridiction de première instance. Lorsque la requête est présentée aux fins de renouvellement de l'habilitation familiale, il y est joint une copie de la décision ayant désigné une personne habilitée.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000038810503","similarity":0.745958485821528},{"id":"6df0dfe7-488f-4e64-8734-2707f13884aa","code_name":"Code de procédure civile","article_number":"Article 487","content":"Le juge des référés a la faculté de renvoyer l'affaire en état de référé devant la formation collégiale de la juridiction à une audience dont il fixe la date.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006410757","similarity":0.745742420876701}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 16-11 (0.49)',
+  'Article 1217 (0.49)',
+  'Article 16-8 (0.48)',
+  'Article 487 (0.48)',
+  'Article 16-8-1 (0.48)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"bb7d066d-ab4f-4f53-a1e5-61e3d3b34467","code_name":"Code de procédure civile","article_number":"Article 100","content":"Si le même litige est pendant devant deux juridictions de même degré également compétentes pour en connaître, la juridiction saisie en second lieu doit se dessaisir au profit de l'autre si l'une des parties le demande. A défaut, elle peut le faire d'office.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006410207","similarity":0.835186046072145},{"id":"2bf7b984-807d-4034-aa7f-6989fd9022be","code_name":"Code de procédure civile","article_number":"Article 352","content":"Si la demande est justifiée, l'affaire est renvoyée soit à une autre formation de la juridiction primitivement saisie, soit à une autre juridiction de même nature que celle-ci. La décision s'impose aux parties et au juge de renvoi. Elle n'est susceptible d'aucun recours.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000034803449","similarity":0.832999611847206}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 21-25 (0.49)',
+  'Article 100 (0.49)',
+  'Article L321-3 (0.48)',
+  'Article 352 (0.48)',
+  'Article L1423-1-1 (0.48)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"035836f3-153f-402a-9b52-8f2484a5beeb","code_name":"Code de procédure civile","article_number":"Article 837","content":"A la demande de l'une des parties et si l'urgence le justifie, le président du tribunal judiciaire ou le juge des contentieux de la protection saisi en référé peut renvoyer l'affaire à une audience dont il fixe la date pour qu'il soit statué au fond. Il veille à ce que le défendeur dispose d'un temps suffisant pour préparer sa défense. L'ordonnance emporte saisine de la juridiction. Lorsque la représentation par avocat est obligatoire devant la juridiction à laquelle l'affaire est renvoyée, il est ensuite procédé comme il est dit à l'article 842 et aux trois derniers alinéas de l'article 844 . Lorsque le président de la juridiction a ordonné la réassignation du défendeur non comparant, ce dernier est convoqué par acte d'huissier de justice à l'initiative du demandeur.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000039623729","similarity":0.806668625592048},{"id":"cba6c978-02ed-45af-a29b-30abff1a7052","code_name":"Code de procédure civile","article_number":"Article 638","content":"L'affaire est à nouveau jugée en fait et en droit par la juridiction de renvoi à l'exclusion des chefs non atteints par la cassation.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006410999","similarity":0.805620989450667}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 21-18 (0.49)',
+  'Article 837 (0.49)',
+  'Article 21-21 (0.48)',
+  'Article 638 (0.48)',
+  'Article L1423-1-1 (0.48)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"ef92d9a5-f7fb-43bc-ace3-b51aab562690","code_name":"Code de procédure civile","article_number":"Article 768","content":"Les conclusions doivent formuler expressément les prétentions des parties ainsi que les moyens en fait et en droit sur lesquels chacune de ces prétentions est fondée avec indication pour chaque prétention des pièces invoquées et de leur numérotation. Un bordereau énumérant les pièces justifiant ces prétentions est annexé aux conclusions. Les conclusions comprennent distinctement un exposé des faits et de la procédure, une discussion des prétentions et des moyens ainsi qu'un dispositif récapitulant les prétentions. Les moyens qui n'auraient pas été formulés dans les conclusions précédentes doivent être présentés de manière formellement distincte. Le tribunal ne statue que sur les prétentions énoncées au dispositif et n'examine les moyens au soutien de ces prétentions que s'ils sont invoqués dans la discussion. Les parties doivent reprendre dans leurs dernières conclusions les prétentions et moyens présentés ou invoqués dans leurs conclusions antérieures. A défaut, elles sont réputées les avoir abandonnés et le tribunal ne statue que sur les dernières conclusions déposées.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000039623422","similarity":0.862656262420729},{"id":"9c1d3830-a814-4c45-bd44-8ad3a49ea9f3","code_name":"Code de procédure civile","article_number":"Article 446-2-1","content":"Lorsque les débats sont renvoyés à une audience ultérieure, que toutes les parties comparantes sont assistées ou représentées par un avocat et présentent leurs prétentions et moyens par écrit, leurs conclusions doivent formuler expressément les prétentions ainsi que les moyens en fait et en droit sur lesquels chacune d'elles est fondée avec indication pour chaque prétention des pièces invoquées et de leur numérotation. Un bordereau énumérant les pièces justifiant ces prétentions est annexé aux conclusions. Les conclusions comprennent distinctement un exposé des faits et de la procédure, une discussion des prétentions et des moyens ainsi qu'un dispositif récapitulant les prétentions. Les moyens qui n'auraient pas été formulés dans les précédentes conclusions doivent être présentés de manière formellement distincte. Le juge ne statue que sur les prétentions énoncées au dispositif et n'examine les moyens au soutien de celles-ci que s'ils sont invoqués dans la discussion. Les parties doivent reprendre dans leurs dernières conclusions les prétentions et moyens présentés ou invoqués dans leurs conclusions antérieures. A défaut, elles sont réputées les avoir abandonnés et le juge ne statue que sur les dernières conclusions déposées.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000051863642","similarity":0.862155836589663}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1130 (0.49)',
+  'Article 768 (0.49)',
+  'Article 1143 (0.48)',
+  'Article 446-2-1 (0.48)',
+  'Article 1217 (0.48)'
+]
+[HyDE] Found 15 articles from hypothetical search
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"ccd33039-629c-4b83-8d9d-4004227d8204","code_name":"Code de procédure civile","article_number":"Article 1031-14","content":"Le demandeur doit également joindre les pièces invoquées à l'appui de la demande de réexamen et une copie des dernières écritures que les parties au réexamen ont déposées devant la juridiction dont émane la décision critiquée ainsi que devant la Cour européenne des droits de l'homme. Lorsque la décision critiquée émane de la Cour de cassation, il joint également les dernières conclusions déposées devant la juridiction du fond. Lorsque la demande en réexamen est formée par une des personnes mentionnées au 2° de l'article L. 452-2 du code de l'organisation judicaire, le demandeur doit joindre les pièces justificatives du lien d'alliance, de parenté et du droit successoral allégué.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000034275967","similarity":0.836013905929147},{"id":"262833de-b09d-408b-b4bd-81ffb45900da","code_name":"Code de procédure pénale","article_number":"Article 624-3","content":"Si la formation de jugement de la cour de révision et de réexamen estime que l'affaire n'est pas en l'état, elle ordonne l'exécution d'un supplément d'information confié à l'un ou à plusieurs de ses membres aux fins de procéder, directement ou par commission rogatoire, dans les formes prévues au présent code, à tout acte d'information utile à l'instruction de la demande, à l'exception de l'audition de toute personne à l'égard de laquelle il existe des raisons plausibles de soupçonner qu'elle a commis ou tenté de commettre une infraction. Lorsque l'affaire est en état, la formation de jugement de la cour l'examine au fond et statue, par un arrêt motivé non susceptible de recours, à l'issue d'une audience publique au cours de laquelle sont recueillies les observations orales ou écrites du requérant ou de son avocat, celles du ministère public ainsi que, si elle intervient à l'instance, après en avoir été dûment avisée, celles de la partie civile constituée au procès dont la révision ou le réexamen est demandé ou de son avocat. Le requérant ou son avocat a la parole le dernier. Le président de la cour peut, au cours des débats, demander l'audition par la formation de jugement de toute personne utile à l'examen de la demande.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000029112896","similarity":0.835425538714598}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 5 (0.49)',
+  'Article 1031-14 (0.49)',
+  'Article 581 (0.48)',
+  'Article 624-3 (0.48)',
+  'Article 24-1 (0.48)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"625ea925-17b7-43e2-8735-399e4d94b824","code_name":"Code de procédure pénale","article_number":"Article 118","content":"S'il apparaît au cours de l'information que les faits reprochés à la personne mise en examen sous une qualification correctionnelle constituent en réalité un crime, le juge d'instruction notifie à la personne, après l'avoir informée de son intention et avoir recueilli ses éventuelles observations et celles de son avocat, qu'une qualification criminelle est substituée à la qualification initialement retenue. A défaut de cette notification, il ne peut être fait application des dispositions de l'article 181 . Si la personne était placée en détention provisoire, le mandat de dépôt initialement délivré demeure valable et est considéré comme un mandat de dépôt criminel. La détention provisoire se trouve alors soumise aux règles applicables en matière criminelle, les délais prévus pour la prolongation de la mesure étant calculés à compter de la délivrance du mandat. Lors de la notification prévue au premier alinéa, le juge d'instruction peut faire connaître à la personne un nouveau délai prévisible d'achèvement de l'information, conformément aux dispositions du neuvième alinéa de l'article 116. Si l'information a été ouverte au sein d'une juridiction dépourvue de pôle de l'instruction et lorsque la gravité ou la complexité de l'affaire le justifie, le juge d'instruction, aussitôt après avoir procédé aux formalités prévues par le présent article, peut se dessaisir, d'office ou sur réquisition du procureur de la République, au profit d'un juge du pôle de l'instruction compétent, désigné par le président du tribunal judiciaire dans lequel se trouve ce pôle.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044568314","similarity":0.840889294630917},{"id":"3328e4ac-4cf8-4132-8436-4b7dc6e05079","code_name":"Code de procédure pénale","article_number":"Article 189","content":"Sont considérées comme charges nouvelles les déclarations des témoins, pièces et procès-verbaux qui, n'ayant pu être soumis à l'examen du juge d'instruction, sont cependant de nature soit à fortifier les charges qui auraient été trouvées trop faibles, soit à donner aux faits de nouveaux développements utiles à la manifestation de la vérité.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006575431","similarity":0.834466998856144}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1103 (0.49)',
+  'Article 118 (0.49)',
+  'Article 2224 (0.48)',
+  'Article 189 (0.48)',
+  'Article 9-1 (0.48)'
+]
+[MULTI-QUERY + HyDE] Fused 83 unique articles from 6 queries
+[RAG-FUSION] Starting with query: refais le cas pratique
+[RAG-FUSION] Generated 0 variants
+[HYBRID] Starting hybrid search...
+[VECTOR DEBUG] Calling match_court_decisions with threshold: 0.2
+[HYBRID SEARCH] Timeout set to 10000ms (filtered: false)
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.053131103515625,
+  0.028564453125,
+  0.035980224609375,
+  -0.00899505615234375,
+  0.0233154296875
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: null
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 20
+[VECTOR DEBUG] Raw response sample: [{"id":"9531a467-77b1-4bc0-ad48-aadcb752b098","code_name":"Code de procédure civile","article_number":"Article 1217","content":"Hors les cas prévus aux articles 390 , 391 , 442 , 485 et au troisième alinéa de l'article 494-3 du code civil, le juge est saisi par requête remise ou adressée au greffe de la juridiction de première instance. Lorsque la requête est présentée aux fins de renouvellement de l'habilitation familiale, il y est joint une copie de la décision ayant désigné une personne habilitée.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000038810503","similarity":0.745958485821528},{"id":"6df0dfe7-488f-4e64-8734-2707f13884aa","code_name":"Code de procédure civile","article_number":"Article 487","content":"Le juge des référés a la faculté de renvoyer l'affaire en état de référé devant la formation collégiale de la juridiction à une audience dont il fixe la date.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006410757","similarity":0.745742420876701}]
+[HYBRID] Vector found: 20 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 16-11 (0.49)',
+  'Article 1217 (0.49)',
+  'Article 16-8 (0.48)',
+  'Article 487 (0.48)',
+  'Article 16-8-1 (0.48)'
+]
+[RAG-FUSION] Final results: 10 articles
+[RAG-FUSION] Top 5: [
+  'Article 16-11',
+  'Article 1217',
+  'Article 16-8',
+  'Article 487',
+  'Article 16-8-1'
+]
+[RAG] Hybrid search completed in 3070ms
+[RAG] RAG-Fusion found: 10 [
+  'Article 16-11',
+  'Article 1217',
+  'Article 16-8',
+  'Article 487',
+  'Article 16-8-1',
+  'Article 488',
+  'Article 17-11',
+  'Article 638',
+  'Article L310-5',
+  'Article 1424-15'
+]
+[RAG] Combined Multi-Query (83) + RAG-Fusion (10) = 83 unique articles
+[VECTOR DEBUG] Jurisprudence raw response error: null
+[VECTOR DEBUG] Jurisprudence raw response data length: 2
+[VECTOR DEBUG] Jurisprudence raw response sample: [{"id":null,"jurisdiction":"cc","chambre":"Chambre criminelle","date_decision":"1972-01-19","case_number":"71-91.406","title":null,"summary":"Encourt la cassation l'arrêt qui a présenté comme hypothétique l'accès d'un médecin de l'hygiène scolaire à la situation plus lucrative de médecin d'un hôpital psychiatrique, laquelle n'était que l'aboutissement normal des études qu'il avait entreprises et qui n'a pas réparé, de ce fait, l'intégralité du préjudice certain et actuel résultant du retard qui lui avait été occasionné dans ses études par l'accident dont il avait été victime (1).","content":null,"source_url":"https://www.courdecassation.fr/decision/6079a8999ba5988459c4e2c5","similarity":0.753744926687777},{"id":null,"jurisdiction":"cc","chambre":"Chambre sociale","date_decision":"1979-04-04","case_number":"78-10.451","title":null,"summary":"Encourt la cassation l'arrêt qui rejette le recours de la caisse en remboursement des frais de séjour de la victime dans un centre de réadaptation, postérieurs à la décision ayant statué sur le préjudice, au motif que ces frais étaient prévisibles à la date de la précédente décision, alors que la nouvelle action de la caisse tendait à la réparation d'un élément de préjudice sur lequel il n'avait pas été statué, puisqu'il n'avait pas été inclus dans la demande initiale.","content":null,"source_url":"https://www.courdecassation.fr/decision/6079b0b59ba5988459c4f8f6","similarity":0.751670432133987}]
+[RAG] Jurisprudence found (before filtering): 2 [ '71-91.406', '78-10.451' ]
+[JURISPRUDENCE] Pas de filtrage (domaines non identifiés)
+[RERANK] Articles from Claude analysis (protected): 0
+[RERANK] Articles to rerank: 83
+[RERANK] Reranking 83 documents with Cohere...
+[RERANK] Reranked order: [
+  'Article 1424-15 (0.012)',
+  'Article 638 (0.011)',
+  'Article 444 (0.010)',
+  'Article 779 (0.006)',
+  'Article 488 (0.006)',
+  'Article 622-1 (0.005)'
+]
+[FINAL] Protected analysis articles: 0
+[FINAL] Reranked articles added: 5
+[FINAL] Max articles limit: 20
+[FINAL] Total articles: 5
+[FINAL] Final order: [
+  'Article 1424-15 (Code de procédure civile, sim: 0.01)',
+  'Article 638 (Code de procédure civile, sim: 0.01)',
+  'Article 444 (Code de procédure civile, sim: 0.01)',
+  'Article 779 (Code de procédure civile, sim: 0.01)',
+  'Article 488 (Code de procédure civile, sim: 0.01)'
+]
+[FINAL] Total sources: 5 articles, 2 jurisprudence
+[FINAL] Articles: [
+  'Article 1424-15 (sim: 0.01)',
+  'Article 638 (sim: 0.01)',
+  'Article 444 (sim: 0.01)',
+  'Article 779 (sim: 0.01)',
+  'Article 488 (sim: 0.01)'
+]
+[CAS PRATIQUE] Explicit - will use structured methodology
+
+========== SYSTEM PROMPT DEBUG ==========
+Sources count: 5
+Jurisprudence count: 2
+
+--- Articles in prompt ---
+
+[1] Article 1424-15 - Code de procédure civile
+Content length: 96 chars
+Content preview: La procédure de réexamen dans des cas exceptionnels est régie par les articles 1424-8 à 1424-13....
+Similarity: 0.011687257
+
+[2] Article 638 - Code de procédure civile
+Content length: 133 chars
+Content preview: L'affaire est à nouveau jugée en fait et en droit par la juridiction de renvoi à l'exclusion des chefs non atteints par la cassation....
+Similarity: 0.0107351625
+
+[3] Article 444 - Code de procédure civile
+Content length: 334 chars
+Content preview: Le président peut ordonner la réouverture des débats. Il doit le faire chaque fois que les parties n'ont pas été à même de s'expliquer contradictoirem...
+Similarity: 0.009559399
+
+[4] Article 779 - Code de procédure civile
+Content length: 1534 chars
+Content preview: Le président peut décider que les avocats se présenteront à nouveau devant lui, à une date d'audience qu'il fixe, pour conférer une dernière fois de l...
+Similarity: 0.00588816
+
+[5] Article 488 - Code de procédure civile
+Content length: 163 chars
+Content preview: L'ordonnance de référé n'a pas, au principal, l'autorité de la chose jugée. Elle ne peut être modifiée ou rapportée en référé qu'en cas de circonstanc...
+Similarity: 0.005533388
+
+--- Full System Prompt ---
+Tu es Nomo, un assistant juridique expert pour les etudiants en droit francais niveau CRFPA.
+
+
+RÈGLES JURIDIQUES IMPORTANTES À RESPECTER :
+
+Ces règles sont des principes établis que tu DOIS appliquer correctement :
+
+=== DROIT DES SOCIÉTÉS ===
+
+TRANSFORMATION DE SOCIÉTÉ :
+- La transformation entraîne la CESSATION AUTOMATIQUE des mandats (pas une révocation)
+- Une cessation ≠ une révocation → les clauses d'indemnité de révocation ne s'appliquent PAS
+- Exception : si la transformation vise UNIQUEMENT à évincer un dirigeant = révocation déguisée
+
+ACTION SOCIALE UT SINGULI :
+- Possible UNIQUEMENT contre les dirigeants de DROIT (pas de fait)
+- Contre un dirigeant de FAIT → il faut passer par un mandataire ad hoc ou l'action sociale ut universi
+- Nécessite de mettre en cause la société (mandataire ad hoc si conflit d'intérêts)
+
+ACTION INDIVIDUELLE DE L'ASSOCIÉ :
+- Fondement : Art. 1240 Code civil
+- Condition STRICTE : préjudice PERSONNEL et DISTINCT du préjudice social
+- La perte de valeur des titres, l'absence de dividendes = préjudice INDIRECT → action vouée à l'échec
+
+DEVOIR DE LOYAUTÉ :
+- Le DIRIGEANT a un devoir de loyauté envers la société
+- L'ACTIONNAIRE n'a PAS de devoir de loyauté (arrêt Vilgrain, Cass. com. 27 févr. 1996)
+- Exception : clause statutaire ou actes de concurrence déloyale caractérisés
+
+INSUFFISANCE D'ACTIF (Art. L. 651-2) :
+- Action possible contre dirigeants de droit ET de fait
+- Requiert : faute de gestion + contribution à l'insuffisance d'actif
+- Seul le liquidateur peut l'exercer (pas l'associé directement)
+
+=== CESSION DE FONDS DE COMMERCE ===
+
+ÉLÉMENTS DU FONDS :
+- Éléments corporels : matériel, outillage, marchandises/stock
+- Éléments incorporels : clientèle, nom commercial, droit au bail, contrats spéciaux
+- Le stock est inclus SAUF stipulation contraire expresse dans l'acte
+
+TRANSMISSION DES CONTRATS :
+- Principe : les contrats NE SE TRANSMETTENT PAS automatiquement
+- Exceptions légales : bail commercial (Art. L. 145-16), contrats de travail (Art. L. 1224-1)
+- Le contrat de distribution N'EST PAS transmis automatiquement, même essentiel à l'activité
+- Exception : clause contractuelle EXPRESSE de transmission au cessionnaire
+
+=== CONVENTIONS RÉGLEMENTÉES ===
+
+PROCÉDURE :
+- Autorisation PRÉALABLE du conseil d'administration
+- Approbation ULTÉRIEURE par l'assemblée générale
+
+SANCTIONS :
+- Défaut d'autorisation préalable → nullité possible SI préjudice pour la société
+- Défaut d'approbation AG seule → convention reste valable (sauf fraude), responsabilité des dirigeants
+
+RAISON D'ÊTRE (Art. 1835 C. civ.) :
+- Sa violation ne permet PAS d'annuler un contrat avec un tiers
+- Seule sanction : responsabilité civile des dirigeants pour faute de gestion
+
+⚠️ INSTRUCTION OBLIGATOIRE : Tu DOIS utiliser les sources ci-dessous pour repondre. Des sources pertinentes ont ete trouvees pour cette question.
+
+REGLES STRICTES :
+1. Tu DOIS construire ta reponse a partir des articles et/ou arrets fournis
+2. Ne dis JAMAIS "je n'ai pas trouve" si des sources sont presentes ci-dessous
+3. Cite explicitement les articles et arrets dans ta reponse
+4. N'invente rien, utilise uniquement le contenu des sources
+
+
+
+MÉTHODOLOGIE CAS PRATIQUE :
+
+L'utilisateur a explicitement demandé un cas pratique. Tu DOIS structurer ta réponse selon le syllogisme juridique :
+
+1. **Qualification des faits**
+   - Situe le cas en une phrase (thème juridique : droit du travail, droit des contrats, etc.)
+   - Résume les faits pertinents en utilisant des termes juridiques
+   - Qualifie les parties (ex: "le locataire", "l'employeur", "le vendeur") plutôt que les noms propres
+
+2. **Problème de droit**
+   - Formule la question juridique de manière générale et abstraite
+   - Ne te réfère pas aux faits spécifiques de l'espèce
+   - Exemple : "Un salarié peut-il..." plutôt que "M. Dupont peut-il..."
+
+3. **Règle de droit applicable (Majeure)**
+   - Cite les articles de loi pertinents en les reformulant (ne recopie pas)
+   - Mentionne la jurisprudence applicable avec les arrêts fournis
+   - Respecte la hiérarchie des normes (Constitution > Traités > Lois > Règlements)
+
+4. **Application aux faits (Mineure)**
+   - Commence par "En l'espèce..."
+   - Applique concrètement la règle de droit aux faits qualifiés
+   - Si plusieurs solutions sont possibles, envisage-les toutes et argumente
+
+5. **Conclusion**
+   - Énonce les conséquences juridiques en quelques lignes
+   - Réponds directement à la question posée
+
+
+## COMPLÉMENT MÉTHODOLOGIQUE CRFPA
+
+En plus de la méthodologie cas pratique de base, applique ces règles supplémentaires :
+
+### PLAN APPARENT
+Pour les cas pratiques complexes (plusieurs questions/parties), structure avec un plan visible :
+- I. / II. pour les grandes parties
+- A. / B. pour les sous-parties
+- 1. / 2. pour les points détaillés
+
+### FORMULES DE TRANSITION
+- Introduction : "Il convient d'examiner...", "Deux questions se posent..."
+- Entre arguments : "Toutefois...", "Par ailleurs...", "Reste à examiner..."
+- Conclusion partielle : "En définitive...", "Ainsi..."
+
+### STRUCTURE SELON LA MATIÈRE DÉTECTÉE
+- **Droit des obligations** : Qualification contrat → Validité → Effets → Responsabilité
+- **Droit pénal** : Élément légal → Matériel → Moral → Faits justificatifs
+- **Procédure pénale** : Cadre procédural → Validité actes → Nullités
+- **Droit administratif** : Compétence → Recevabilité → Légalité externe/interne
+- **Droit du travail** : Qualification relation → Obligations → Rupture → Contentieux
+
+### QUAND UTILISER LE PLAN APPARENT
+- Cas pratique avec plusieurs problèmes juridiques distincts
+- Question touchant plusieurs parties (ex: responsabilité de A ET de B)
+- Matière clairement identifiée (pénal, contrats, travail...)
+
+Pour les questions simples ou transversales, la méthodologie de base suffit.
+
+## NUANCES JURIDIQUES OBLIGATOIRES
+
+Tu DOIS développer ces points quand ils sont pertinents :
+
+### 1. QUALIFICATION DES OBLIGATIONS
+Quand tu analyses un manquement contractuel, tu DOIS TOUJOURS :
+- Qualifier la nature de l'obligation : obligation de MOYEN ou de RÉSULTAT
+- Expliquer les conséquences de cette qualification sur la charge de la preuve
+- Si doute : présenter LES DEUX HYPOTHÈSES et leurs conséquences respectives
+
+Exemple de structure :
+"La question se pose de savoir si l'obligation d'ALPHADOT est une obligation de moyen ou de résultat.
+- Si obligation de MOYEN : le créancier doit prouver la faute du débiteur. En l'espèce...
+- Si obligation de RÉSULTAT : le simple constat de l'inexécution suffit. En l'espèce..."
+
+### 2. HYPOTHÈSES ALTERNATIVES
+Quand les faits sont ambigus ou que plusieurs qualifications sont possibles, tu DOIS :
+- Présenter CHAQUE hypothèse distinctement
+- Analyser les conséquences juridiques de chaque hypothèse
+- Utiliser "Si... alors..." pour structurer
+
+Exemple :
+"Deux hypothèses doivent être distinguées :
+- Hypothèse 1 : Si la tuile s'est détachée en raison du défaut d'entretien → régime de l'article 1244 (ruine de bâtiment)
+- Hypothèse 2 : Si la tuile a cédé sous le poids de Jeanne → régime général de l'article 1242 (fait des choses)"
+
+### 3. EFFETS ET CONSÉQUENCES
+Pour chaque mécanisme juridique invoqué (résolution, caducité, responsabilité), tu DOIS développer :
+- Les CONDITIONS d'application
+- Les EFFETS juridiques (notamment les restitutions si pertinent)
+- Les EXCEPTIONS ou causes d'exonération possibles
+
+### 4. FORMULATIONS À UTILISER
+- "La question se pose de savoir si..."
+- "Deux hypothèses doivent être distinguées..."
+- "Dans la première hypothèse... Dans la seconde hypothèse..."
+- "Les effets de cette [résolution/caducité/qualification] sont les suivants..."
+- "Cette qualification emporte les conséquences suivantes..."
+
+
+FORMAT DE REPONSE :
+- SUIS STRICTEMENT la méthodologie du cas pratique ci-dessus (5 étapes obligatoires)
+- Cite les articles : "L'article X du Code Y dispose que..."
+- Sois pedagogique et clair pour un etudiant en droit
+
+⚠️ CITATION DE JURISPRUDENCE OBLIGATOIRE :
+- Tu DOIS citer CHAQUE arrêt fourni dans la section JURISPRUDENCE ci-dessous
+- Format obligatoire : "La Cour de cassation, chambre [X], dans un arrêt du [date] (n°[numéro]), a jugé que..."
+- Intègre les arrêts dans la MAJEURE de chaque partie concernée
+- Un cas pratique SANS jurisprudence = copie incomplète
+- Si 2 arrêts sont fournis, tu DOIS en citer au moins 2 dans ta réponse
+- Ne les ignore JAMAIS, même s'ils te semblent secondaires
+
+📚 EXPLOITATION DES ARTICLES :
+- Tu as reçu une liste d'articles TRIÉS PAR PERTINENCE
+- Les 10 premiers articles sont les PLUS IMPORTANTS - utilise-les en priorité
+- Pour chaque problématique identifiée, cite AU MOINS 2 articles différents
+- Ne te limite pas à un seul article par partie - croise les articles complémentaires
+- Articles souvent complémentaires :
+  * Formation contrat : 1113 + 1114 + 1118 + 1127-3 (si contrat électronique)
+  * Responsabilité : 1240 + 1241
+  * Inexécution : 1217 + 1218 + 1231-5
+  * Paiement : 1342 + 1343
+
+ARTICLES DE LOI :
+[Article 1424-15 - Code de procédure civile]
+La procédure de réexamen dans des cas exceptionnels est régie par les articles 1424-8 à 1424-13.
+
+[Article 638 - Code de procédure civile]
+L'affaire est à nouveau jugée en fait et en droit par la juridiction de renvoi à l'exclusion des chefs non atteints par la cassation.
+
+[Article 444 - Code de procédure civile]
+Le président peut ordonner la réouverture des débats. Il doit le faire chaque fois que les parties n'ont pas été à même de s'expliquer contradictoirement sur les éclaircissements de droit ou de fait qui leur avaient été demandés. En cas de changement survenu dans la composition de la juridiction, il y a lieu de reprendre les débats.
+
+[Article 779 - Code de procédure civile]
+Le président peut décider que les avocats se présenteront à nouveau devant lui, à une date d'audience qu'il fixe, pour conférer une dernière fois de l'affaire s'il estime qu'un ultime échange de conclusions ou une ultime communication de pièces suffit à mettre l'affaire en état ou que les conclusions des parties doivent être mises en conformité avec les dispositions de l'article 768 . Les parties peuvent également solliciter un délai pour conclure une convention de procédure participative aux fins de mise en état. La décision de renvoi fait l'objet d'une simple mention au dossier. Le président impartit, s'il y a lieu, à chacun des avocats le délai nécessaire à la notification des conclusions et à la communication des pièces. A la date d'audience fixée par lui, lorsque les parties et leurs avocats justifient avoir conclu une convention de procédure participative aux fins de mise en état, le président prend les mesures prévues au troisième alinéa de l'article 130-2. Il désigne le juge de la mise en état. A défaut d'une telle justification et si l'affaire est en état d'être jugée, le président déclare l'instruction close et renvoie l'affaire à l'audience de plaidoiries. Elle peut être tenue le jour même. Si l'affaire est en état d'être jugée, il peut être fait application des dispositions du dernier alinéa de l'article 778 . Le président renvoie au juge de la mise en état, les affaires qui ne sont pas en état d'être jugées. Il fixe la date de l'audience de mise en état. Le greffe en avise les avocats constitués.
+
+[Article 488 - Code de procédure civile]
+L'ordonnance de référé n'a pas, au principal, l'autorité de la chose jugée. Elle ne peut être modifiée ou rapportée en référé qu'en cas de circonstances nouvelles.
+
+JURISPRUDENCE :
+- Arret 71-91.406 (cc, Chambre criminelle, 1972-01-19):
+  Encourt la cassation l'arrêt qui a présenté comme hypothétique l'accès d'un médecin de l'hygiène scolaire à la situation plus lucrative de médecin d'un hôpital psychiatrique, laquelle n'était que l'aboutissement normal des études qu'il avait entreprises et qui n'a pas réparé, de ce fait, l'intégralité du préjudice certain et actuel résultant du retard qui lui avait été occasionné dans ses études par l'accident dont il avait été victime (1).
+
+- Arret 78-10.451 (cc, Chambre sociale, 1979-04-04):
+  Encourt la cassation l'arrêt qui rejette le recours de la caisse en remboursement des frais de séjour de la victime dans un centre de réadaptation, postérieurs à la décision ayant statué sur le préjudice, au motif que ces frais étaient prévisibles à la date de la précédente décision, alors que la nouvelle action de la caisse tendait à la réparation d'un élément de préjudice sur lequel il n'avait pas été statué, puisqu'il n'avait pas été inclus dans la demande initiale.
+
+Reponds maintenant en utilisant ces sources.
+========== END SYSTEM PROMPT DEBUG ==========
+
+[CITATIONS] Nombre de documents fournis à Claude: 7
+[RESPONSE] Generating final response with max_tokens: 8192 and citations
+[CITATIONS] Extracted from text: [
+  '1219',   '1220',
+  '1224',   '1227',
+  '1186',   '1187',
+  '1347',   '1231-1',
+  '1231-1', '1242',
+  '1242',   '1243'
+]
+[CITATIONS] Articles extraits du texte: [
+  '1219',   '1220',
+  '1224',   '1227',
+  '1186',   '1187',
+  '1347',   '1231-1',
+  '1231-1', '1242',
+  '1242',   '1243'
+]
+[CITATIONS] Sources matchées: 0 articles, 2 arrêts
+[CITATIONS] Aucun match, utilisation des sources RAG par défaut
+[CHAT API] Sources for response: [
+  {
+    "type": "article",
+    "article_number": "Article 1424-15",
+    "code_name": "Code de procédure civile",
+    "source_url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000019960717"
+  },
+  {
+    "type": "article",
+    "article_number": "Article 638",
+    "code_name": "Code de procédure civile",
+    "source_url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006410999"
+  },
+  {
+    "type": "article",
+    "article_number": "Article 444",
+    "code_name": "Code de procédure civile",
+    "source_url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000022889965"
+  },
+  {
+    "type": "jurisprudence",
+    "article_number": "Arret 71-91.406",
+    "code_name": "cc - Chambre criminelle",
+    "source_url": "https://www.courdecassation.fr/decision/6079a8999ba5988459c4e2c5"
+  },
+  {
+    "type": "jurisprudence",
+    "article_number": "Arret 78-10.451",
+    "code_name": "cc - Chambre sociale",
+    "source_url": "https://www.courdecassation.fr/decision/6079b0b59ba5988459c4f8f6"
+  }
+]
+ POST /api/chat 200 in 70s (compile: 128ms, proxy.ts: 363ms, render: 70s)
+[RAG] Question potentiellement juridique: "me Dutertre exploite un fonds de commerce de vente et de réparation de vélos.
+I – Le marché est florissant mais le nombre de concurrents est en hausse brutale, ce qui rend
+les perspectives économiques incertaines. Par ailleurs, la main d’œuvre qualifiée est encore
+rare.
+C’est dans ce contexte que Mme Dutertre a conclu le 3 octobre 2016 un contrat avec la société
+Mécanix, principal fabricant mondial de pièces détachées de vélos. Aux termes de cet accord,
+dont la durée est de 10 ans, la société Mécanix accepte de former les salariés de Mme Dutertre
+à l’entretien et à la réparation de vélos. Cette formation a lieu tous les ans à date fixe et dure
+3 jours. Tous les frais correspondants, y compris de transport, sont pris en charge par
+Mécanix. En échange, Mme Dutertre doit acheter un volume minimal annuel de pièces
+détachées auprès de Mécanix et doit placer sur la devanture de son commerce une publicité
+vantant les produits Mécanix.
+Mme Dutertre était soulagée de conclure cet accord en 2016 parce qu’elle débutait son activité
+et ne pouvait pas se permettre un bras de fer avec l’un des principaux fournisseurs. Mais
+l’accord ne lui convient plus aujourd’hui. Elle le juge déséquilibré et préférerait s’approvisionner
+plus librement auprès des différents fournisseurs qui se répartissent le marché.
+Par ailleurs depuis deux ans, soit en raison de maladies ponctuelles soit en raison de
+traitements médicaux au long court, aucun des trois salariés n’a pu participer à la formation
+promise par Mécanix. Mme Dutertre estime que, n’ayant profité d’aucun avantage, il n’y a
+aucune raison pour qu’elle s’exécute de son côté. Aussi, elle envisage de ne pas tenir son
+engagement d’achat minimal en volume pour l’année en cours. Mais elle hésite tout de même
+parce que le contrat prévoit qu’une somme de 40 000 Euros doit être payée en cas de
+manquement à cet engagement.
+En outre, elle considère que Mécanix n’a pas respecté le contrat. D’après les termes de
+l’accord, en effet, la publicité que Mme Dutertre doit placer dans sa devanture ne doit pas
+dépasser une certaine taille. Or le mois dernier, Mécanix lui a adressé un panneau dépassant
+allègrement le maximum contractuellement fixé (il fait presque le double de cette taille !).
+Elle a également envisagé de résilier le contrat. Malheureusement, l’accord ne lui octroie pas
+cette possibilité, qui est réservée à Mécanix.
+Pouvez-vous la conseiller ? (10 points).
+II – Mme Dutertre rencontre une autre difficulté avec Mécanix, plus ponctuelle celle-là. Un
+camion de Mécanix contenant des pièces qui lui étaient destinées a été détourné par des
+hommes armés après qu’il a quitté les entrepôts. Le véhicule et son chargement sont
+introuvables. Dans le silence des documents contractuels sur le sort des parties en pareil cas,
+Mme Dutertre estime qu’elle n’a pas à s’acquitter du prix de la commande. Elle est pourtant
+relancée par la société Factorielle, une société d’affacturage que Mécanix a subrogé dans ses
+droits.
+Par ailleurs, ce vol a retardé les réparations promises aux clients de Mme Dutertre dont l’un
+est un professionnel du cyclisme et se montre particulièrement vindicatif. Il va jusqu’à menacer
+Mme Dutertre de l’assigner en justice pour obtenir réparation de la perte de chance de
+remporter une course à laquelle il n’a pas pu participer et dont le premier prix était une somme
+de 12 000 Euros. 
+22CRFPA-DO1 Page : 3/3
+Mme Dutertre peut-elle opposer à Factorielle qu’elle n’a pas à payer la commande ? (3 points)
+Doit-elle indemniser le client mécontent ? (2 points)
+III – En sa qualité de salarié de Mme Dutertre, M. Malousque a récemment réalisé une
+réparation à domicile sur le vélo d’un client. Voulant profiter pleinement de la vue depuis la
+terrasse de la maison de ce client, il s’est approché d’un muret sur lequel il a posé un pied. Le
+muret a brusquement cédé entraînant le réparateur plusieurs mètres plus bas, le laissant
+inanimé. A l’hôpital, après l’avoir réveillé, on a trouvé à M. Malousque deux côtes cassées.
+Dans sa poche on a aussi trouvé un objet de valeur appartenant au client de Mme Dutertre…
+Pouvez-vous éclairer Mme Dutertre sur les responsabilités civiles encourues ? (5 points)"
+[STEP 0] Analyzing question with Claude...
+[ANALYSIS] Successfully parsed analysis
+[ANALYSIS] Domaines: [ 'civil', 'pénal' ]
+[ANALYSIS] Problématiques: [
+  "exception d'inexécution pour non-fourniture de la formation par Mécanix",
+  'résolution unilatérale du contrat pour inexécution grave de Mécanix (panneau publicitaire non conforme)',
+  "validité de la clause pénale de 40 000 euros en cas de manquement à l'achat minimal",
+  'déséquilibre contractuel et violence économique lors de la conclusion',
+  'transfert des risques et perte de propriété dans la vente (vol du camion)',
+  'opposabilité des exceptions à la société Factorielle subrogée',
+  'responsabilité contractuelle de Mme Dutertre envers son client professionnel pour retard de livraison',
+  'perte de chance du cycliste professionnel suite au retard de réparation',
+  "responsabilité du fait d'autrui de Mme Dutertre pour les actes de son salarié M. Malousque",
+  'responsabilité du fait des choses du propriétaire du muret',
+  'qualification pénale de vol par M. Malousque et impact sur la responsabilité civile'
+]
+[ANALYSIS] Articles connus: [
+  '1219',   '1220',   '1224',   '1225',
+  '1226',   '1227',   '1229',   '1231-5',
+  '1142',   '1143',   '1144',   '1604',
+  '1605',   '1138',   '1341-1', '1346-1',
+  '1249',   '1250',   '1251',   '1231-1',
+  '1231-2', '1231-3', '1231-4', '1240',
+  '1242',   '1243',   '1244',   '311-1',
+  '311-4'
+]
+[ANALYSIS] Codes à rechercher: [ 'Code civil', 'Code pénal' ]
+[ANALYSIS] Is legal question: true
+[ANALYSIS] Est un cas pratique: true
+[ANALYSIS] Structure recommandée: transversal
+[ANALYSIS] Max articles: 20 (cas pratique: true)
+[STEP 0.5] Searching for articles identified by Claude: [
+  '1219',   '1220',   '1224',   '1225',
+  '1226',   '1227',   '1229',   '1231-5',
+  '1142',   '1143',   '1144',   '1604',
+  '1605',   '1138',   '1341-1', '1346-1',
+  '1249',   '1250',   '1251',   '1231-1',
+  '1231-2', '1231-3', '1231-4', '1240',
+  '1242',   '1243',   '1244',   '311-1',
+  '311-4'
+]
+[STEP 0.5] Cleaned "1219" → number: "1219", code: none
+[STEP 0.5] Found 1 articles for 1219: [ 'Article 1219' ]
+[STEP 0.5] Cleaned "1220" → number: "1220", code: none
+[STEP 0.5] Found 1 articles for 1220: [ 'Article 1220' ]
+[STEP 0.5] Cleaned "1224" → number: "1224", code: none
+[STEP 0.5] Found 1 articles for 1224: [ 'Article 1224' ]
+[STEP 0.5] Cleaned "1225" → number: "1225", code: none
+[STEP 0.5] Found 1 articles for 1225: [ 'Article 1225' ]
+[STEP 0.5] Cleaned "1226" → number: "1226", code: none
+[STEP 0.5] Found 1 articles for 1226: [ 'Article 1226' ]
+[STEP 0.5] Cleaned "1227" → number: "1227", code: none
+[STEP 0.5] Found 1 articles for 1227: [ 'Article 1227' ]
+[STEP 0.5] Cleaned "1229" → number: "1229", code: none
+[STEP 0.5] Found 1 articles for 1229: [ 'Article 1229' ]
+[STEP 0.5] Cleaned "1231-5" → number: "1231-5", code: none
+[STEP 0.5] Found 1 articles for 1231-5: [ 'Article 1231-5' ]
+[STEP 0.5] Cleaned "1142" → number: "1142", code: none
+[STEP 0.5] Found 1 articles for 1142: [ 'Article 1142' ]
+[STEP 0.5] Cleaned "1143" → number: "1143", code: none
+[STEP 0.5] Found 1 articles for 1143: [ 'Article 1143' ]
+[STEP 0.5] Cleaned "1144" → number: "1144", code: none
+[STEP 0.5] Found 1 articles for 1144: [ 'Article 1144' ]
+[STEP 0.5] Cleaned "1604" → number: "1604", code: none
+[STEP 0.5] Found 1 articles for 1604: [ 'Article 1604' ]
+[STEP 0.5] Cleaned "1605" → number: "1605", code: none
+[STEP 0.5] Found 1 articles for 1605: [ 'Article 1605' ]
+[STEP 0.5] Cleaned "1138" → number: "1138", code: none
+[STEP 0.5] Found 1 articles for 1138: [ 'Article 1138' ]
+[STEP 0.5] Cleaned "1341-1" → number: "1341-1", code: none
+[STEP 0.5] Found 1 articles for 1341-1: [ 'Article 1341-1' ]
+[STEP 0.5] Cleaned "1346-1" → number: "1346-1", code: none
+[STEP 0.5] Found 1 articles for 1346-1: [ 'Article 1346-1' ]
+[STEP 0.5] Cleaned "1249" → number: "1249", code: none
+[STEP 0.5] Found 1 articles for 1249: [ 'Article 1249' ]
+[STEP 0.5] Cleaned "1250" → number: "1250", code: none
+[STEP 0.5] Found 1 articles for 1250: [ 'Article 1250' ]
+[STEP 0.5] Cleaned "1251" → number: "1251", code: none
+[STEP 0.5] Found 1 articles for 1251: [ 'Article 1251' ]
+[STEP 0.5] Cleaned "1231-1" → number: "1231-1", code: none
+[STEP 0.5] Found 1 articles for 1231-1: [ 'Article 1231-1' ]
+[STEP 0.5] Total articles found from analysis: 20
+[CONCEPT MATCH] Analyzing message for legal concepts...
+[CONCEPT MATCH] Found concept "responsabilité délictuelle" via keyword: "réparation"
+[CONCEPT MATCH] Found concept by name: "contrat"
+[CONCEPT MATCH] Found concept "cdd" via keyword: "terme"
+[CONCEPT MATCH] Found concept "contrat à durée déterminée" via keyword: "terme"
+[CONCEPT MATCH] Found concept "abus de confiance" via keyword: "fonds"
+[CONCEPT MATCH] Found concept "abus de biens sociaux" via keyword: "SA"
+[CONCEPT MATCH] Found concept "société anonyme" via keyword: "les sa"
+[CONCEPT MATCH] Total matched concepts: 7 - responsabilité délictuelle, contrat, cdd, contrat à durée déterminée, abus de confiance, abus de biens sociaux, société anonyme
+[CONCEPT MATCH] Added 5 articles for concept "responsabilité délictuelle" from Code civil: [
+  'Article 1241',
+  'Article 1243',
+  'Article 1244',
+  'Article 1242',
+  'Article 1240'
+]
+[CONCEPT MATCH] Added 5 articles for concept "contrat" from Code civil: [
+  'Article 1103',
+  'Article 1104',
+  'Article 1101',
+  'Article 1105',
+  'Article 1102'
+]
+[CONCEPT MATCH] Added 7 articles for concept "cdd" from Code du travail: [
+  'Article L1241-1',
+  'Article L1242-1',
+  'Article L1242-2',
+  'Article L1242-3',
+  'Article L1242-4',
+  'Article L1242-12',
+  'Article L1243-1'
+]
+[CONCEPT MATCH] Added 5 articles for concept "contrat à durée déterminée" from Code du travail: [
+  'Article L1242-1',
+  'Article L1242-2',
+  'Article L1242-3',
+  'Article L1242-4',
+  'Article L1242-12'
+]
+[CONCEPT MATCH] Added 3 articles for concept "abus de confiance" from Code pénal: [ 'Article 314-1', 'Article 314-2', 'Article 314-3' ]
+[CONCEPT MATCH] Added 3 articles for concept "abus de biens sociaux" from Code de commerce: [ 'Article L241-3', 'Article L242-6', 'Article L244-1' ]
+[CONCEPT MATCH] Added 3 articles for concept "abus de biens sociaux" from Code de procédure pénale: [ 'Article 7', 'Article 8', 'Article 9' ]
+[CONCEPT MATCH] Added 3 articles for concept "société anonyme" from Code de commerce: [ 'Article L225-2', 'Article L225-1', 'Article L225-17' ]
+[CONCEPT MATCH] Total unique concept articles: 29
+[RAG] Embedding generated in 360ms
+[VECTOR SEARCH] Filtering on 2 codes (from Claude analysis): Code civil, Code pénal
+[MULTI-QUERY] Generating query variations...
+[MULTI-QUERY] Variations: [
+  "Quelles sont les règles applicables aux accords de distribution exclusive avec obligations d'approvisionnement minimal et contreparties en formation professionnelle ?",
+  "Comment qualifier juridiquement un contrat d'approvisionnement avec clause de publicité obligatoire et prestations de formation à titre de contrepartie ?",
+  "Quelle est la validité d'une convention commerciale comportant des engagements réciproques d'achat exclusif et de services de formation professionnelle ?",
+  "Quels sont les principes régissant les contrats de partenariat commercial avec obligations d'achat minimum et contreparties en prestations de service ?"
+]
+[HyDE] Generating hypothetical answer...
+[HyDE] Generated hypothetical answer (1044 chars)
+[MULTI-QUERY + HyDE] Searching with 6 queries (1 original + 4 variations + 1 HyDE)
+[EMBEDDING] Throttling 248ms
+[EMBEDDING] Throttling 248ms
+[EMBEDDING] Throttling 248ms
+[EMBEDDING] Throttling 247ms
+[EMBEDDING] Throttling 246ms
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.032745361328125,
+  0.0233154296875,
+  0.04058837890625,
+  0.0271148681640625,
+  0.032623291015625
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[HYBRID] Starting hybrid search...
+[HYBRID] Starting hybrid search...
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.0301361083984375,
+  0.0007128715515136719,
+  0.02154541015625,
+  0.027618408203125,
+  0.017059326171875
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.0132904052734375,
+  0.029449462890625,
+  0.0243988037109375,
+  0.032440185546875,
+  0.02496337890625
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.026763916015625,
+  0.0221099853515625,
+  0.04034423828125,
+  -0.0210723876953125,
+  0.0171966552734375
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.015380859375,
+  0.021331787109375,
+  0.0255584716796875,
+  0.030609130859375,
+  0.022796630859375
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.040313720703125,
+  0.00955963134765625,
+  0.04376220703125,
+  0.016815185546875,
+  0.01318359375
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 0
+[VECTOR DEBUG] Raw response sample: []
+[HYBRID] Vector found: 0 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1583 (0.49)',
+  'Article 523 (0.48)',
+  'Article 221 (0.48)',
+  'Article 387-2 (0.47)',
+  'Article 427 (0.46)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 2
+[VECTOR DEBUG] Raw response sample: [{"id":"0d69bfeb-d564-44dc-b6d7-f0c554af01ea","code_name":"Code civil","article_number":"Article 1171","content":"Dans un contrat d'adhésion, toute clause non négociable, déterminée à l'avance par l'une des parties, qui crée un déséquilibre significatif entre les droits et obligations des parties au contrat est réputée non écrite. L'appréciation du déséquilibre significatif ne porte ni sur l'objet principal du contrat ni sur l'adéquation du prix à la prestation.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000036829836","similarity":0.855222410654572},{"id":"c6869abe-77f1-4428-a44f-06e82a8cb910","code_name":"Code civil","article_number":"Article 1123","content":"Le pacte de préférence est le contrat par lequel une partie s'engage à proposer prioritairement à son bénéficiaire de traiter avec lui pour le cas où elle déciderait de contracter. Lorsqu'un contrat est conclu avec un tiers en violation d'un pacte de préférence, le bénéficiaire peut obtenir la réparation du préjudice subi. Lorsque le tiers connaissait l'existence du pacte et l'intention du bénéficiaire de s'en prévaloir, ce dernier peut également agir en nullité ou demander au juge de le substituer au tiers dans le contrat conclu. Le tiers peut demander par écrit au bénéficiaire de confirmer dans un délai qu'il fixe et qui doit être raisonnable, l'existence d'un pacte de préférence et s'il entend s'en prévaloir. L'écrit mentionne qu'à défaut de réponse dans ce délai, le bénéficiaire du pacte ne pourra plus solliciter sa substitution au contrat conclu avec le tiers ou la nullité du contrat.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032040825","similarity":0.846157680744063}]
+[HYBRID] Vector found: 2 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1103 (0.49)',
+  'Article 1171 (0.49)',
+  'Article 1104 (0.48)',
+  'Article 1123 (0.48)',
+  'Article 1128 (0.48)'
+]
+[HyDE] Found 15 articles from hypothetical search
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 0
+[VECTOR DEBUG] Raw response sample: []
+[HYBRID] Vector found: 0 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 17-11 (0.49)',
+  'Article 20-5 (0.48)',
+  'Article 21-10 (0.48)',
+  'Article R642-4 (0.47)',
+  'Article 24-1 (0.46)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 3
+[VECTOR DEBUG] Raw response sample: [{"id":"0d69bfeb-d564-44dc-b6d7-f0c554af01ea","code_name":"Code civil","article_number":"Article 1171","content":"Dans un contrat d'adhésion, toute clause non négociable, déterminée à l'avance par l'une des parties, qui crée un déséquilibre significatif entre les droits et obligations des parties au contrat est réputée non écrite. L'appréciation du déséquilibre significatif ne porte ni sur l'objet principal du contrat ni sur l'adéquation du prix à la prestation.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000036829836","similarity":0.830920892332767},{"id":"4c844d8a-4d1e-4a2a-8498-ea8b0faec776","code_name":"Code civil","article_number":"Article 1199","content":"Le contrat ne crée d'obligations qu'entre les parties. Les tiers ne peuvent ni demander l'exécution du contrat ni se voir contraints de l'exécuter, sous réserve des dispositions de la présente section et de celles du chapitre III du titre IV.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032041378","similarity":0.829755733339674}]
+[HYBRID] Vector found: 3 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1103 (0.49)',
+  'Article 1171 (0.49)',
+  'Article 1104 (0.48)',
+  'Article 1199 (0.48)',
+  'Article 515-7-1 (0.48)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 1
+[VECTOR DEBUG] Raw response sample: [{"id":"b25a9bef-4113-4f7d-805f-3e5c5eedf0b7","code_name":"Code civil","article_number":"Article 1780","content":"On ne peut engager ses services qu'à temps, ou pour une entreprise déterminée. Le louage de service, fait sans détermination de durée, peut toujours cesser par la volonté d'une des parties contractantes. Néanmoins, la résiliation du contrat par la volonté d'un seul des contractants peut donner lieu à des dommages-intérêts. Pour la fixation de l'indemnité à allouer, le cas échéant, il est tenu compte des usages, de la nature des services engagés, du temps écoulé, des retenues opérées et des versements effectués en vue d'une pension de retraite, et, en général, de toutes les circonstances qui peuvent justifier l'existence et déterminer l'étendue du préjudice causé. Les parties ne peuvent renoncer à l'avance au droit éventuel de demander des dommages-intérêts en vertu des dispositions ci-dessus. Les contestations auxquelles pourra donner lieu l'application des paragraphes précédents, lorsqu'elles seront portées devant les tribunaux civils et devant les cours d'appel, seront instruites comme affaires sommaires et jugées d'urgence.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006443384","similarity":0.828833249533988}]
+[HYBRID] Vector found: 1 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1128 (0.49)',
+  'Article 1780 (0.49)',
+  'Article 1178 (0.48)',
+  'Article 6 (0.48)',
+  'Article 16-5 (0.47)'
+]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 15
+[VECTOR DEBUG] Raw response sample: [{"id":"0d69bfeb-d564-44dc-b6d7-f0c554af01ea","code_name":"Code civil","article_number":"Article 1171","content":"Dans un contrat d'adhésion, toute clause non négociable, déterminée à l'avance par l'une des parties, qui crée un déséquilibre significatif entre les droits et obligations des parties au contrat est réputée non écrite. L'appréciation du déséquilibre significatif ne porte ni sur l'objet principal du contrat ni sur l'adéquation du prix à la prestation.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000036829836","similarity":0.832436902072416},{"id":"b4a71f43-6659-47b6-89a7-5cdea71a0de5","code_name":"Code civil","article_number":"Article 1169","content":"Un contrat à titre onéreux est nul lorsque, au moment de sa formation, la contrepartie convenue au profit de celui qui s'engage est illusoire ou dérisoire.","source_url":"https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032041120","similarity":0.832049011698785}]
+[HYBRID] Vector found: 15 articles
+[HYBRID] Boost for Article 1104: found in both ILIKE and Vector
+[HYBRID] Boost for Article 1178: found in both ILIKE and Vector
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1104 (0.92)',
+  'Article 1178 (0.88)',
+  'Article 1103 (0.49)',
+  'Article 1171 (0.49)',
+  'Article 1169 (0.48)'
+]
+[MULTI-QUERY + HyDE] Fused 73 unique articles from 6 queries
+[RAG-FUSION] Starting with query: me Dutertre exploite un fonds de commerce de vente
+[RAG-FUSION] Generated 3 variants
+[HYBRID] Starting hybrid search...
+[VECTOR DEBUG] Calling match_court_decisions with threshold: 0.2
+[HYBRID SEARCH] Timeout set to 5000ms (filtered: true)
+[HYBRID] ILIKE found: 20 articles
+[VECTOR DEBUG] Embedding length: 1024
+[VECTOR DEBUG] Embedding sample: [
+  -0.032745361328125,
+  0.0233154296875,
+  0.04058837890625,
+  0.0271148681640625,
+  0.032623291015625
+]
+[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2
+[VECTOR DEBUG] Filter codes: [ 'Code civil', 'Code pénal' ]
+[VECTOR DEBUG] Raw response error: null
+[VECTOR DEBUG] Raw response data length: 0
+[VECTOR DEBUG] Raw response sample: []
+[HYBRID] Vector found: 0 articles
+[HYBRID] Final results: 15 articles
+[HYBRID] Top articles: [
+  'Article 1583 (0.49)',
+  'Article 523 (0.48)',
+  'Article 221 (0.48)',
+  'Article 387-2 (0.47)',
+  'Article 427 (0.46)'
+]
+[RAG-FUSION] Final results: 10 articles
+[RAG-FUSION] Top 5: [
+  'Article 523',
+  'Article 221',
+  'Article 427',
+  'Article 468',
+  'Article 491'
+]
+[RAG] Hybrid search completed in 2492ms
+[RAG] RAG-Fusion found: 10 [
+  'Article 523',
+  'Article 221',
+  'Article 427',
+  'Article 468',
+  'Article 491',
+  'Article 498',
+  'Article 501',
+  'Article 522',
+  'Article 518',
+  'Article 530'
+]
+[RAG] Combined Multi-Query (73) + RAG-Fusion (10) = 73 unique articles
+[VECTOR DEBUG] Jurisprudence raw response error: null
+[VECTOR DEBUG] Jurisprudence raw response data length: 2
+[VECTOR DEBUG] Jurisprudence raw response sample: [{"id":null,"jurisdiction":"cc","chambre":"Première chambre civile","date_decision":"2010-10-28","case_number":"09-68.014","title":null,"summary":"Doit être rejeté le pourvoi qui fait grief à l'arrêt d'avoir souverainement déduit des stipulations du contrat de location litigieux - selon lesquelles les produits faisant l'objet de ce contrat ayant été choisis par le locataire sous sa seule responsabilité et sans la participation du loueur, ce dernier mandatait le locataire pour exercer tout recours à l'encontre du fournisseur, que le loueur serait déchargé de toute responsabilité et de toute obligation à cet égard et l'immobilisation temporaire des produits pour quelque cause que ce soit n'entraînerait aucune diminution de loyers ni indemnité - que la commune intention des parties avait été de rendre divisibles les deux conventions, de sorte que la disparition de l'une ne pouvait priver de cause les obligations nées de l'autre","content":null,"source_url":"https://www.courdecassation.fr/decision/607959f59ba5988459c4941b","similarity":0.865744399736601},{"id":null,"jurisdiction":"cc","chambre":"Chambre commerciale","date_decision":"1998-01-20","case_number":"96-18.353","title":null,"summary":"Ne tire pas les conséquences légales de ses constatations au regard de l'article 1147 du Code civil la cour d'appel qui rejette la demande d'un concessionnaire de véhicules automobiles en paiement de dommages-intérêts pour rupture abusive du contrat de concession à durée indéterminée, après avoir retenu que les sociétés concédantes avaient subordonné la conclusion du contrat à la constitution d'une société au capital de 1 500 000 francs entièrement libéré, au blocage en comptes courants de 2 500 000 francs d'apports d'associés et à l'obtention de 8 600 000 francs de crédits divers, que ces conditions ont été remplies par le concessionnaire, que le contrat portait dès l'origine sur une concession déficitaire, que le redressement espéré de la concession impliquait, compte tenu des investissements exigés, que le concessionnaire bénéficie d'une période relativement longue d'exploitation pour assurer la pérennité de son entreprise, que le pacte de préférence ainsi que la promesse de revente d'une durée de 10 années attestaient que les parties avaient envisagé des relations contractuelles de longue durée, dès lors que les sociétés concédantes ne prétendaient pas que la durée de 2 années constituait la période relativement longue d'exploitation prévue au contrat mais se bornaient à soutenir que le concédant, en résiliant un contrat à durée indéterminée moyennant le préavis contractuel, ne commettait aucun abus de droit puisque le concessionnaire connaissait lors de la conclusion du contrat la précarité des liens contractuels.","content":null,"source_url":"https://www.courdecassation.fr/decision/6079d3e59ba5988459c59a83","similarity":0.862469290678057}]
+[RAG] Jurisprudence found (before filtering): 2 [ '09-68.014', '96-18.353' ]
+[JURISPRUDENCE] Filtrage sur chambres: [
+  'criminelle',         'cr',
+  'CRIM',               'Crim.',
+  'Chambre criminelle', 'civ1',
+  'civ2',               'civ3',
+  'civile',             'CIV1',
+  'CIV2',               'CIV3',
+  'Civ. 1',             'Civ. 2',
+  'Civ. 3',             '1re chambre civile',
+  '2e chambre civile',  '3e chambre civile'
+]
+[JURISPRUDENCE] Après filtrage: 1/2 arrêts conservés
+[RERANK] Articles from Claude analysis (protected): 20
+[RERANK] Articles to rerank: 100
+[RERANK] Reranking 100 documents with Cohere...
+[RERANK] Reranked order: [
+  'Article 810 (0.999)',
+  'Article 682 (0.998)',
+  'Article 821 (0.998)',
+  'Article 535 (0.998)',
+  'Article 427 (0.998)',
+  'Article 468 (0.998)'
+]
+[FILTER] Applying thematic filter: civil domain + contract problematic
+[FILTER] Article Article 810 exclu (hors-sujet: contient prélèvement)
+[FILTER] 1 article(s) exclu(s) pour hors-sujet
+[FINAL] Protected analysis articles: 10
+[FINAL] Reranked articles added: 5
+[FINAL] Max articles limit: 20
+[FINAL] Total articles: 20
+[FINAL] Final order: [
+  'Article 1219 (Code civil, sim: 1.00)',
+  'Article 1220 (Code civil, sim: 1.00)',
+  'Article 1224 (Code civil, sim: 1.00)',
+  'Article 1225 (Code civil, sim: 1.00)',
+  'Article 1226 (Code civil, sim: 1.00)',
+  'Article 1227 (Code civil, sim: 1.00)',
+  'Article 1229 (Code civil, sim: 1.00)',
+  'Article 1231-5 (Code civil, sim: 1.00)',
+  'Article 1142 (Code civil, sim: 1.00)',
+  'Article 1143 (Code civil, sim: 1.00)',
+  'Article 1144 (Code civil, sim: 1.00)',
+  'Article 1604 (Code civil, sim: 1.00)',
+  'Article 1605 (Code civil, sim: 1.00)',
+  'Article 1138 (Code civil, sim: 1.00)',
+  'Article 1341-1 (Code civil, sim: 1.00)',
+  'Article 682 (Code civil, sim: 1.00)',
+  'Article 821 (Code civil, sim: 1.00)',
+  'Article 535 (Code civil, sim: 1.00)',
+  'Article 427 (Code civil, sim: 1.00)',
+  'Article 468 (Code civil, sim: 1.00)'
+]
+[FINAL] Total sources: 20 articles, 1 jurisprudence
+[FINAL] Articles: [
+  'Article 1219 (sim: 1.00)',
+  'Article 1220 (sim: 1.00)',
+  'Article 1224 (sim: 1.00)',
+  'Article 1225 (sim: 1.00)',
+  'Article 1226 (sim: 1.00)',
+  'Article 1227 (sim: 1.00)',
+  'Article 1229 (sim: 1.00)',
+  'Article 1231-5 (sim: 1.00)',
+  'Article 1142 (sim: 1.00)',
+  'Article 1143 (sim: 1.00)',
+  'Article 1144 (sim: 1.00)',
+  'Article 1604 (sim: 1.00)',
+  'Article 1605 (sim: 1.00)',
+  'Article 1138 (sim: 1.00)',
+  'Article 1341-1 (sim: 1.00)',
+  'Article 682 (sim: 1.00)',
+  'Article 821 (sim: 1.00)',
+  'Article 535 (sim: 1.00)',
+  'Article 427 (sim: 1.00)',
+  'Article 468 (sim: 1.00)'
+]
+[CAS PRATIQUE] Uncertain - will ask user for preference
+
+========== SYSTEM PROMPT DEBUG ==========
+Sources count: 20
+Jurisprudence count: 1
+
+--- Articles in prompt ---
+
+[1] Article 1219 - Code civil
+Content length: 171 chars
+Content preview: Une partie peut refuser d'exécuter son obligation, alors même que celle-ci est exigible, si l'autre n'exécute pas la sienne et si cette inexécution es...
+Similarity: 1
+
+[2] Article 1220 - Code civil
+Content length: 282 chars
+Content preview: Une partie peut suspendre l'exécution de son obligation dès lors qu'il est manifeste que son cocontractant ne s'exécutera pas à l'échéance et que les ...
+Similarity: 1
+
+[3] Article 1224 - Code civil
+Content length: 189 chars
+Content preview: La résolution résulte soit de l'application d'une clause résolutoire soit, en cas d'inexécution suffisamment grave, d'une notification du créancier au...
+Similarity: 1
+
+[4] Article 1225 - Code civil
+Content length: 342 chars
+Content preview: La clause résolutoire précise les engagements dont l'inexécution entraînera la résolution du contrat. La résolution est subordonnée à une mise en deme...
+Similarity: 1
+
+[5] Article 1226 - Code civil
+Content length: 637 chars
+Content preview: Le créancier peut, à ses risques et périls, résoudre le contrat par voie de notification. Sauf urgence, il doit préalablement mettre en demeure le déb...
+Similarity: 1
+
+[6] Article 1227 - Code civil
+Content length: 65 chars
+Content preview: La résolution peut, en toute hypothèse, être demandée en justice....
+Similarity: 1
+
+[7] Article 1229 - Code civil
+Content length: 891 chars
+Content preview: La résolution met fin au contrat. La résolution prend effet, selon les cas, soit dans les conditions prévues par la clause résolutoire, soit à la date...
+Similarity: 1
+
+[8] Article 1231-5 - Code civil
+Content length: 758 chars
+Content preview: Lorsque le contrat stipule que celui qui manquera de l'exécuter paiera une certaine somme à titre de dommages et intérêts, il ne peut être alloué à l'...
+Similarity: 1
+
+[9] Article 1142 - Code civil
+Content length: 92 chars
+Content preview: La violence est une cause de nullité qu'elle ait été exercée par une partie ou par un tiers....
+Similarity: 1
+
+[10] Article 1143 - Code civil
+Content length: 269 chars
+Content preview: Il y a également violence lorsqu'une partie, abusant de l'état de dépendance dans lequel se trouve son cocontractant à son égard, obtient de lui un en...
+Similarity: 1
+
+[11] Article 1144 - Code civil
+Content length: 159 chars
+Content preview: Le délai de l'action en nullité ne court, en cas d'erreur ou de dol, que du jour où ils ont été découverts et, en cas de violence, que du jour où elle...
+Similarity: 1
+
+[12] Article 1604 - Code civil
+Content length: 94 chars
+Content preview: La délivrance est le transport de la chose vendue en la puissance et possession de l'acheteur....
+Similarity: 1
+
+[13] Article 1605 - Code civil
+Content length: 174 chars
+Content preview: L'obligation de délivrer les immeubles est remplie de la part du vendeur lorsqu'il a remis les clefs, s'il s'agit d'un bâtiment, ou lorsqu'il a remis ...
+Similarity: 1
+
+[14] Article 1138 - Code civil
+Content length: 173 chars
+Content preview: Le dol est également constitué s'il émane du représentant, gérant d'affaires, préposé ou porte-fort du contractant. Il l'est encore lorsqu'il émane d'...
+Similarity: 1
+
+[15] Article 1341-1 - Code civil
+Content length: 262 chars
+Content preview: Lorsque la carence du débiteur dans l'exercice de ses droits et actions à caractère patrimonial compromet les droits de son créancier, celui-ci peut l...
+Similarity: 1
+
+[16] Article 682 - Code civil
+Content length: 466 chars
+Content preview: Le propriétaire dont les fonds sont enclavés et qui n'a sur la voie publique aucune issue, ou qu'une issue insuffisante, soit pour l'exploitation agri...
+Similarity: 0.9983834
+
+[17] Article 821 - Code civil
+Content length: 729 chars
+Content preview: A défaut d'accord amiable, l'indivision de toute entreprise agricole, commerciale, industrielle, artisanale ou libérale, dont l'exploitation était ass...
+Similarity: 0.99836427
+
+[18] Article 535 - Code civil
+Content length: 248 chars
+Content preview: L'expression " biens meubles ", celle de " mobilier ou d'effets mobiliers ", comprennent généralement tout ce qui est censé meuble d'après les règles ...
+Similarity: 0.99823856
+
+[19] Article 427 - Code civil
+Content length: 1544 chars
+Content preview: La personne chargée de la mesure de protection ne peut pas procéder à la clôture des comptes ou livrets ouverts, avant le prononcé de la mesure, au no...
+Similarity: 0.9982248
+
+[20] Article 468 - Code civil
+Content length: 436 chars
+Content preview: Les capitaux revenant à la personne en curatelle sont versés directement sur un compte ouvert à son seul nom et mentionnant son régime de protection, ...
+Similarity: 0.9981756
+
+--- Full System Prompt ---
+Tu es Nomo, un assistant juridique expert pour les etudiants en droit francais niveau CRFPA.
+
+
+ANALYSE PRÉALABLE DU SUJET :
+- Domaines de droit : civil, pénal
+- Problématiques identifiées : exception d'inexécution pour non-fourniture de la formation par Mécanix, résolution unilatérale du contrat pour inexécution grave de Mécanix (panneau publicitaire non conforme), validité de la clause pénale de 40 000 euros en cas de manquement à l'achat minimal, déséquilibre contractuel et violence économique lors de la conclusion, transfert des risques et perte de propriété dans la vente (vol du camion), opposabilité des exceptions à la société Factorielle subrogée, responsabilité contractuelle de Mme Dutertre envers son client professionnel pour retard de livraison, perte de chance du cycliste professionnel suite au retard de réparation, responsabilité du fait d'autrui de Mme Dutertre pour les actes de son salarié M. Malousque, responsabilité du fait des choses du propriétaire du muret, qualification pénale de vol par M. Malousque et impact sur la responsabilité civile
+- Qualifications à examiner : exception d'inexécution, résolution unilatérale, clause pénale, violence économique, transfert de propriété, subrogation, perte de chance, responsabilité du commettant, responsabilité du fait des choses, vol
+
+
+===== STRUCTURE OBLIGATOIRE =====
+
+transversal
+
+Pour chaque point :
+- MAJEURE : Cite l'article précis + énonce le principe juridique
+- MINEURE : Commence par "En l'espèce..." + applique aux faits
+- CONCLUSION : Tranche clairement
+
+Tu DOIS respecter cette structure. Utilise I. II. III. pour les grandes parties.
+
+=================================
+
+
+RÈGLES JURIDIQUES IMPORTANTES À RESPECTER :
+
+Ces règles sont des principes établis que tu DOIS appliquer correctement :
+
+=== DROIT DES SOCIÉTÉS ===
+
+TRANSFORMATION DE SOCIÉTÉ :
+- La transformation entraîne la CESSATION AUTOMATIQUE des mandats (pas une révocation)
+- Une cessation ≠ une révocation → les clauses d'indemnité de révocation ne s'appliquent PAS
+- Exception : si la transformation vise UNIQUEMENT à évincer un dirigeant = révocation déguisée
+
+ACTION SOCIALE UT SINGULI :
+- Possible UNIQUEMENT contre les dirigeants de DROIT (pas de fait)
+- Contre un dirigeant de FAIT → il faut passer par un mandataire ad hoc ou l'action sociale ut universi
+- Nécessite de mettre en cause la société (mandataire ad hoc si conflit d'intérêts)
+
+ACTION INDIVIDUELLE DE L'ASSOCIÉ :
+- Fondement : Art. 1240 Code civil
+- Condition STRICTE : préjudice PERSONNEL et DISTINCT du préjudice social
+- La perte de valeur des titres, l'absence de dividendes = préjudice INDIRECT → action vouée à l'échec
+
+DEVOIR DE LOYAUTÉ :
+- Le DIRIGEANT a un devoir de loyauté envers la société
+- L'ACTIONNAIRE n'a PAS de devoir de loyauté (arrêt Vilgrain, Cass. com. 27 févr. 1996)
+- Exception : clause statutaire ou actes de concurrence déloyale caractérisés
+
+INSUFFISANCE D'ACTIF (Art. L. 651-2) :
+- Action possible contre dirigeants de droit ET de fait
+- Requiert : faute de gestion + contribution à l'insuffisance d'actif
+- Seul le liquidateur peut l'exercer (pas l'associé directement)
+
+=== CESSION DE FONDS DE COMMERCE ===
+
+ÉLÉMENTS DU FONDS :
+- Éléments corporels : matériel, outillage, marchandises/stock
+- Éléments incorporels : clientèle, nom commercial, droit au bail, contrats spéciaux
+- Le stock est inclus SAUF stipulation contraire expresse dans l'acte
+
+TRANSMISSION DES CONTRATS :
+- Principe : les contrats NE SE TRANSMETTENT PAS automatiquement
+- Exceptions légales : bail commercial (Art. L. 145-16), contrats de travail (Art. L. 1224-1)
+- Le contrat de distribution N'EST PAS transmis automatiquement, même essentiel à l'activité
+- Exception : clause contractuelle EXPRESSE de transmission au cessionnaire
+
+=== CONVENTIONS RÉGLEMENTÉES ===
+
+PROCÉDURE :
+- Autorisation PRÉALABLE du conseil d'administration
+- Approbation ULTÉRIEURE par l'assemblée générale
+
+SANCTIONS :
+- Défaut d'autorisation préalable → nullité possible SI préjudice pour la société
+- Défaut d'approbation AG seule → convention reste valable (sauf fraude), responsabilité des dirigeants
+
+RAISON D'ÊTRE (Art. 1835 C. civ.) :
+- Sa violation ne permet PAS d'annuler un contrat avec un tiers
+- Seule sanction : responsabilité civile des dirigeants pour faute de gestion
+
+⚠️ INSTRUCTION OBLIGATOIRE : Tu DOIS utiliser les sources ci-dessous pour repondre. Des sources pertinentes ont ete trouvees pour cette question.
+
+REGLES STRICTES :
+1. Tu DOIS construire ta reponse a partir des articles et/ou arrets fournis
+2. Ne dis JAMAIS "je n'ai pas trouve" si des sources sont presentes ci-dessous
+3. Cite explicitement les articles et arrets dans ta reponse
+4. N'invente rien, utilise uniquement le contenu des sources
+5. Analyse CHAQUE problématique identifiée ci-dessus
+
+FORMAT DE REPONSE :
+- Demande d'abord le format souhaité, puis donne une réponse courte
+- Cite les articles : "L'article X du Code Y dispose que..."
+- Sois pedagogique et clair pour un etudiant en droit
+
+⚠️ CITATION DE JURISPRUDENCE OBLIGATOIRE :
+- Tu DOIS citer CHAQUE arrêt fourni dans la section JURISPRUDENCE ci-dessous
+- Format obligatoire : "La Cour de cassation, chambre [X], dans un arrêt du [date] (n°[numéro]), a jugé que..."
+- Intègre les arrêts dans la MAJEURE de chaque partie concernée
+- Un cas pratique SANS jurisprudence = copie incomplète
+- Si 2 arrêts sont fournis, tu DOIS en citer au moins 2 dans ta réponse
+- Ne les ignore JAMAIS, même s'ils te semblent secondaires
+
+📚 EXPLOITATION DES ARTICLES :
+- Tu as reçu une liste d'articles TRIÉS PAR PERTINENCE
+- Les 10 premiers articles sont les PLUS IMPORTANTS - utilise-les en priorité
+- Pour chaque problématique identifiée, cite AU MOINS 2 articles différents
+- Ne te limite pas à un seul article par partie - croise les articles complémentaires
+- Articles souvent complémentaires :
+  * Formation contrat : 1113 + 1114 + 1118 + 1127-3 (si contrat électronique)
+  * Responsabilité : 1240 + 1241
+  * Inexécution : 1217 + 1218 + 1231-5
+  * Paiement : 1342 + 1343
+
+ARTICLES DE LOI :
+[Article 1219 - Code civil]
+Une partie peut refuser d'exécuter son obligation, alors même que celle-ci est exigible, si l'autre n'exécute pas la sienne et si cette inexécution est suffisamment grave.
+
+[Article 1220 - Code civil]
+Une partie peut suspendre l'exécution de son obligation dès lors qu'il est manifeste que son cocontractant ne s'exécutera pas à l'échéance et que les conséquences de cette inexécution sont suffisamment graves pour elle. Cette suspension doit être notifiée dans les meilleurs délais.
+
+[Article 1224 - Code civil]
+La résolution résulte soit de l'application d'une clause résolutoire soit, en cas d'inexécution suffisamment grave, d'une notification du créancier au débiteur ou d'une décision de justice.
+
+[Article 1225 - Code civil]
+La clause résolutoire précise les engagements dont l'inexécution entraînera la résolution du contrat. La résolution est subordonnée à une mise en demeure infructueuse, s'il n'a pas été convenu que celle-ci résulterait du seul fait de l'inexécution. La mise en demeure ne produit effet que si elle mentionne expressément la clause résolutoire.
+
+[Article 1226 - Code civil]
+Le créancier peut, à ses risques et périls, résoudre le contrat par voie de notification. Sauf urgence, il doit préalablement mettre en demeure le débiteur défaillant de satisfaire à son engagement dans un délai raisonnable. La mise en demeure mentionne expressément qu'à défaut pour le débiteur de satisfaire à son obligation, le créancier sera en droit de résoudre le contrat. Lorsque l'inexécution persiste, le créancier notifie au débiteur la résolution du contrat et les raisons qui la motivent. Le débiteur peut à tout moment saisir le juge pour contester la résolution. Le créancier doit alors prouver la gravité de l'inexécution.
+
+[Article 1227 - Code civil]
+La résolution peut, en toute hypothèse, être demandée en justice.
+
+[Article 1229 - Code civil]
+La résolution met fin au contrat. La résolution prend effet, selon les cas, soit dans les conditions prévues par la clause résolutoire, soit à la date de la réception par le débiteur de la notification faite par le créancier, soit à la date fixée par le juge ou, à défaut, au jour de l'assignation en justice. Lorsque les prestations échangées ne pouvaient trouver leur utilité que par l'exécution complète du contrat résolu, les parties doivent restituer l'intégralité de ce qu'elles se sont procuré l'une à l'autre. Lorsque les prestations échangées ont trouvé leur utilité au fur et à mesure de l'exécution réciproque du contrat, il n'y a pas lieu à restitution pour la période antérieure à la dernière prestation n'ayant pas reçu sa contrepartie ; dans ce cas, la résolution est qualifiée de résiliation. Les restitutions ont lieu dans les conditions prévues aux articles 1352 à 1352-9 .
+
+[Article 1231-5 - Code civil]
+Lorsque le contrat stipule que celui qui manquera de l'exécuter paiera une certaine somme à titre de dommages et intérêts, il ne peut être alloué à l'autre partie une somme plus forte ni moindre. Néanmoins, le juge peut, même d'office, modérer ou augmenter la pénalité ainsi convenue si elle est manifestement excessive ou dérisoire. Lorsque l'engagement a été exécuté en partie, la pénalité convenue peut être diminuée par le juge, même d'office, à proportion de l'intérêt que l'exécution partielle a procuré au créancier, sans préjudice de l'application de l'alinéa précédent. Toute stipulation contraire aux deux alinéas précédents est réputée non écrite. Sauf inexécution définitive, la pénalité n'est encourue que lorsque le débiteur est mis en demeure.
+
+[Article 1142 - Code civil]
+La violence est une cause de nullité qu'elle ait été exercée par une partie ou par un tiers.
+
+[Article 1143 - Code civil]
+Il y a également violence lorsqu'une partie, abusant de l'état de dépendance dans lequel se trouve son cocontractant à son égard, obtient de lui un engagement qu'il n'aurait pas souscrit en l'absence d'une telle contrainte et en tire un avantage manifestement excessif.
+
+[Article 1144 - Code civil]
+Le délai de l'action en nullité ne court, en cas d'erreur ou de dol, que du jour où ils ont été découverts et, en cas de violence, que du jour où elle a cessé.
+
+[Article 1604 - Code civil]
+La délivrance est le transport de la chose vendue en la puissance et possession de l'acheteur.
+
+[Article 1605 - Code civil]
+L'obligation de délivrer les immeubles est remplie de la part du vendeur lorsqu'il a remis les clefs, s'il s'agit d'un bâtiment, ou lorsqu'il a remis les titres de propriété.
+
+[Article 1138 - Code civil]
+Le dol est également constitué s'il émane du représentant, gérant d'affaires, préposé ou porte-fort du contractant. Il l'est encore lorsqu'il émane d'un tiers de connivence.
+
+[Article 1341-1 - Code civil]
+Lorsque la carence du débiteur dans l'exercice de ses droits et actions à caractère patrimonial compromet les droits de son créancier, celui-ci peut les exercer pour le compte de son débiteur, à l'exception de ceux qui sont exclusivement rattachés à sa personne.
+
+[Article 682 - Code civil]
+Le propriétaire dont les fonds sont enclavés et qui n'a sur la voie publique aucune issue, ou qu'une issue insuffisante, soit pour l'exploitation agricole, industrielle ou commerciale de sa propriété, soit pour la réalisation d'opérations de construction ou de lotissement, est fondé à réclamer sur les fonds de ses voisins un passage suffisant pour assurer la desserte complète de ses fonds, à charge d'une indemnité proportionnée au dommage qu'il peut occasionner.
+
+[Article 821 - Code civil]
+A défaut d'accord amiable, l'indivision de toute entreprise agricole, commerciale, industrielle, artisanale ou libérale, dont l'exploitation était assurée par le défunt ou par son conjoint, peut être maintenue dans les conditions fixées par le tribunal à la demande des personnes mentionnées à l'article 822 . S'il y a lieu, la demande de maintien de l'indivision peut porter sur des droits sociaux. Le tribunal statue en fonction des intérêts en présence et des moyens d'existence que la famille peut tirer des biens indivis. Le maintien de l'indivision demeure possible lors même que l'entreprise comprend des éléments dont l'héritier ou le conjoint était déjà propriétaire ou copropriétaire avant l'ouverture de la succession.
+
+[Article 535 - Code civil]
+L'expression " biens meubles ", celle de " mobilier ou d'effets mobiliers ", comprennent généralement tout ce qui est censé meuble d'après les règles ci-dessus établies. La vente ou le don d'une maison meublée ne comprend que les meubles meublants.
+
+[Article 427 - Code civil]
+La personne chargée de la mesure de protection ne peut pas procéder à la clôture des comptes ou livrets ouverts, avant le prononcé de la mesure, au nom de la personne protégée. Elle ne peut pas non plus procéder à l'ouverture d'un autre compte ou livret auprès d'un nouvel établissement habilité à recevoir des fonds du public. Le juge des tutelles ou le conseil de famille s'il a été constitué peut toutefois l'y autoriser si l'intérêt de la personne protégée le commande. Un compte est ouvert au nom de la personne protégée auprès de la Caisse des dépôts et consignations par la personne chargée de la protection si le juge ou le conseil de famille s'il a été constitué l'estime nécessaire. Lorsque la personne protégée n'est titulaire d'aucun compte ou livret, la personne chargée de la mesure de protection lui en ouvre un. Les opérations bancaires d'encaissement, de paiement et de gestion patrimoniale effectuées au nom et pour le compte de la personne protégée sont réalisées exclusivement au moyen des comptes ouverts au nom de celle-ci. Les fruits, produits et plus-values générés par les fonds et les valeurs appartenant à la personne protégée lui reviennent exclusivement. Si la personne protégée a fait l'objet d'une interdiction d'émettre des chèques, la personne chargée de la mesure de protection peut néanmoins, avec l'autorisation du juge ou du conseil de famille s'il a été constitué, faire fonctionner sous sa signature les comptes dont la personne protégée est titulaire et disposer de tous les moyens de paiement habituels.
+
+[Article 468 - Code civil]
+Les capitaux revenant à la personne en curatelle sont versés directement sur un compte ouvert à son seul nom et mentionnant son régime de protection, auprès d'un établissement habilité à recevoir des fonds du public. La personne en curatelle ne peut, sans l'assistance du curateur conclure un contrat de fiducie ni faire emploi de ses capitaux. Cette assistance est également requise pour introduire une action en justice ou y défendre.
+
+JURISPRUDENCE :
+- Arret 09-68.014 (cc, Première chambre civile, 2010-10-28):
+  Doit être rejeté le pourvoi qui fait grief à l'arrêt d'avoir souverainement déduit des stipulations du contrat de location litigieux - selon lesquelles les produits faisant l'objet de ce contrat ayant été choisis par le locataire sous sa seule responsabilité et sans la participation du loueur, ce dernier mandatait le locataire pour exercer tout recours à l'encontre du fournisseur, que le loueur serait déchargé de toute responsabilité et de toute obligation à cet égard et l'immobilisation temporaire des produits pour quelque cause que ce soit n'entraînerait aucune diminution de loyers ni indemnité - que la commune intention des parties avait été de rendre divisibles les deux conventions, de sorte que la disparition de l'une ne pouvait priver de cause les obligations nées de l'autre
+
+Reponds maintenant en utilisant ces sources.
+========== END SYSTEM PROMPT DEBUG ==========
+
+[CITATIONS] Nombre de documents fournis à Claude: 21
+[RESPONSE] Generating final response with max_tokens: 8192 and citations
+[CITATIONS] Extracted from text: [
+  '1219', '1231-5', '1224',
+  '1226', '1227',   '1142',
+  '1143', '1144',   '1347',
+  '1604', '1231-1', '1231-4',
+  '1242', '1242',   '1243'
+]
+[CITATIONS] Articles extraits du texte: [
+  '1219', '1231-5', '1224',
+  '1226', '1227',   '1142',
+  '1143', '1144',   '1347',
+  '1604', '1231-1', '1231-4',
+  '1242', '1242',   '1243'
+]
+[CITATIONS] Sources matchées: 9 articles, 1 arrêts
+[CHAT API] Sources for response: [
+  {
+    "type": "article",
+    "article_number": "Article 1219",
+    "code_name": "Code civil",
+    "source_url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032041509"
+  },
+  {
+    "type": "article",
+    "article_number": "Article 1224",
+    "code_name": "Code civil",
+    "source_url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032041482"
+  },
+  {
+    "type": "article",
+    "article_number": "Article 1226",
+    "code_name": "Code civil",
+    "source_url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032041472"
+  },
+  {
+    "type": "jurisprudence",
+    "article_number": "Arret 09-68.014",
+    "code_name": "cc - Première chambre civile",
+    "source_url": "https://www.courdecassation.fr/decision/607959f59ba5988459c4941b"
+  }
+]
+ POST /api/chat 200 in 97s (compile: 10ms, proxy.ts: 1506ms, render: 96s)

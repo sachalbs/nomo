@@ -370,6 +370,21 @@ Si la matière n'est pas clairement identifiable ou est transversale :
 - Quelles prescriptions applicables ?
 - Utiliser le syllogisme : Qualification → Problème de droit → Majeure → Mineure → Conclusion
 
+RÈGLES DE DÉTECTION - Tu DOIS identifier ces articles si les triggers sont présents dans l'énoncé :
+
+| Trigger dans l'énoncé | Article à identifier |
+|----------------------|---------------------|
+| 'ne convient plus', 'changement circonstances', 'déséquilibré' | 1195 (imprévision) |
+| 'clause réservant à X seul', 'déséquilibre significatif' | 1171 (clauses abusives) |
+| 'vol', 'incendie', 'événement imprévisible', 'empêché' | 1218 (force majeure) |
+| 'vol après expédition', 'livraison', 'transport' | 1196 (transfert risques) |
+| 'dépendance économique', 'ne pouvait refuser', 'contraint' | 1143 (violence économique) |
+| 'refus de payer', 'inexécution', 'n'a pas respecté' | 1219, 1220 (exception inexécution) |
+| 'délai', 'échelonnement', 'report paiement' | 1343-5 (délai de grâce) |
+| 'pénalité excessive', 'clause pénale' | 1231-5 (modération pénalité) |
+
+Analyse l'énoncé mot par mot pour détecter ces triggers.
+
 RÈGLES DE SÉLECTION DES ARTICLES :
 
 1. ÉVITE les articles de PRINCIPE GÉNÉRAL sauf s'ils sont directement applicables :
@@ -727,6 +742,24 @@ function detectRelevantCodes(message: string): string[] | null {
 
 // Get relevant court chambers based on legal domains
 function getChambresFromDomaines(domaines: string[]): string[] {
+  // Comprehensive list of all chamber name variations
+  const ALLOWED_CHAMBERS = [
+    'civ1', 'civ2', 'civ3', 'civile', 'CIV1', 'CIV2', 'CIV3',
+    'Civ. 1', 'Civ. 2', 'Civ. 3', 'Civ.1', 'Civ.2', 'Civ.3',
+    '1re chambre civile', '2e chambre civile', '3e chambre civile',
+    'Première chambre civile', 'Deuxième chambre civile', 'Troisième chambre civile',
+    'comm', 'commerciale', 'COMM', 'Com.', 'Com',
+    'chambre commerciale', 'Chambre commerciale',
+    'soc', 'sociale', 'SOC', 'Soc.', 'Soc',
+    'chambre sociale', 'Chambre sociale',
+    'crim', 'criminelle', 'CRIM', 'Crim.', 'Crim',
+    'chambre criminelle', 'Chambre criminelle',
+    'Assemblée plénière', 'Ass. plén.', 'AP', 'Ass.plén.', 'ass. plen.',
+    'Chambre mixte', 'Ch. mixte', 'mixte'
+  ];
+
+  console.log('[JURISPRUDENCE] Chambres autorisées:', ALLOWED_CHAMBERS.length, 'patterns');
+
   const chambres: string[] = [];
 
   // Criminal law
@@ -736,18 +769,21 @@ function getChambresFromDomaines(domaines: string[]): string[] {
 
   // Civil law
   if (domaines.some(d => ["civil", "obligations", "contrats", "famille", "responsabilité civile", "responsabilite civile"].includes(d.toLowerCase()))) {
-    chambres.push("civ1", "civ2", "civ3", "civile", "CIV1", "CIV2", "CIV3", "Civ. 1", "Civ. 2", "Civ. 3", "1re chambre civile", "2e chambre civile", "3e chambre civile");
+    chambres.push("civ1", "civ2", "civ3", "civile", "CIV1", "CIV2", "CIV3", "Civ. 1", "Civ. 2", "Civ. 3", "Civ.1", "Civ.2", "Civ.3", "1re chambre civile", "2e chambre civile", "3e chambre civile", "Première chambre civile", "Deuxième chambre civile", "Troisième chambre civile");
   }
 
   // Commercial law
   if (domaines.some(d => ["commercial", "affaires", "sociétés", "societes", "commerce"].includes(d.toLowerCase()))) {
-    chambres.push("commerciale", "comm", "COMM", "Com.", "Chambre commerciale");
+    chambres.push("commerciale", "comm", "COMM", "Com.", "Com", "chambre commerciale", "Chambre commerciale");
   }
 
   // Labor law
   if (domaines.some(d => ["travail", "social"].includes(d.toLowerCase()))) {
-    chambres.push("sociale", "soc", "SOC", "Soc.", "Chambre sociale");
+    chambres.push("sociale", "soc", "SOC", "Soc.", "Soc", "chambre sociale", "Chambre sociale");
   }
+
+  // Always include Assemblée plénière and Chambre mixte as they are relevant to all domains
+  chambres.push("Assemblée plénière", "Ass. plén.", "AP", "Ass.plén.", "ass. plen.", "Chambre mixte", "Ch. mixte", "mixte");
 
   return chambres;
 }
@@ -1189,13 +1225,22 @@ async function hybridSearch(
   console.log(`[HYBRID] ILIKE found: ${ilikeResults.length} articles`);
 
   // 2. Vector Search
+  console.log('[VECTOR DEBUG] Embedding length:', queryEmbedding?.length);
+  console.log('[VECTOR DEBUG] Embedding sample:', queryEmbedding?.slice(0, 5));
+  console.log('[VECTOR DEBUG] Calling match_law_articles_filtered with threshold: 0.2');
+  console.log('[VECTOR DEBUG] Filter codes:', filterCodes);
+
   const { data: vectorResults, error: vectorError } = await supabase
     .rpc('match_law_articles_filtered', {
       query_embedding: queryEmbedding,
-      match_threshold: 0.35,
+      match_threshold: 0.2,
       match_count: 20,
       filter_codes: filterCodes
     });
+
+  console.log('[VECTOR DEBUG] Raw response error:', vectorError);
+  console.log('[VECTOR DEBUG] Raw response data length:', vectorResults?.length);
+  console.log('[VECTOR DEBUG] Raw response sample:', JSON.stringify(vectorResults?.slice(0, 2)));
 
   if (vectorError) {
     console.error('[HYBRID] Vector error:', vectorError);
@@ -1450,6 +1495,21 @@ ${analysis.problematiques.length > 0 ? `- Problématiques identifiées : ${analy
 ${analysis.qualificationsRecherchees.length > 0 ? `- Qualifications à examiner : ${analysis.qualificationsRecherchees.join(', ')}` : ''}
 ` : '';
 
+  // Build verification section for problematiques
+  const verificationSection = analysis && analysis.problematiques?.length ? `
+
+⚠️ VÉRIFICATION OBLIGATOIRE :
+Tu as identifié les problématiques suivantes. Tu DOIS traiter CHACUNE d'elles dans ta réponse avec une partie dédiée :
+${analysis.problematiques?.map((p, i) => `${i+1}. ${p}`).join('\n') || 'Aucune problématique identifiée'}
+
+AVANT de conclure, vérifie que tu as bien traité TOUTES les ${analysis.problematiques?.length || 0} problématiques ci-dessus.
+Si une problématique n'a pas de partie dédiée, tu DOIS l'ajouter.
+` : '';
+
+  if (verificationSection) {
+    console.log('[PROMPT] Injection vérification', analysis.problematiques?.length || 0, 'problématiques');
+  }
+
   // Build structure section if it's a cas pratique
   const structureSection = analysis && analysis.isCasPratique && analysis.structureRecommandee ? `
 
@@ -1530,7 +1590,7 @@ RAISON D'ÊTRE (Art. 1835 C. civ.) :
 `;
 
   return `Tu es Nomo, un assistant juridique expert pour les etudiants en droit francais niveau CRFPA.
-${analysisSection}${structureSection}${legalRulesSection}
+${analysisSection}${verificationSection}${structureSection}${legalRulesSection}
 ⚠️ INSTRUCTION OBLIGATOIRE : Tu DOIS utiliser les sources ci-dessous pour repondre. Des sources pertinentes ont ete trouvees pour cette question.
 
 REGLES STRICTES :
@@ -1932,86 +1992,18 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // STEP 1.5: CONCEPT MATCH - Search legal concepts index before vector search
+      // ===== STEP 1.5: CONCEPT MATCH DÉSACTIVÉ =====
+      // RAISON: Trop de faux positifs sur les mots courts et ambigus
+      // Exemples de faux positifs: 'terme' → CDD, 'fonds' → abus de confiance, 'SA' → société anonyme
+      // HyDE + Multi-Query + Vector Search sont suffisants pour la découverte d'articles
+      // Les articles critiques sont maintenant détectés via triggers explicites dans STEP 0
       let conceptMatchArticles: LawArticleSource[] = [];
-      try {
-        const lowerMsg = message.toLowerCase();
-        console.log("[CONCEPT MATCH] Analyzing message for legal concepts...");
-
-        // Find matching concepts
-        const matchedConcepts: string[] = [];
-
-        for (const [conceptName, conceptData] of Object.entries(LEGAL_CONCEPTS)) {
-          // Check if concept name matches
-          if (lowerMsg.includes(conceptName.toLowerCase())) {
-            matchedConcepts.push(conceptName);
-            console.log(`[CONCEPT MATCH] Found concept by name: "${conceptName}"`);
-          } else {
-            // Check if any keyword matches
-            for (const keyword of conceptData.keywords) {
-              if (lowerMsg.includes(keyword.toLowerCase())) {
-                matchedConcepts.push(conceptName);
-                console.log(`[CONCEPT MATCH] Found concept "${conceptName}" via keyword: "${keyword}"`);
-                break; // One keyword match is enough
-              }
-            }
-          }
-        }
-
-        // Deduplicate matched concepts
-        const uniqueConcepts = Array.from(new Set(matchedConcepts));
-
-        if (uniqueConcepts.length > 0) {
-          console.log(`[CONCEPT MATCH] Total matched concepts: ${uniqueConcepts.length} - ${uniqueConcepts.join(", ")}`);
-
-          // For each matched concept, fetch articles from database
-          for (const conceptName of uniqueConcepts) {
-            const conceptData = LEGAL_CONCEPTS[conceptName];
-
-            for (const articleGroup of conceptData.articles) {
-              const { code, numbers } = articleGroup;
-
-              // Fetch articles from database
-              const { data: conceptArticles, error: conceptError } = await supabase
-                .from("law_articles")
-                .select("id, code_name, article_number, content, source_url")
-                .eq("code_name", code)
-                .in("article_number", numbers);
-
-              if (conceptError) {
-                console.error(`[CONCEPT MATCH] Error fetching articles for ${conceptName}:`, conceptError);
-              } else if (conceptArticles && conceptArticles.length > 0) {
-                const conceptSources: LawArticleSource[] = conceptArticles.map((a: any) => ({
-                  ...a,
-                  similarity: 0.98, // High priority for concept matches
-                }));
-
-                conceptMatchArticles.push(...conceptSources);
-                console.log(`[CONCEPT MATCH] Added ${conceptArticles.length} articles for concept "${conceptName}" from ${code}:`,
-                  conceptArticles.map((a: any) => a.article_number));
-              } else {
-                console.log(`[CONCEPT MATCH] No articles found for concept "${conceptName}" in ${code}`);
-              }
-            }
-          }
-
-          if (conceptMatchArticles.length > 0) {
-            // Deduplicate concept articles by article_number
-            const uniqueConceptArticles = Array.from(
-              new Map(conceptMatchArticles.map(a => [a.article_number + a.code_name, a])).values()
-            );
-            conceptMatchArticles = uniqueConceptArticles;
-            console.log(`[CONCEPT MATCH] Total unique concept articles: ${conceptMatchArticles.length}`);
-          }
-        } else {
-          console.log("[CONCEPT MATCH] No matching concepts found");
-        }
-      } catch (error) {
-        console.error("[CONCEPT MATCH] Exception:", error);
-      }
+      console.log('[CONCEPT MATCH] DÉSACTIVÉ - HyDE + Multi-Query suffisent');
+      // ===== FIN DÉSACTIVATION CONCEPT MATCH =====
 
       // STEP 2: Vector search (with timeout handling and fallback)
       let vectorArticles: LawArticleSource[] = [];
+      let highScoreArticles: LawArticleSource[] = []; // FIX 7: Articles haute similarité à protéger
       let vectorSearchFailed = false;
 
       try {
@@ -2096,9 +2088,10 @@ export async function POST(request: NextRequest) {
         );
 
         // Search for similar court decisions
+        console.log('[VECTOR DEBUG] Calling match_court_decisions with threshold: 0.2');
         const jurisprudencePromise = supabase.rpc("match_court_decisions", {
           query_embedding: queryEmbedding,
-          match_threshold: 0.45,
+          match_threshold: 0.2,
           match_count: 2,
         });
 
@@ -2135,7 +2128,23 @@ export async function POST(request: NextRequest) {
           console.log(`[RAG] Using RAG-Fusion results only: ${vectorArticles.length}`);
         }
 
+        // FIX 7: Protéger les articles avec haute similarité
+        const HIGH_SCORE_THRESHOLD = 0.75;
+        highScoreArticles = vectorArticles
+          .filter((a: any) => (a.similarity || a.score || 0) >= HIGH_SCORE_THRESHOLD)
+          .slice(0, 5);
+
+        if (highScoreArticles.length > 0) {
+          console.log('[VECTOR] Articles haute similarité protégés:',
+            highScoreArticles.map((a: any) => a.article_number + ' (' + ((a.similarity || a.score) * 100).toFixed(0) + '%)').join(', ')
+          );
+        }
+
         // Store jurisprudence results
+        console.log('[VECTOR DEBUG] Jurisprudence raw response error:', jurisprudenceResult.error);
+        console.log('[VECTOR DEBUG] Jurisprudence raw response data length:', jurisprudenceResult.data?.length);
+        console.log('[VECTOR DEBUG] Jurisprudence raw response sample:', JSON.stringify(jurisprudenceResult.data?.slice(0, 2)));
+
         if (jurisprudenceResult.error) {
           console.error("[RAG] Error searching court decisions:", jurisprudenceResult.error);
         } else {
@@ -2233,10 +2242,18 @@ export async function POST(request: NextRequest) {
       console.log('[RERANK] Articles from Claude analysis (protected):', dedupedAnalysisArticles.length);
       console.log('[RERANK] Articles to rerank:', articlesToRerank.length);
 
+      // FIX 5: Enrichir le contexte pour le reranker avec domaines et problématiques
+      const rerankContext = [
+        'Domaine juridique: ' + (analysis?.domaines?.join(', ') || 'droit civil'),
+        'Problématiques: ' + (analysis?.problematiques?.slice(0, 3).join('; ') || ''),
+        'Question: ' + message.slice(0, 400)
+      ].join('. ');
+      console.log('[RERANK] Query enrichie:', rerankContext.slice(0, 100) + '...');
+
       // Rerank seulement les articles non-protégés
       let rerankedOthers: typeof articlesToRerank = [];
       if (articlesToRerank.length > 0) {
-        rerankedOthers = await rerankWithCohere(message, articlesToRerank, 6);
+        rerankedOthers = await rerankWithCohere(rerankContext, articlesToRerank, 6);
       }
 
       // FILTRE DE PERTINENCE THÉMATIQUE après reranking
@@ -2274,12 +2291,43 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Combiner : articles de l'analyse Claude en premier (max 10), puis reranked (max 5)
+      // Combiner : articles de l'analyse Claude en premier, puis haute similarité, puis reranked
       // Note: maxArticles est défini plus haut (15 pour cas pratiques, 10 sinon)
-      const finalArticles = [
+      // FIX 7: Ajouter les articles haute similarité pour s'assurer qu'ils sont inclus même si mal classés par reranker
+      const dedupedHighScore = highScoreArticles.filter(hs =>
+        !dedupedAnalysisArticles.some(da => da.id === hs.id)
+      );
+
+      let finalArticles = [
         ...dedupedAnalysisArticles.slice(0, 15),  // Les articles que Claude a identifiés pour CE cas spécifique
+        ...dedupedHighScore.slice(0, 3),  // Articles haute similarité protégés
         ...rerankedOthers.slice(0, 5)
       ].slice(0, maxArticles);
+
+      if (dedupedHighScore.length > 0) {
+        console.log('[FINAL] Protected high-score articles added:', dedupedHighScore.slice(0, 3).map(a => a.article_number).join(', '));
+      }
+
+      // FIX 3: Filtrer les articles hors-sujet (servitudes, succession, tutelle, etc.)
+      const EXCLUSIONS_CONTRATS = [
+        '682', '683', '684', '685', '686', '687', '688', '689', '690', '691', '692',
+        '810', '811', '812', '813', '814', '815', '816', '817', '818', '819', '820', '821', '822',
+        '427', '428', '429', '430', '431', '432', '433', '434', '435', '436', '437', '438', '439', '440',
+        '467', '468', '469', '470', '471', '472', '473', '474', '475', '476', '477', '478', '479', '480',
+        '535', '536', '537', '538', '539', '540', '541', '542', '543'
+      ];
+
+      const domaines = analysis?.domaines || [];
+      if (domaines.some((d: string) => ['contrats', 'civil', 'obligations', 'responsabilité'].includes(d.toLowerCase()))) {
+        const beforeCount = finalArticles.length;
+        finalArticles = finalArticles.filter((a: any) => {
+          const num = (a.article_number || '').replace('Article ', '').split(' ')[0];
+          return !EXCLUSIONS_CONTRATS.some(ex => num === ex || num.startsWith(ex + '-'));
+        });
+        if (beforeCount !== finalArticles.length) {
+          console.log('[FILTER HORS-SUJET] Exclu', beforeCount - finalArticles.length, 'articles (succession/servitudes/tutelle)');
+        }
+      }
 
       sources = finalArticles;
 
