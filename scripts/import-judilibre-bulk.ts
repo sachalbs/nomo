@@ -42,6 +42,37 @@ const CHAMBERS = [
   { id: 'cr', name: 'Chambre criminelle', priority: 3 },
 ];
 
+// Legal keywords for search queries (API requires query parameter)
+const LEGAL_QUERIES = [
+  // Civil law
+  { query: 'responsabilité civile', domain: 'civil', priority: 1 },
+  { query: 'contrat', domain: 'civil', priority: 1 },
+  { query: 'préjudice', domain: 'civil', priority: 1 },
+  { query: 'obligation', domain: 'civil', priority: 2 },
+  { query: 'nullité', domain: 'civil', priority: 2 },
+  { query: 'résolution', domain: 'civil', priority: 2 },
+  { query: 'dol', domain: 'civil', priority: 2 },
+  { query: 'vice caché', domain: 'civil', priority: 2 },
+  // Property law
+  { query: 'propriété', domain: 'biens', priority: 2 },
+  { query: 'servitude', domain: 'biens', priority: 3 },
+  // Family law
+  { query: 'divorce', domain: 'famille', priority: 2 },
+  { query: 'succession', domain: 'famille', priority: 2 },
+  // Labor law
+  { query: 'licenciement', domain: 'travail', priority: 1 },
+  { query: 'contrat de travail', domain: 'travail', priority: 1 },
+  { query: 'faute grave', domain: 'travail', priority: 2 },
+  // Commercial law
+  { query: 'société', domain: 'commercial', priority: 1 },
+  { query: 'abus de biens sociaux', domain: 'commercial', priority: 2 },
+  { query: 'faillite', domain: 'commercial', priority: 2 },
+  // Criminal law
+  { query: 'abus de confiance', domain: 'pénal', priority: 1 },
+  { query: 'escroquerie', domain: 'pénal', priority: 2 },
+  { query: 'homicide', domain: 'pénal', priority: 2 },
+];
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -121,6 +152,8 @@ async function fetchDecisions(params: {
   date_end?: string;
   page?: number;
   page_size?: number;
+  query?: string;
+  type?: string;
 }): Promise<JudilibreResponse> {
   const apiKey = process.env.PISTE_API_KEY;
   if (!apiKey) {
@@ -150,8 +183,16 @@ async function fetchDecisions(params: {
   if (params.date_end) {
     queryParts.push(`date_end=${encodeURIComponent(params.date_end)}`);
   }
+  if (params.query) {
+    queryParts.push(`query=${encodeURIComponent(params.query)}`);
+  }
+  if (params.type) {
+    queryParts.push(`type=${encodeURIComponent(params.type)}`);
+  }
 
   const url = `${JUDILIBRE_BASE}/search?${queryParts.join('&')}`;
+
+  console.log('[API] URL:', url);
 
   const response = await fetch(url, {
     headers: {
@@ -160,12 +201,30 @@ async function fetchDecisions(params: {
     },
   });
 
+  console.log('[API] Response status:', response.status);
+
   if (!response.ok) {
     const error = await response.text();
+    console.error('[API] Error response:', error.substring(0, 500));
     throw new Error(`Judilibre API error: ${response.status} - ${error}`);
   }
 
-  return response.json();
+  const data = await response.json();
+
+  // Debug logging
+  console.log('[API] Response keys:', Object.keys(data));
+  console.log('[API] Total:', data.total);
+  console.log('[API] Results count:', data.results?.length ?? 'undefined');
+  console.log('[API] Next page:', data.next_page);
+
+  if (!data.results) {
+    console.log('[API] Full response (no results):', JSON.stringify(data).substring(0, 1000));
+  } else if (data.results.length > 0) {
+    console.log('[API] First result keys:', Object.keys(data.results[0]));
+    console.log('[API] First result sample:', JSON.stringify(data.results[0]).substring(0, 300));
+  }
+
+  return data;
 }
 
 async function fetchDecisionDetails(id: string): Promise<JudilibreDecision | null> {
@@ -328,6 +387,7 @@ async function importByFilter(
     chamber?: string;
     date_start?: string;
     date_end?: string;
+    query?: string;
   },
   label: string,
   startPage: number = 0,
@@ -427,6 +487,67 @@ async function main() {
   const limitIndex = args.indexOf('--limit');
   const pageLimit = limitIndex !== -1 ? parseInt(args[limitIndex + 1], 10) : MAX_PAGES_PER_FILTER;
   const bulletinOnly = args.includes('--bulletin-only');
+  const testMode = args.includes('--test');
+
+  // Test mode: just fetch a few results without any filter to verify API works
+  if (testMode) {
+    console.log('\n🧪 TEST MODE: Fetching results without filters...\n');
+
+    const apiKey = process.env.PISTE_API_KEY;
+    if (!apiKey) {
+      console.error('Missing PISTE_API_KEY');
+      process.exit(1);
+    }
+
+    // Test 1: No filter at all
+    console.log('--- Test 1: No filter ---');
+    const test1 = await fetchDecisions({ page: 0, page_size: 5 });
+    console.log(`Results: ${test1.results?.length || 0}\n`);
+
+    // Test 2: Just date filter
+    console.log('--- Test 2: Date filter (2024) ---');
+    const test2 = await fetchDecisions({ page: 0, page_size: 5, date_start: '2024-01-01' });
+    console.log(`Results: ${test2.results?.length || 0}\n`);
+
+    // Test 3: Chamber filter
+    console.log('--- Test 3: Chamber filter (civ1) ---');
+    const test3 = await fetchDecisions({ page: 0, page_size: 5, chamber: 'civ1' });
+    console.log(`Results: ${test3.results?.length || 0}\n`);
+
+    // Test 4: Publication filter
+    console.log('--- Test 4: Publication filter (b) ---');
+    const test4 = await fetchDecisions({ page: 0, page_size: 5, publication: ['b'] });
+    console.log(`Results: ${test4.results?.length || 0}\n`);
+
+    // Test 5: With query parameter (text search)
+    console.log('--- Test 5: Query "responsabilité" ---');
+    const test5 = await fetchDecisions({ page: 0, page_size: 5, query: 'responsabilité' });
+    console.log(`Results: ${test5.results?.length || 0}\n`);
+
+    // Test 6: With query and type=arret
+    console.log('--- Test 6: Query + type=arret ---');
+    const test6 = await fetchDecisions({ page: 0, page_size: 5, query: 'contrat', type: 'arret' });
+    console.log(`Results: ${test6.results?.length || 0}\n`);
+
+    // Test 7: Export endpoint instead of search
+    console.log('--- Test 7: Export endpoint ---');
+    const exportUrl = `${JUDILIBRE_BASE}/export?batch_size=5`;
+    console.log('[API] URL:', exportUrl);
+    const exportResponse = await fetch(exportUrl, {
+      headers: { 'KeyId': apiKey, 'Accept': 'application/json' }
+    });
+    console.log('[API] Response status:', exportResponse.status);
+    if (exportResponse.ok) {
+      const exportData = await exportResponse.json();
+      console.log('[API] Export keys:', Object.keys(exportData));
+      console.log('[API] Export sample:', JSON.stringify(exportData).substring(0, 500));
+    } else {
+      console.log('[API] Export error:', await exportResponse.text());
+    }
+
+    console.log('\nTest complete.');
+    return;
+  }
 
   // Validate environment
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -467,17 +588,35 @@ async function main() {
   let totalStats: ImportStats = { total: 0, inserted: 0, skipped: 0, errors: 0 };
 
   // ─────────────────────────────────────────────────────────────────────────
-  // STEP 1: Import Bulletin decisions (highest priority)
+  // IMPORT BY LEGAL QUERIES (API requires query parameter)
   // ─────────────────────────────────────────────────────────────────────────
 
-  if (!progress.bulletin.completed && !specificChamber) {
-    console.log('\n📚 ÉTAPE 1: Arrêts publiés au Bulletin (priorité maximale)');
+  console.log('\n📚 Import par requêtes juridiques');
+  console.log(`   ${LEGAL_QUERIES.length} requêtes configurées`);
+  console.log(`   Max ${pageLimit} pages par requête\n`);
+
+  // Sort queries by priority
+  const sortedQueries = [...LEGAL_QUERIES].sort((a, b) => a.priority - b.priority);
+
+  for (const queryConfig of sortedQueries) {
+    const queryKey = queryConfig.query.replace(/\s+/g, '_');
+    const queryProgress = progress.chambers[queryKey] || { page: 0, completed: false };
+
+    if (queryProgress.completed) {
+      console.log(`   "${queryConfig.query}": déjà complété, skip`);
+      continue;
+    }
+
+    console.log(`\n🔍 Recherche: "${queryConfig.query}" (${queryConfig.domain})`);
 
     const { stats, lastPage, completed } = await importByFilter(
       supabase,
-      { publication: ['b'] },
-      'Bulletin',
-      progress.bulletin.page,
+      {
+        query: queryConfig.query,
+        publication: ['b'], // Only Bulletin for quality
+      },
+      queryConfig.query,
+      queryProgress.page,
       pageLimit
     );
 
@@ -486,57 +625,14 @@ async function main() {
     totalStats.skipped += stats.skipped;
     totalStats.errors += stats.errors;
 
-    progress.bulletin = { page: lastPage, completed };
+    progress.chambers[queryKey] = { page: lastPage, completed };
     progress.totalImported += stats.inserted;
     saveProgress(progress);
 
-    if (bulletinOnly) {
-      console.log('\n--bulletin-only flag set, stopping here.');
-      return;
-    }
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // STEP 2: Import by chamber (recent decisions)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  if (!bulletinOnly) {
-    console.log('\n\n⚖️ ÉTAPE 2: Import par chambre (arrêts récents)');
-
-    const chambersToImport = specificChamber
-      ? CHAMBERS.filter(c => c.id === specificChamber)
-      : CHAMBERS;
-
-    for (const chamber of chambersToImport) {
-      const chamberProgress = progress.chambers[chamber.id] || { page: 0, completed: false };
-
-      if (chamberProgress.completed) {
-        console.log(`\n   ${chamber.name}: déjà complété, skip`);
-        continue;
-      }
-
-      console.log(`\n   Chambre: ${chamber.name} (${chamber.id})`);
-
-      const { stats, lastPage, completed } = await importByFilter(
-        supabase,
-        {
-          chamber: chamber.id,
-          date_start: '2020-01-01',
-          publication: ['b', 'r'],
-        },
-        chamber.name,
-        chamberProgress.page,
-        pageLimit
-      );
-
-      totalStats.total += stats.total;
-      totalStats.inserted += stats.inserted;
-      totalStats.skipped += stats.skipped;
-      totalStats.errors += stats.errors;
-
-      progress.chambers[chamber.id] = { page: lastPage, completed };
-      progress.totalImported += stats.inserted;
-      saveProgress(progress);
+    // Early exit if bulletinOnly
+    if (bulletinOnly && totalStats.inserted >= 100) {
+      console.log('\n--bulletin-only flag set and 100+ imported, stopping.');
+      break;
     }
   }
 

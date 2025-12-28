@@ -1,34 +1,86 @@
 {
   "bulletin": {
-    "page": 5,
+    "page": 0,
     "completed": false
   },
   "chambers": {
-    "civ1": {
-      "page": 5,
+    "responsabilité_civile": {
+      "page": 1,
       "completed": false
     },
-    "civ2": {
-      "page": 5,
+    "contrat": {
+      "page": 1,
       "completed": false
     },
-    "civ3": {
-      "page": 5,
+    "préjudice": {
+      "page": 1,
       "completed": false
     },
-    "com": {
-      "page": 5,
+    "licenciement": {
+      "page": 1,
       "completed": false
     },
-    "soc": {
-      "page": 5,
+    "contrat_de_travail": {
+      "page": 1,
       "completed": false
     },
-    "crim": {
-      "page": 5,
+    "société": {
+      "page": 1,
+      "completed": false
+    },
+    "abus_de_confiance": {
+      "page": 1,
+      "completed": false
+    },
+    "obligation": {
+      "page": 1,
+      "completed": false
+    },
+    "nullité": {
+      "page": 1,
+      "completed": false
+    },
+    "résolution": {
+      "page": 1,
+      "completed": false
+    },
+    "dol": {
+      "page": 1,
+      "completed": false
+    },
+    "vice_caché": {
+      "page": 1,
+      "completed": false
+    },
+    "propriété": {
+      "page": 1,
+      "completed": false
+    },
+    "divorce": {
+      "page": 1,
+      "completed": false
+    },
+    "succession": {
+      "page": 1,
+      "completed": false
+    },
+    "faute_grave": {
+      "page": 1,
+      "completed": false
+    },
+    "abus_de_biens_sociaux": {
+      "page": 1,
+      "completed": false
+    },
+    "faillite": {
+      "page": 1,
+      "completed": false
+    },
+    "escroquerie": {
+      "page": 1,
       "completed": false
     }
   },
-  "totalImported": 0,
-  "lastRun": "2025-12-28T17:37:43.020Z"
+  "totalImported": 771,
+  "lastRun": "2025-12-28T17:52:09.462Z"
 }
