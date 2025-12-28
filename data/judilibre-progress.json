@@ -5,90 +5,90 @@
   },
   "chambers": {
     "responsabilité_civile": {
-      "page": 10,
+      "page": 30,
       "completed": false
     },
     "contrat": {
-      "page": 10,
+      "page": 30,
       "completed": false
     },
     "préjudice": {
-      "page": 10,
+      "page": 30,
       "completed": false
     },
     "licenciement": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "contrat_de_travail": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "société": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "abus_de_confiance": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "obligation": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "nullité": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "résolution": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "dol": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "vice_caché": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "propriété": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "divorce": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "succession": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "faute_grave": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "abus_de_biens_sociaux": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "faillite": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "escroquerie": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "homicide": {
-      "page": 10,
+      "page": 20,
       "completed": false
     },
     "servitude": {
-      "page": 10,
+      "page": 20,
       "completed": false
     }
   },
-  "totalImported": 129,
+  "totalImported": 1471,
   "lastRun": "2025-12-28T18:18:15.924Z"
 }

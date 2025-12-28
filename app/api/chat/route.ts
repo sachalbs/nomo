@@ -960,6 +960,177 @@ function reciprocalRankFusion(resultSets: any[][], k: number = 60): any[] {
     .map(([id]) => articleMap.get(id));
 }
 
+// Plans dynamiques pour les cas pratiques pénaux
+const PLAN_INTENTIONNELLE = `
+=== PLAN INFRACTION INTENTIONNELLE ===
+
+I. ÉLÉMENT LÉGAL
+- Cite le texte d'incrimination précis (article + alinéa du Code pénal)
+- Qualifie : crime, délit ou contravention
+
+II. ÉLÉMENT MATÉRIEL
+A. Comportement incriminé (action ou omission)
+B. Résultat (si infraction matérielle)
+C. Lien de causalité entre comportement et résultat
+
+III. ÉLÉMENT MORAL
+A. Dol général : connaissance du caractère illicite + volonté de commettre l'acte
+B. Dol spécial (si requis par le texte) : intention d'atteindre un résultat précis
+
+CONCLUSION : Infraction constituée ou non + peines encourues
+`;
+
+const PLAN_NON_INTENTIONNELLE = `
+=== PLAN INFRACTION NON-INTENTIONNELLE ===
+(Appliquer la loi Fauchon du 10 juillet 2000)
+
+I. RÉSULTAT
+- Nature du dommage : mort (221-6 CP) / ITT > 3 mois (222-19 CP) / ITT ≤ 3 mois (222-20 CP ou R625-2 CP)
+
+II. LIEN DE CAUSALITÉ - QUALIFICATION OBLIGATOIRE
+Tu DOIS qualifier la causalité en DIRECT ou INDIRECT.
+
+CAUSALITÉ DIRECTE : le comportement est la cause exclusive, immédiate ou déterminante du dommage
+CAUSALITÉ INDIRECTE (art. 121-3 al.4) : la personne a créé ou contribué à créer la situation ayant permis le dommage, OU n'a pas pris les mesures permettant de l'éviter
+
+III. FAUTE REQUISE
+
+SI CAUSALITÉ DIRECTE → Faute simple suffit (art. 121-3 al.3)
+= imprudence, négligence, manquement à une obligation de prudence ou sécurité prévue par la loi ou le règlement
+
+SI CAUSALITÉ INDIRECTE → Faute qualifiée exigée (art. 121-3 al.4)
+Deux types ALTERNATIFS :
+a) Faute DÉLIBÉRÉE : violation manifestement délibérée d'une obligation particulière de prudence ou sécurité prévue par la loi ou le règlement
+b) Faute CARACTÉRISÉE : exposer autrui à un risque d'une particulière gravité qu'on ne pouvait ignorer
+
+CONCLUSION : Responsabilité engagée ou non + peines
+`;
+
+const PLAN_TENTATIVE = `
+=== PLAN TENTATIVE ===
+
+I. ÉLÉMENT LÉGAL
+A. La tentative est-elle punissable pour cette infraction ?
+- Crime : toujours punissable (art. 121-4 1° CP)
+- Délit : seulement si la loi le prévoit expressément
+- Contravention : jamais
+B. Citer l'article 121-4 2° CP + le texte de l'infraction principale
+
+II. COMMENCEMENT D'EXÉCUTION (art. 121-5 CP)
+Définition : acte tendant directement et immédiatement à la consommation de l'infraction
+≠ Actes préparatoires (non punissables)
+En l'espèce : l'acte a-t-il fait entrer l'agent dans la phase d'exécution ?
+
+III. ABSENCE DE DÉSISTEMENT VOLONTAIRE
+La cause de l'interruption est-elle :
+- INVOLONTAIRE (intervention tiers, obstacle matériel) → Tentative punissable
+- VOLONTAIRE (remords, peur, repentir) → Pas de tentative
+
+Types : tentative suspendue / tentative manquée / tentative impossible (toutes punissables si involontaire)
+
+CONCLUSION : Tentative constituée + peines identiques à l'infraction consommée
+`;
+
+// Classify penal infraction type for better case analysis
+async function classifyPenalInfraction(question: string): Promise<'INTENTIONNELLE' | 'NON_INTENTIONNELLE' | 'TENTATIVE'> {
+  try {
+    const anthropicClient = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+    const response = await anthropicClient.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 50,
+      messages: [{
+        role: "user",
+        content: `Analyse ce cas pratique pénal et classifie le TYPE D'INFRACTION principal :
+- INTENTIONNELLE : meurtre, vol, escroquerie, abus de confiance, violences volontaires, viol...
+- NON_INTENTIONNELLE : homicide involontaire, blessures involontaires, mise en danger...
+- TENTATIVE : si les mots tentative, a tenté de, commencement d'exécution apparaissent
+
+Réponds UNIQUEMENT par : INTENTIONNELLE ou NON_INTENTIONNELLE ou TENTATIVE
+
+Cas pratique : ${question}`
+      }]
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text.trim().toUpperCase() : 'INTENTIONNELLE';
+
+    if (text.includes('NON_INTENTIONNELLE') || text.includes('NON INTENTIONNELLE')) {
+      return 'NON_INTENTIONNELLE';
+    } else if (text.includes('TENTATIVE')) {
+      return 'TENTATIVE';
+    } else {
+      return 'INTENTIONNELLE';
+    }
+  } catch (error) {
+    console.error('[PENAL] Classification error:', error);
+    return 'INTENTIONNELLE'; // Default fallback
+  }
+}
+
+// Detect aggravating circumstances in penal case
+function detectAggravatingCircumstances(question: string): string[] {
+  const text = question.toLowerCase();
+  const found: string[] = [];
+
+  const patterns = [
+    { regex: /vulnérable|âgé|mineur|enfant|handicap|infirme/i, label: 'Vulnérabilité victime (art. 311-4 5°, 222-12)' },
+    { regex: /nuit|minuit|obscurité|soir|23h|2h|3h/i, label: 'Circonstance de temps - nuit (art. 311-4 2°)' },
+    { regex: /arme|couteau|pistolet|fusil|batte|matraque/i, label: 'Usage ou port d\'arme (art. 311-4 4°, 222-12 4°)' },
+    { regex: /plusieurs|groupe|bande|réunion|complices|ensemble/i, label: 'Réunion ou bande organisée (art. 311-4 1°, 311-9)' },
+    { regex: /véhicule|voiture|scooter|moto|camion/i, label: 'Utilisation d\'un véhicule (art. 311-4 8°)' },
+    { regex: /effraction|casser|forcer la porte|escalade|fenêtre/i, label: 'Effraction ou escalade (art. 311-4 6°, 7°)' },
+    { regex: /menace|menacer|intimidation/i, label: 'Menace (art. 311-4 3°, 312-1)' },
+    { regex: /dépositaire.*autorité|policier|gendarme|magistrat|élu/i, label: 'Victime dépositaire autorité publique (art. 222-12 4°)' },
+    { regex: /préméditation|guet-apens|prémédit/i, label: 'Préméditation ou guet-apens (art. 221-3, 222-12 1°)' },
+    { regex: /alcool|ivresse|stupéfiant|drogue|sous l'emprise/i, label: 'Emprise alcool/stupéfiants (circonstance aggravante routière)' }
+  ];
+
+  for (const p of patterns) {
+    if (p.regex.test(text)) {
+      found.push(p.label);
+    }
+  }
+
+  return found;
+}
+
+// Strict rules for penal law responses
+const REGLES_PENALES = `
+=== RÈGLES STRICTES DROIT PÉNAL ===
+
+❌ INTERDIT - Ne fais JAMAIS cela :
+- Présenter des 'hypothèses' ou 'deux hypothèses doivent être distinguées' → Tu DOIS TRANCHER
+- Développer la prescription SAUF si l'énoncé mentionne des faits anciens (plus de 6 ans)
+- Utiliser 'fautes caractérisées' au pluriel pour dire 'fautes établies/prouvées'
+- Analyser la causalité sans la qualifier en directe ou indirecte
+- Oublier de citer l'article 121-4 2° CP pour une tentative de délit
+
+✅ OBLIGATOIRE - Fais TOUJOURS cela :
+- TRANCHER : 'En l'espèce, l'infraction EST/N'EST PAS constituée car...'
+- Qualifier la causalité (directe/indirecte) AVANT de déterminer la faute requise
+- Utiliser 'faute caractérisée' UNIQUEMENT au sens technique de l'art. 121-3 al.4
+- Analyser CHAQUE circonstance aggravante détectée
+- Conclure avec les peines encourues (quantum maximum)
+
+=== TERMINOLOGIE JURIDIQUE PRÉCISE ===
+| ✅ Correct | ❌ Incorrect |
+|-----------|-------------|
+| fautes constituées/établies | fautes caractérisées (sens courant) |
+| faute caractérisée (art. 121-3 al.4) | faute grave/sérieuse |
+| causalité directe | lien de causalité (sans précision) |
+| causalité indirecte | causalité partielle |
+| dol général | intention (sans précision) |
+| dol spécial | intention particulière |
+
+=== FORMULATIONS À UTILISER ===
+- 'En l'espèce, [qualification]. En effet, [argumentation].'
+- 'L'article X du Code pénal dispose que... Or, en l'espèce...'
+- 'La causalité est DIRECTE/INDIRECTE car...'
+- 'Une faute simple suffit / Une faute qualifiée est exigée'
+- 'L'infraction est constituée/n'est pas constituée. [Prénom] encourt...'
+`;
+
 // Hybrid search: combines keyword search (ILIKE) + Vector search with Reciprocal Rank Fusion
 async function hybridSearch(
   supabase: any,
@@ -2251,8 +2422,50 @@ export async function POST(request: NextRequest) {
       console.log("[CAS PRATIQUE] Uncertain - will ask user for preference");
     }
 
+    // Classify penal infraction type if relevant
+    let penalInfractionType: 'INTENTIONNELLE' | 'NON_INTENTIONNELLE' | 'TENTATIVE' | null = null;
+    let penalPlan = '';
+    if (analysis?.domaines.includes('pénal')) {
+      penalInfractionType = await classifyPenalInfraction(message);
+      console.log('[PENAL] Type d\'infraction détecté:', penalInfractionType);
+
+      // Select the appropriate plan based on infraction type
+      if (penalInfractionType === 'INTENTIONNELLE') {
+        penalPlan = PLAN_INTENTIONNELLE;
+        console.log('[PENAL] Plan injecté: PLAN_INTENTIONNELLE');
+      } else if (penalInfractionType === 'NON_INTENTIONNELLE') {
+        penalPlan = PLAN_NON_INTENTIONNELLE;
+        console.log('[PENAL] Plan injecté: PLAN_NON_INTENTIONNELLE');
+      } else if (penalInfractionType === 'TENTATIVE') {
+        penalPlan = PLAN_TENTATIVE;
+        console.log('[PENAL] Plan injecté: PLAN_TENTATIVE');
+      }
+    }
+
     // Build system prompt with dynamic content (including Claude's analysis)
-    const systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection, analysis);
+    let systemPrompt = buildSystemPrompt(sources, jurisprudence, casPratiqueDetection, analysis);
+
+    // Inject penal plan if applicable
+    if (penalPlan) {
+      systemPrompt += '\n\n' + penalPlan;
+    }
+
+    // Detect and inject aggravating circumstances for penal cases
+    if (analysis?.domaines.includes('pénal')) {
+      const aggravatingFactors = detectAggravatingCircumstances(message);
+      if (aggravatingFactors.length > 0) {
+        console.log('[PENAL] Circonstances aggravantes détectées:', aggravatingFactors);
+        systemPrompt += '\n\n⚠️ CIRCONSTANCES AGGRAVANTES DÉTECTÉES DANS L\'ÉNONCÉ :\n';
+        systemPrompt += aggravatingFactors.map(f => '- ' + f).join('\n');
+        systemPrompt += '\n\nTu DOIS analyser ces circonstances aggravantes dans ta réponse et citer les articles correspondants.';
+      } else {
+        console.log('[PENAL] Aucune circonstance aggravante détectée');
+      }
+
+      // Inject strict penal rules
+      systemPrompt += '\n\n' + REGLES_PENALES;
+      console.log('[PENAL] Règles strictes injectées');
+    }
 
     // DEBUG: Log system prompt
     console.log("\n========== SYSTEM PROMPT DEBUG ==========");
