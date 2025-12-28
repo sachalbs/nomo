@@ -901,6 +901,171 @@ async function keywordSearch(
   }
 }
 
+// Hybrid search: combines keyword search (ILIKE) + Vector search with Reciprocal Rank Fusion
+async function hybridSearch(
+  supabase: any,
+  message: string,
+  queryEmbedding: number[],
+  filterCodes: string[] | null,
+  limit: number = 10
+): Promise<LawArticleSource[]> {
+  console.log('[HYBRID] Starting hybrid search...');
+
+  // Extract keywords for ILIKE search
+  const keywords = extractKeywords(message);
+
+  // Also extract article numbers for exact matching
+  const articleNumber = extractArticleNumber(message);
+
+  // 1. Keyword/ILIKE Search (for exact terms like "article 1240")
+  let ilikeResults: any[] = [];
+
+  if (keywords.length > 0 || articleNumber) {
+    let query = supabase
+      .from('law_articles')
+      .select('id, code_name, article_number, content, source_url');
+
+    // Build OR conditions for keywords
+    const conditions: string[] = [];
+
+    // Add article number search (highest priority)
+    if (articleNumber) {
+      conditions.push(`article_number.ilike.%${articleNumber}%`);
+    }
+
+    // Add keyword conditions
+    keywords.slice(0, 5).forEach(kw => {
+      conditions.push(`content.ilike.%${kw}%`);
+    });
+
+    if (conditions.length > 0) {
+      query = query.or(conditions.join(','));
+    }
+
+    // Filter by codes if specified
+    if (filterCodes && filterCodes.length > 0) {
+      query = query.in('code_name', filterCodes);
+    }
+
+    const { data, error } = await query.limit(20);
+
+    if (error) {
+      console.error('[HYBRID] ILIKE error:', error);
+    } else {
+      ilikeResults = data || [];
+    }
+  }
+
+  console.log(`[HYBRID] ILIKE found: ${ilikeResults.length} articles`);
+
+  // 2. Vector Search
+  const { data: vectorResults, error: vectorError } = await supabase
+    .rpc('match_law_articles_filtered', {
+      query_embedding: queryEmbedding,
+      match_threshold: 0.35,
+      match_count: 20,
+      filter_codes: filterCodes
+    });
+
+  if (vectorError) {
+    console.error('[HYBRID] Vector error:', vectorError);
+  }
+  console.log(`[HYBRID] Vector found: ${vectorResults?.length || 0} articles`);
+
+  // 3. Reciprocal Rank Fusion (RRF)
+  const k = 60; // RRF constant
+  const scores = new Map<string, { article: any; score: number }>();
+
+  // Score ILIKE results (boost for exact matches)
+  ilikeResults.forEach((article: any, rank: number) => {
+    const isExactArticleMatch = articleNumber &&
+      article.article_number.toLowerCase().includes(articleNumber.toLowerCase());
+    const boost = isExactArticleMatch ? 2.0 : 1.0; // 2x boost for exact article number
+    const score = boost / (k + rank + 1);
+    scores.set(article.id, { article, score });
+  });
+
+  // Add Vector results scores
+  (vectorResults || []).forEach((article: any, rank: number) => {
+    const score = 1 / (k + rank + 1);
+    const existing = scores.get(article.id);
+    if (existing) {
+      existing.score += score; // Article found in both → boost score
+      console.log(`[HYBRID] Boost for ${article.article_number}: found in both ILIKE and Vector`);
+    } else {
+      scores.set(article.id, { article, score });
+    }
+  });
+
+  // Sort by combined score and return top results
+  const results = Array.from(scores.values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(({ article, score }) => ({
+      ...article,
+      similarity: Math.min(score * 30, 1) // Normalize to 0-1 range
+    }));
+
+  console.log(`[HYBRID] Final results: ${results.length} articles`);
+  console.log('[HYBRID] Top articles:', results.slice(0, 5).map(r => `${r.article_number} (${r.similarity.toFixed(2)})`));
+
+  return results;
+}
+
+// Rerank results using Cohere for better relevance
+async function rerankWithCohere(
+  query: string,
+  documents: LawArticleSource[],
+  topN: number = 5
+): Promise<LawArticleSource[]> {
+  const cohereApiKey = process.env.COHERE_API_KEY;
+
+  if (!cohereApiKey || documents.length === 0) {
+    console.log('[RERANK] Skipping - no API key or no documents');
+    return documents.slice(0, topN);
+  }
+
+  console.log(`[RERANK] Reranking ${documents.length} documents with Cohere...`);
+
+  try {
+    const response = await fetch('https://api.cohere.ai/v1/rerank', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cohereApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'rerank-multilingual-v3.0',
+        query: query,
+        documents: documents.map(d => `${d.article_number} (${d.code_name}): ${d.content.substring(0, 500)}`),
+        top_n: topN,
+        return_documents: false
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('[RERANK] Cohere API error:', error);
+      return documents.slice(0, topN);
+    }
+
+    const data = await response.json();
+
+    // Reorder documents based on Cohere ranking
+    const rerankedDocs = data.results.map((result: { index: number; relevance_score: number }) => ({
+      ...documents[result.index],
+      similarity: result.relevance_score
+    }));
+
+    console.log('[RERANK] Reranked order:', rerankedDocs.map((d: LawArticleSource) => `${d.article_number} (${d.similarity.toFixed(3)})`));
+
+    return rerankedDocs;
+  } catch (error) {
+    console.error('[RERANK] Exception:', error);
+    return documents.slice(0, topN);
+  }
+}
+
 function buildSystemPrompt(
   sources: LawArticleSource[],
   jurisprudence: CourtDecisionSource[],
@@ -1518,14 +1683,15 @@ export async function POST(request: NextRequest) {
           console.log('[VECTOR SEARCH] No filter → searching all codes');
         }
 
-        // Search for similar law articles with timeout and code filtering
+        // Search for similar law articles using hybrid search (ILIKE + Vector + RRF)
         const searchStartTime = Date.now();
-        const articlesPromise = supabase.rpc("match_law_articles_filtered", {
-          query_embedding: queryEmbedding,
-          match_threshold: 0.4,
-          match_count: 5,
-          filter_codes: relevantCodes  // NULL = tous les codes, sinon filtre sur les codes détectés
-        });
+        const articlesPromise = hybridSearch(
+          supabase,
+          message,
+          queryEmbedding,
+          relevantCodes,
+          10
+        );
 
         // Search for similar court decisions
         const jurisprudencePromise = supabase.rpc("match_court_decisions", {
@@ -1535,10 +1701,10 @@ export async function POST(request: NextRequest) {
         });
 
         // Dynamic timeout based on code filtering
-        // - With filter (specific codes) → 3s (fast search)
-        // - Without filter (all codes) → 8s (comprehensive search)
-        const timeoutMs = relevantCodes ? 3000 : 8000;
-        console.log(`[VECTOR SEARCH] Timeout set to ${timeoutMs}ms (filtered: ${!!relevantCodes})`);
+        // - With filter (specific codes) → 5s (hybrid search takes more time)
+        // - Without filter (all codes) → 10s (comprehensive search)
+        const timeoutMs = relevantCodes ? 5000 : 10000;
+        console.log(`[HYBRID SEARCH] Timeout set to ${timeoutMs}ms (filtered: ${!!relevantCodes})`);
 
         const timeoutPromise = new Promise<never>((_, reject) => {
           setTimeout(() => reject(new Error("SEARCH_TIMEOUT")), timeoutMs);
@@ -1551,16 +1717,11 @@ export async function POST(request: NextRequest) {
         ]);
 
         const searchDuration = Date.now() - searchStartTime;
-        console.log(`[RAG] Vector search completed in ${searchDuration}ms`);
+        console.log(`[RAG] Hybrid search completed in ${searchDuration}ms`);
 
-        // Store vector results
-        if (articlesResult.error) {
-          console.error("[RAG] Error searching law articles:", articlesResult.error);
-          vectorSearchFailed = true;
-        } else {
-          vectorArticles = articlesResult.data || [];
-          console.log(`[RAG] Vector search found: ${vectorArticles.length}`, vectorArticles.map(s => s.article_number));
-        }
+        // Store hybrid search results (hybridSearch returns array directly)
+        vectorArticles = articlesResult || [];
+        console.log(`[RAG] Hybrid search found: ${vectorArticles.length}`, vectorArticles.map(s => s.article_number));
 
         // Store jurisprudence results
         if (jurisprudenceResult.error) {
@@ -1647,15 +1808,24 @@ export async function POST(request: NextRequest) {
         return true;
       });
 
-      // Combine all sources with NEW priority ordering
-      sources = [
+      // Combine all sources
+      let combinedSources = [
         ...dedupedAnalysisArticles,
         ...dedupedExactMatches,
         ...dedupedConceptMatches,
         ...dedupedVectorArticles
-      ].slice(0, 5);
+      ];
 
-      console.log(`[COMBINED] Total articles: ${sources.length} (${dedupedAnalysisArticles.length} analysis + ${dedupedExactMatches.length} exact + ${dedupedConceptMatches.length} concept + ${dedupedVectorArticles.length} vector/keyword)`);
+      console.log(`[COMBINED] Total articles before rerank: ${combinedSources.length} (${dedupedAnalysisArticles.length} analysis + ${dedupedExactMatches.length} exact + ${dedupedConceptMatches.length} concept + ${dedupedVectorArticles.length} vector/keyword)`);
+
+      // Rerank with Cohere if we have enough documents
+      if (combinedSources.length > 3) {
+        combinedSources = await rerankWithCohere(message, combinedSources, 5);
+      }
+
+      sources = combinedSources.slice(0, 5);
+
+      console.log(`[COMBINED] Total articles after rerank: ${sources.length}`);
       if (sources.length > 0) {
         console.log(`[COMBINED] Final order:`, sources.map(s => `${s.article_number} (${s.code_name}, sim: ${s.similarity.toFixed(2)})`));
       }
@@ -1873,6 +2043,8 @@ export async function POST(request: NextRequest) {
         model: "claude-sonnet-4-20250514",
         max_tokens: 8192,
         system: systemPrompt,
+        // @ts-expect-error - citations is a beta feature
+        citations: { enabled: true },
         messages: [
           // Include history if any
           ...historyMessages,
