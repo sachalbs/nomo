@@ -2074,49 +2074,79 @@ export async function POST(request: NextRequest) {
     // EXTRACT CITED ARTICLES FROM RESPONSE TEXT
     // =========================================================================
 
-    // Parse le texte pour trouver les articles cités (article 1244, art. 1186, L. 121-1, etc.)
-    const extractCitedArticles = (text: string): string[] => {
-      const patterns = [
-        /article\s+(\d+(?:-\d+)?(?:-\d+)?)/gi,
-        /art\.\s*(\d+(?:-\d+)?(?:-\d+)?)/gi,
-        /articles?\s+(\d+(?:-\d+)?)\s+(?:et|,)\s+(\d+(?:-\d+)?)/gi,
-        /L\.?\s*(\d+(?:-\d+)?(?:-\d+)?)/gi,
-        /R\.?\s*(\d+(?:-\d+)?(?:-\d+)?)/gi,
-      ];
+    // Extract ALL article numbers cited in the response text
+    const extractCitedArticles = (text: string): { number: string; code?: string }[] => {
+      const cited: { number: string; code?: string }[] = [];
 
-      const cited = new Set<string>();
-      for (const pattern of patterns) {
-        const matches = text.matchAll(pattern);
-        for (const match of matches) {
-          // Ajouter tous les groupes capturés (pour "articles 1224 et 1226")
-          for (let i = 1; i < match.length; i++) {
-            if (match[i]) {
-              cited.add(match[i]);
-            }
+      // Pattern 1: "article 1240 du Code civil", "article L. 225-1 du Code de commerce"
+      const fullPattern = /articles?\s+(L\.?\s*)?(\d+(?:-\d+)*(?:-\d+)?)\s+(?:et\s+(L\.?\s*)?(\d+(?:-\d+)*))?(?:\s+du\s+(Code\s+\w+))?/gi;
+
+      // Pattern 2: Simple "article 1240", "art. 1241"
+      const simplePattern = /(?:article|art\.?)\s+(L\.?\s*)?(\d+(?:-\d+)*)/gi;
+
+      // Pattern 3: "articles 1240, 1241 et 1242"
+      const listPattern = /articles?\s+(\d+(?:-\d+)*(?:\s*,\s*\d+(?:-\d+)*)*(?:\s+et\s+\d+(?:-\d+)*)?)/gi;
+
+      // Extract from full pattern (with code name)
+      for (const match of text.matchAll(fullPattern)) {
+        const prefix = match[1] || '';
+        const num = prefix + match[2];
+        const code = match[5];
+        cited.push({ number: num.replace(/\s+/g, ''), code });
+
+        // Also capture second article if "et" present
+        if (match[4]) {
+          const prefix2 = match[3] || '';
+          cited.push({ number: prefix2 + match[4], code });
+        }
+      }
+
+      // Extract from simple pattern
+      for (const match of text.matchAll(simplePattern)) {
+        const prefix = match[1] || '';
+        const num = prefix + match[2];
+        if (!cited.some(c => c.number === num.replace(/\s+/g, ''))) {
+          cited.push({ number: num.replace(/\s+/g, '') });
+        }
+      }
+
+      // Extract from list pattern (1240, 1241 et 1242)
+      for (const match of text.matchAll(listPattern)) {
+        const numbers = match[1].split(/[,\s]+et\s+|,\s*/).map(n => n.trim()).filter(n => n);
+        for (const num of numbers) {
+          if (!cited.some(c => c.number === num)) {
+            cited.push({ number: num });
           }
         }
       }
 
-      return [...cited];
+      console.log('[CITATIONS] Extracted from text:', cited.map(c => c.code ? `${c.number} (${c.code})` : c.number));
+      return cited;
     };
 
-    const citedArticleNumbers = extractCitedArticles(assistantMessage);
-    console.log("[CITATIONS] Articles extraits du texte:", citedArticleNumbers);
+    const citedArticles = extractCitedArticles(assistantMessage);
+    console.log("[CITATIONS] Articles extraits du texte:", citedArticles.map(c => c.number));
 
-    // Matcher avec les sources RAG
+    // Match sources with cited articles - be more strict
     const matchedSources = sources.filter((article) => {
       const articleNum = article.article_number
-        .replace(/Article\s*/i, "")
-        .replace(/\s+/g, "")
+        .replace(/^Article\s*/i, '')
+        .replace(/\s+/g, '')
         .trim();
 
-      return citedArticleNumbers.some((cited) => {
-        const citedClean = cited.replace(/\s+/g, "");
-        return (
-          articleNum.includes(citedClean) ||
-          citedClean.includes(articleNum.replace(/-/g, "")) ||
-          articleNum === citedClean
-        );
+      return citedArticles.some((cited) => {
+        // Exact match or partial match
+        const citedNum = cited.number.replace(/\s+/g, '');
+        const matches = articleNum === citedNum ||
+                       articleNum.includes(citedNum) ||
+                       citedNum.includes(articleNum);
+
+        // If code is specified, also check code name
+        if (matches && cited.code) {
+          return article.code_name.toLowerCase().includes(cited.code.toLowerCase().replace('code ', ''));
+        }
+
+        return matches;
       });
     });
 
