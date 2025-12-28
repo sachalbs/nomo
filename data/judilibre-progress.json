@@ -5,82 +5,90 @@
   },
   "chambers": {
     "responsabilité_civile": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "contrat": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "préjudice": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "licenciement": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "contrat_de_travail": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "société": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "abus_de_confiance": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "obligation": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "nullité": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "résolution": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "dol": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "vice_caché": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "propriété": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "divorce": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "succession": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "faute_grave": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "abus_de_biens_sociaux": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "faillite": {
-      "page": 1,
+      "page": 10,
       "completed": false
     },
     "escroquerie": {
-      "page": 1,
+      "page": 10,
+      "completed": false
+    },
+    "homicide": {
+      "page": 10,
+      "completed": false
+    },
+    "servitude": {
+      "page": 10,
       "completed": false
     }
   },
-  "totalImported": 771,
-  "lastRun": "2025-12-28T17:52:09.462Z"
+  "totalImported": 129,
+  "lastRun": "2025-12-28T18:18:15.924Z"
 }
