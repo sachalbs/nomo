@@ -861,6 +861,67 @@ async function keywordSearch(
   }
 }
 
+// Generate query variations for Multi-Query RAG
+async function generateQueryVariations(question: string, anthropic: any): Promise<string[]> {
+  try {
+    console.log('[MULTI-QUERY] Generating query variations...');
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 500,
+      messages: [{
+        role: "user",
+        content: `Tu es un expert en droit français. Génère 4 reformulations de cette question juridique pour trouver des articles de loi pertinents.
+
+Question: "${question.slice(0, 1000)}"
+
+IMPORTANT: Chaque reformulation doit utiliser des termes juridiques différents.
+Exemple: "responsabilité du vendeur" → "obligation du vendeur", "garantie des vices", "inexécution contractuelle"
+
+Réponds UNIQUEMENT avec un JSON array de 4 strings:
+["reformulation 1", "reformulation 2", "reformulation 3", "reformulation 4"]`
+      }]
+    });
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : '[]';
+
+    // Clean markdown code blocks (Claude sometimes returns ```json ... ```)
+    const cleanedText = text
+      .replace(/^```json\s*/i, '')  // Remove ```json at start
+      .replace(/^```\s*/i, '')       // Remove ``` at start (fallback)
+      .replace(/\s*```$/i, '')       // Remove ``` at end
+      .trim();
+
+    const variations = JSON.parse(cleanedText);
+    console.log('[MULTI-QUERY] Variations:', variations);
+    return variations;
+  } catch (error) {
+    console.error('[MULTI-QUERY] Error generating variations:', error);
+    return [];
+  }
+}
+
+// Reciprocal Rank Fusion for combining multiple search results
+function reciprocalRankFusion(resultSets: any[][], k: number = 60): any[] {
+  const scores = new Map<string, number>();
+  const articleMap = new Map<string, any>();
+
+  for (const results of resultSets) {
+    results.forEach((article, rank) => {
+      const id = article.id || article.article_number || JSON.stringify(article);
+      const currentScore = scores.get(id) || 0;
+      scores.set(id, currentScore + 1 / (k + rank + 1));
+      if (!articleMap.has(id)) {
+        articleMap.set(id, article);
+      }
+    });
+  }
+
+  return Array.from(scores.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([id]) => articleMap.get(id));
+}
+
 // Hybrid search: combines keyword search (ILIKE) + Vector search with Reciprocal Rank Fusion
 async function hybridSearch(
   supabase: any,
@@ -1489,7 +1550,7 @@ export async function POST(request: NextRequest) {
 
     // Déterminer la limite d'articles selon la complexité (défini ici pour être accessible partout)
     const isCasPratique = analysis?.isCasPratique || message.toLowerCase().includes('cas pratique');
-    const maxArticles = isCasPratique ? 15 : 10;
+    const maxArticles = isCasPratique ? 20 : 12;
     console.log('[ANALYSIS] Max articles:', maxArticles, `(cas pratique: ${isCasPratique})`);
 
     // If Claude determined it's not a legal question, skip RAG
@@ -1534,6 +1595,36 @@ export async function POST(request: NextRequest) {
     let sources: LawArticleSource[] = [];
     let jurisprudence: CourtDecisionSource[] = [];
     let exactMatchArticles: LawArticleSource[] = [];
+    // Helper function to clean article numbers with code suffixes
+    function cleanArticleNumber(articleRef: string): { number: string, codeHint?: string } {
+      // First remove common prefixes like "Art.", "Article"
+      let cleaned = articleRef.replace(/^(Art\.?|Article)\s*/i, '').trim();
+
+      // Patterns for code suffixes
+      const patterns = [
+        { suffix: / CSI$/i, code: 'Code de la sécurité intérieure' },
+        { suffix: / CC$/i, code: 'Code civil' },
+        { suffix: / C\.?\s?civ\.?$/i, code: 'Code civil' },
+        { suffix: / CP$/i, code: 'Code pénal' },
+        { suffix: / C\.?\s?pén\.?$/i, code: 'Code pénal' },
+        { suffix: / C\.?\s?com\.?$/i, code: 'Code de commerce' },
+        { suffix: / C\.?\s?trav\.?$/i, code: 'Code du travail' },
+        { suffix: / CPP$/i, code: 'Code de procédure pénale' },
+        { suffix: / CPC$/i, code: 'Code de procédure civile' },
+      ];
+
+      for (const pattern of patterns) {
+        if (pattern.suffix.test(cleaned)) {
+          return {
+            number: cleaned.replace(pattern.suffix, '').trim(),
+            codeHint: pattern.code
+          };
+        }
+      }
+
+      return { number: cleaned };
+    }
+
     let articlesFromAnalysis: LawArticleSource[] = [];
     let searchTimedOut = false;
 
@@ -1542,24 +1633,23 @@ export async function POST(request: NextRequest) {
       if (analysis.articlesConnus && analysis.articlesConnus.length > 0) {
         console.log('[STEP 0.5] Searching for articles identified by Claude:', analysis.articlesConnus);
 
-        for (const articleRef of analysis.articlesConnus.slice(0, 10)) {
+        for (const articleRef of analysis.articlesConnus.slice(0, 20)) {
           try {
-            // Clean article reference (remove "Art.", "article", etc.)
-            const cleanNum = articleRef.replace(/^(Art\.?|Article)\s*/i, '').trim();
+            // Clean article reference and extract code hint
+            const cleaned = cleanArticleNumber(articleRef);
+            console.log(`[STEP 0.5] Cleaned "${articleRef}" → number: "${cleaned.number}", code: ${cleaned.codeHint || 'none'}`);
 
-            // Extract code name if present (e.g., "L435-1 CSI" → code = "Code de la sécurité intérieure")
-            let targetCode: string | null = null;
-            if (articleRef.includes('CSI')) {
-              targetCode = "Code de la sécurité intérieure";
-            } else if (analysis.codesARechercher.length > 0) {
-              // Use first code from analysis as hint
+            // Determine target code: use code hint from article reference, or from analysis
+            let targetCode: string | null = cleaned.codeHint || null;
+            if (!targetCode && analysis.codesARechercher.length > 0) {
+              // Use first code from analysis as fallback hint
               targetCode = analysis.codesARechercher[0];
             }
 
             let query = supabase
               .from('law_articles')
               .select('id, code_name, article_number, content, source_url')
-              .ilike('article_number', `%${cleanNum}%`);
+              .ilike('article_number', `%${cleaned.number}%`);
 
             if (targetCode) {
               query = query.eq('code_name', targetCode);
@@ -1726,6 +1816,41 @@ export async function POST(request: NextRequest) {
           console.log('[VECTOR SEARCH] No filter → searching all codes');
         }
 
+        // MULTI-QUERY RAG: Generate variations and search in parallel
+        let multiQueryResults: LawArticleSource[] = [];
+        try {
+          const anthropicClient = new Anthropic({
+            apiKey: process.env.ANTHROPIC_API_KEY,
+          });
+
+          const queryVariations = await generateQueryVariations(message, anthropicClient);
+          const allQueries = [message, ...queryVariations];
+          console.log(`[MULTI-QUERY] Searching with ${allQueries.length} queries (1 original + ${queryVariations.length} variations)`);
+
+          // Execute searches in parallel for each variation
+          const multiQuerySearches = await Promise.all(
+            allQueries.map(async (query) => {
+              try {
+                // Generate embedding for this variation
+                const variantEmbedding = await generateEmbedding(query);
+                // Use hybridSearch for each variation
+                const results = await hybridSearch(supabase, query, variantEmbedding, relevantCodes, 15);
+                return results;
+              } catch (error) {
+                console.error(`[MULTI-QUERY] Error searching for "${query.slice(0, 50)}...":`, error);
+                return [];
+              }
+            })
+          );
+
+          // Fuse results with RRF
+          multiQueryResults = reciprocalRankFusion(multiQuerySearches);
+          console.log(`[MULTI-QUERY] Fused ${multiQueryResults.length} unique articles from ${allQueries.length} queries`);
+        } catch (error) {
+          console.error('[MULTI-QUERY] Error in multi-query pipeline:', error);
+          // Continue without multi-query results
+        }
+
         // Search for similar law articles using hybrid search (ILIKE + Vector + RRF)
         const searchStartTime = Date.now();
         const articlesPromise = ragFusion(
@@ -1763,8 +1888,18 @@ export async function POST(request: NextRequest) {
         console.log(`[RAG] Hybrid search completed in ${searchDuration}ms`);
 
         // Store hybrid search results (hybridSearch returns array directly)
-        vectorArticles = articlesResult || [];
-        console.log(`[RAG] Hybrid search found: ${vectorArticles.length}`, vectorArticles.map(s => s.article_number));
+        const ragFusionResults = articlesResult || [];
+        console.log(`[RAG] RAG-Fusion found: ${ragFusionResults.length}`, ragFusionResults.map(s => s.article_number));
+
+        // Combine Multi-Query results with RAG-Fusion results using RRF
+        if (multiQueryResults.length > 0) {
+          const combinedResults = reciprocalRankFusion([multiQueryResults, ragFusionResults]);
+          vectorArticles = combinedResults;
+          console.log(`[RAG] Combined Multi-Query (${multiQueryResults.length}) + RAG-Fusion (${ragFusionResults.length}) = ${vectorArticles.length} unique articles`);
+        } else {
+          vectorArticles = ragFusionResults;
+          console.log(`[RAG] Using RAG-Fusion results only: ${vectorArticles.length}`);
+        }
 
         // Store jurisprudence results
         if (jurisprudenceResult.error) {
@@ -1870,10 +2005,45 @@ export async function POST(request: NextRequest) {
         rerankedOthers = await rerankWithCohere(message, articlesToRerank, 6);
       }
 
+      // FILTRE DE PERTINENCE THÉMATIQUE après reranking
+      if (rerankedOthers.length > 0) {
+        const isCivilDomain = analysis?.domaines.some(d => d.toLowerCase().includes('civil'));
+        const isContractRelated = analysis?.problematiques.some(p => {
+          const pLower = p.toLowerCase();
+          return pLower.includes('contrat') ||
+                 pLower.includes('obligation') ||
+                 pLower.includes('clause pénale') ||
+                 pLower.includes('force majeure');
+        });
+
+        if (isCivilDomain && isContractRelated) {
+          console.log('[FILTER] Applying thematic filter: civil domain + contract problematic');
+
+          const offTopicKeywords = ['empreintes génétiques', 'adn', 'identification', 'prélèvement'];
+          const beforeFilterCount = rerankedOthers.length;
+
+          rerankedOthers = rerankedOthers.filter(article => {
+            const contentLower = article.content?.toLowerCase() || '';
+            const isOffTopic = offTopicKeywords.some(keyword => contentLower.includes(keyword));
+
+            if (isOffTopic) {
+              console.log(`[FILTER] Article ${article.article_number} exclu (hors-sujet: contient ${offTopicKeywords.find(k => contentLower.includes(k))})`);
+              return false;
+            }
+            return true;
+          });
+
+          const excludedCount = beforeFilterCount - rerankedOthers.length;
+          if (excludedCount > 0) {
+            console.log(`[FILTER] ${excludedCount} article(s) exclu(s) pour hors-sujet`);
+          }
+        }
+      }
+
       // Combiner : articles de l'analyse Claude en premier (max 10), puis reranked (max 5)
       // Note: maxArticles est défini plus haut (15 pour cas pratiques, 10 sinon)
       const finalArticles = [
-        ...dedupedAnalysisArticles.slice(0, 10),  // Les articles que Claude a identifiés pour CE cas spécifique
+        ...dedupedAnalysisArticles.slice(0, 15),  // Les articles que Claude a identifiés pour CE cas spécifique
         ...rerankedOthers.slice(0, 5)
       ].slice(0, maxArticles);
 
