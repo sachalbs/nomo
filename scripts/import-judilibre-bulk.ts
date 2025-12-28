@@ -27,18 +27,19 @@ const MISTRAL_API_URL = 'https://api.mistral.ai/v1/embeddings';
 
 const RATE_LIMIT_DELAY = 300; // 300ms between API requests
 const EMBEDDING_DELAY = 200; // 200ms between embedding requests
-const PAGE_SIZE = 100;
-const MAX_PAGES_PER_FILTER = 500; // Max 50k per filter
+const PAGE_SIZE = 50; // Max 50 per page (API limit)
+const MAX_PAGES_PER_FILTER = 1000; // Max 50k per filter (1000 pages * 50)
 const PROGRESS_FILE = 'data/judilibre-progress.json';
 
 // Chambers to import (in priority order)
+// Valid chamber codes: pl, mi, civ1, civ2, civ3, comm, soc, cr, creun, ordo, allciv, other
 const CHAMBERS = [
   { id: 'civ1', name: 'Première chambre civile', priority: 1 },
   { id: 'civ2', name: 'Deuxième chambre civile', priority: 1 },
   { id: 'civ3', name: 'Troisième chambre civile', priority: 1 },
-  { id: 'com', name: 'Chambre commerciale', priority: 2 },
+  { id: 'comm', name: 'Chambre commerciale', priority: 2 },
   { id: 'soc', name: 'Chambre sociale', priority: 2 },
-  { id: 'crim', name: 'Chambre criminelle', priority: 3 },
+  { id: 'cr', name: 'Chambre criminelle', priority: 3 },
 ];
 
 // ============================================================================
@@ -126,24 +127,31 @@ async function fetchDecisions(params: {
     throw new Error('Missing PISTE_API_KEY');
   }
 
-  const queryParams = new URLSearchParams();
-  queryParams.set('page_size', String(params.page_size || PAGE_SIZE));
-  queryParams.set('page', String(params.page || 0));
+  // Build query string manually to handle arrays correctly
+  // Arrays need to be repeated: publication=b&publication=r (not publication=b,r)
+  const queryParts: string[] = [];
 
-  if (params.publication) {
-    queryParams.set('publication', params.publication.join(','));
+  queryParts.push(`page_size=${params.page_size || PAGE_SIZE}`);
+  queryParts.push(`page=${params.page || 0}`);
+
+  // Handle publication array - repeat parameter for each value
+  if (params.publication && params.publication.length > 0) {
+    for (const pub of params.publication) {
+      queryParts.push(`publication=${encodeURIComponent(pub)}`);
+    }
   }
+
   if (params.chamber) {
-    queryParams.set('chamber', params.chamber);
+    queryParts.push(`chamber=${encodeURIComponent(params.chamber)}`);
   }
   if (params.date_start) {
-    queryParams.set('date_start', params.date_start);
+    queryParts.push(`date_start=${encodeURIComponent(params.date_start)}`);
   }
   if (params.date_end) {
-    queryParams.set('date_end', params.date_end);
+    queryParts.push(`date_end=${encodeURIComponent(params.date_end)}`);
   }
 
-  const url = `${JUDILIBRE_BASE}/search?${queryParams}`;
+  const url = `${JUDILIBRE_BASE}/search?${queryParts.join('&')}`;
 
   const response = await fetch(url, {
     headers: {
@@ -270,14 +278,19 @@ async function insertDecision(
     // Determine importance
     const importance = decision.publication?.includes('b') ? 'important' : 'courant';
 
-    // Map chamber to French name
+    // Map API chamber codes to French names
     const chamberMap: Record<string, string> = {
       'civ1': 'Première chambre civile',
       'civ2': 'Deuxième chambre civile',
       'civ3': 'Troisième chambre civile',
-      'com': 'Chambre commerciale',
+      'comm': 'Chambre commerciale',
       'soc': 'Chambre sociale',
-      'crim': 'Chambre criminelle',
+      'cr': 'Chambre criminelle',
+      'pl': 'Assemblée plénière',
+      'mi': 'Chambre mixte',
+      'creun': 'Chambres réunies',
+      'ordo': 'Ordonnance',
+      'allciv': 'Toutes chambres civiles',
     };
 
     // Insert
