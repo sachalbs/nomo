@@ -1248,6 +1248,7 @@ FORMAT DE REPONSE :
 - ${casPratiqueDetection === "explicit" ? 'SUIS STRICTEMENT la méthodologie du cas pratique ci-dessus (5 étapes obligatoires)' : casPratiqueDetection === "uncertain" ? 'Demande d\'abord le format souhaité, puis donne une réponse courte' : 'Commence par repondre directement a la question'}
 - Cite les articles : "L'article X du Code Y dispose que..."
 - Cite les arrets : "L'arret [nom] du [date] a juge que..."
+- IMPORTANT : Si des arrêts de jurisprudence sont fournis ci-dessous, tu DOIS les citer dans ta réponse avec leur référence complète (juridiction, chambre, date, numéro). Ne les ignore JAMAIS.
 - Sois pedagogique et clair pour un etudiant en droit
 
 ARTICLES DE LOI :

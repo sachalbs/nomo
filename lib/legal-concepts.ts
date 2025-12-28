@@ -33,6 +33,18 @@ export const LEGAL_CONCEPTS: Record<string, {
     ],
     keywords: ["convention", "obligation", "accord", "parties"]
   },
+  "caducité": {
+    articles: [
+      { code: "Code civil", numbers: ["Article 1186", "Article 1187"] }
+    ],
+    keywords: ["caducité", "contrats interdépendants", "ensemble contractuel", "contrats liés", "disparition", "anéantissement"]
+  },
+  "contrats interdépendants": {
+    articles: [
+      { code: "Code civil", numbers: ["Article 1186", "Article 1187", "Article 1189"] }
+    ],
+    keywords: ["interdépendants", "ensemble contractuel", "opération globale", "contrats liés", "indivisibilité"]
+  },
 
   // DROIT DU TRAVAIL
   "cdi": {
