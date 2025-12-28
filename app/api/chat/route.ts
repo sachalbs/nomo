@@ -1012,6 +1012,132 @@ async function hybridSearch(
   return results;
 }
 
+// Generate query variants for RAG-Fusion
+function generateQueryVariants(query: string): string[] {
+  const variants: string[] = [];
+
+  // Extract key legal terms
+  const legalTerms: Record<string, string[]> = {
+    "responsabilité": ["1240", "1241", "faute", "dommage", "préjudice"],
+    "contrat": ["1103", "obligation", "inexécution", "résolution"],
+    "abus de confiance": ["314-1", "détournement", "pénal"],
+    "abus de biens sociaux": ["L241-3", "L242-6", "dirigeant", "société"],
+    "cdd": ["L1242-1", "durée déterminée", "travail", "terme"],
+    "licenciement": ["L1234", "faute grave", "préavis", "indemnité"],
+    "sarl": ["L223-1", "société", "gérant", "parts sociales"],
+    "sas": ["L227-1", "président", "actions simplifiée"],
+    "prescription": ["délai", "action", "années"],
+    "légitime défense": ["122-5", "pénal", "justificatif"],
+    "homicide": ["221-6", "involontaire", "imprudence"],
+    "garde à vue": ["62-2", "procédure pénale", "retenue"],
+    "dol": ["1137", "vice", "consentement", "tromperie"],
+    "caducité": ["1186", "1187", "ensemble contractuel"]
+  };
+
+  // Check if query contains any legal terms
+  const queryLower = query.toLowerCase();
+  for (const [term, relatedTerms] of Object.entries(legalTerms)) {
+    if (queryLower.includes(term.toLowerCase())) {
+      // Add variant with related terms
+      variants.push(relatedTerms.join(' '));
+    }
+  }
+
+  // Add a simplified version (remove question words)
+  const simplified = query
+    .replace(/qu'est-ce que?|quels? sont|quelles? sont|comment|quel est le/gi, '')
+    .replace(/\?/g, '')
+    .trim();
+  if (simplified !== query) {
+    variants.push(simplified);
+  }
+
+  // Add article number extraction variant
+  const articleMatch = query.match(/(\d+(?:-\d+)?)/g);
+  if (articleMatch) {
+    variants.push(`article ${articleMatch.join(' ')}`);
+  }
+
+  return variants.slice(0, 4); // Max 4 variants to avoid slowdown
+}
+
+// RAG-Fusion: Generate query variants and combine results
+async function ragFusion(
+  supabase: any,
+  originalQuery: string,
+  queryEmbedding: number[],
+  filterCodes: string[] | null,
+  limit: number = 10
+): Promise<LawArticleSource[]> {
+  console.log('[RAG-FUSION] Starting with query:', originalQuery.substring(0, 50));
+
+  // 1. Generate query variants using simple transformations
+  const variants = generateQueryVariants(originalQuery);
+  console.log(`[RAG-FUSION] Generated ${variants.length} variants`);
+
+  // 2. Search with original query
+  const originalResults = await hybridSearch(supabase, originalQuery, queryEmbedding, filterCodes, 15);
+
+  // 3. Search with each variant (using keyword search, no embedding needed)
+  const allResults: Map<string, { article: LawArticleSource; score: number }> = new Map();
+
+  // Add original results with high weight
+  originalResults.forEach((article, rank) => {
+    const key = `${article.code_name}:${article.article_number}`;
+    const score = 1 / (60 + rank + 1);
+    allResults.set(key, { article, score: score * 1.5 }); // 1.5x weight for original
+  });
+
+  // 4. For each variant, do keyword search and add results
+  for (const variant of variants) {
+    const keywords = variant.split(/\s+/).filter(k => k.length > 3);
+    if (keywords.length === 0) continue;
+
+    // Simple keyword search
+    let query = supabase
+      .from('law_articles')
+      .select('id, code_name, article_number, content, source_url');
+
+    // Build OR conditions for keywords
+    const conditions = keywords.slice(0, 3).map(kw => `content.ilike.%${kw}%`);
+    if (conditions.length > 0) {
+      query = query.or(conditions.join(','));
+    }
+
+    if (filterCodes && filterCodes.length > 0) {
+      query = query.in('code_name', filterCodes);
+    }
+
+    const { data: variantResults } = await query.limit(10);
+
+    // Add variant results with lower weight
+    (variantResults || []).forEach((article: any, rank: number) => {
+      const key = `${article.code_name}:${article.article_number}`;
+      const score = 1 / (60 + rank + 1);
+      const existing = allResults.get(key);
+      if (existing) {
+        existing.score += score; // Boost if found in multiple variants
+      } else {
+        allResults.set(key, { article: { ...article, similarity: 0 }, score });
+      }
+    });
+  }
+
+  // 5. Sort by combined score and return top results
+  const results = Array.from(allResults.values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(({ article, score }) => ({
+      ...article,
+      similarity: Math.min(score * 20, 1)
+    }));
+
+  console.log(`[RAG-FUSION] Final results: ${results.length} articles`);
+  console.log('[RAG-FUSION] Top 5:', results.slice(0, 5).map(r => r.article_number));
+
+  return results;
+}
+
 // Rerank results using Cohere for better relevance
 async function rerankWithCohere(
   query: string,
@@ -1686,7 +1812,7 @@ export async function POST(request: NextRequest) {
 
         // Search for similar law articles using hybrid search (ILIKE + Vector + RRF)
         const searchStartTime = Date.now();
-        const articlesPromise = hybridSearch(
+        const articlesPromise = ragFusion(
           supabase,
           message,
           queryEmbedding,

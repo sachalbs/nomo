@@ -1,0 +1,184 @@
+{
+  "questions": [
+    {
+      "id": "1",
+      "question": "Quelles sont les conditions de la responsabilité civile délictuelle ?",
+      "domain": "civil",
+      "difficulty": "simple",
+      "expectedArticles": ["1240", "1241"],
+      "expectedCodes": ["Code civil"],
+      "keywords": ["responsabilité", "faute", "dommage", "lien de causalité"]
+    },
+    {
+      "id": "2",
+      "question": "Quelles sont les conditions de la résolution unilatérale d'un contrat ?",
+      "domain": "civil",
+      "difficulty": "medium",
+      "expectedArticles": ["1224", "1226"],
+      "expectedCodes": ["Code civil"],
+      "keywords": ["résolution", "inexécution", "unilatérale", "gravité"]
+    },
+    {
+      "id": "3",
+      "question": "Qu'est-ce que la caducité dans les ensembles contractuels ?",
+      "domain": "civil",
+      "difficulty": "complex",
+      "expectedArticles": ["1186", "1187"],
+      "expectedCodes": ["Code civil"],
+      "keywords": ["caducité", "contrats interdépendants", "ensemble contractuel"]
+    },
+    {
+      "id": "4",
+      "question": "Quels sont les vices du consentement ?",
+      "domain": "civil",
+      "difficulty": "simple",
+      "expectedArticles": ["1130", "1131", "1137"],
+      "expectedCodes": ["Code civil"],
+      "keywords": ["erreur", "dol", "violence", "consentement"]
+    },
+    {
+      "id": "5",
+      "question": "Quel est le délai de prescription en matière civile ?",
+      "domain": "civil",
+      "difficulty": "simple",
+      "expectedArticles": ["2224"],
+      "expectedCodes": ["Code civil"],
+      "keywords": ["prescription", "délai", "cinq ans"]
+    },
+    {
+      "id": "6",
+      "question": "Quels sont les éléments constitutifs de l'abus de confiance ?",
+      "domain": "penal",
+      "difficulty": "medium",
+      "expectedArticles": ["314-1"],
+      "expectedCodes": ["Code pénal"],
+      "keywords": ["détournement", "préjudice", "remise", "confiance"]
+    },
+    {
+      "id": "7",
+      "question": "Quel est le délai de prescription pour un délit ?",
+      "domain": "penal",
+      "difficulty": "simple",
+      "expectedArticles": ["8"],
+      "expectedCodes": ["Code de procédure pénale"],
+      "keywords": ["prescription", "délit", "six ans", "action publique"]
+    },
+    {
+      "id": "8",
+      "question": "Qu'est-ce que la légitime défense ?",
+      "domain": "penal",
+      "difficulty": "medium",
+      "expectedArticles": ["122-5"],
+      "expectedCodes": ["Code pénal"],
+      "keywords": ["légitime défense", "nécessité", "proportionnalité", "irresponsabilité"]
+    },
+    {
+      "id": "9",
+      "question": "Quelles sont les conditions de l'homicide involontaire ?",
+      "domain": "penal",
+      "difficulty": "medium",
+      "expectedArticles": ["221-6"],
+      "expectedCodes": ["Code pénal"],
+      "keywords": ["homicide", "involontaire", "imprudence", "négligence"]
+    },
+    {
+      "id": "10",
+      "question": "Quelles sont les conditions du licenciement pour faute grave ?",
+      "domain": "travail",
+      "difficulty": "medium",
+      "expectedArticles": ["L1234-1", "L1234-5"],
+      "expectedCodes": ["Code du travail"],
+      "keywords": ["licenciement", "faute grave", "préavis", "indemnité"]
+    },
+    {
+      "id": "11",
+      "question": "Qu'est-ce qu'un CDD ?",
+      "domain": "travail",
+      "difficulty": "simple",
+      "expectedArticles": ["L1242-1", "L1242-2"],
+      "expectedCodes": ["Code du travail"],
+      "keywords": ["CDD", "contrat", "durée déterminée", "terme"]
+    },
+    {
+      "id": "12",
+      "question": "Quel est le délai de préavis en CDI ?",
+      "domain": "travail",
+      "difficulty": "simple",
+      "expectedArticles": ["L1234-1"],
+      "expectedCodes": ["Code du travail"],
+      "keywords": ["préavis", "CDI", "rupture", "délai"]
+    },
+    {
+      "id": "13",
+      "question": "Quelles sont les conditions de l'abus de biens sociaux ?",
+      "domain": "commercial",
+      "difficulty": "complex",
+      "expectedArticles": ["L241-3", "L242-6"],
+      "expectedCodes": ["Code de commerce"],
+      "keywords": ["abus de biens sociaux", "dirigeant", "intérêt personnel", "société"]
+    },
+    {
+      "id": "14",
+      "question": "Comment fonctionne une SARL ?",
+      "domain": "commercial",
+      "difficulty": "simple",
+      "expectedArticles": ["L223-1", "L223-2"],
+      "expectedCodes": ["Code de commerce"],
+      "keywords": ["SARL", "associés", "parts sociales", "gérant"]
+    },
+    {
+      "id": "15",
+      "question": "Qu'est-ce qu'une SAS ?",
+      "domain": "commercial",
+      "difficulty": "simple",
+      "expectedArticles": ["L227-1", "L227-5"],
+      "expectedCodes": ["Code de commerce"],
+      "keywords": ["SAS", "société par actions simplifiée", "président", "statuts"]
+    },
+    {
+      "id": "16",
+      "question": "Comment est calculé l'impôt sur le revenu ?",
+      "domain": "fiscal",
+      "difficulty": "complex",
+      "expectedArticles": ["1", "13", "156"],
+      "expectedCodes": ["Code général des impôts"],
+      "keywords": ["impôt sur le revenu", "barème", "tranche", "foyer fiscal"]
+    },
+    {
+      "id": "17",
+      "question": "Qu'est-ce que la TVA ?",
+      "domain": "fiscal",
+      "difficulty": "simple",
+      "expectedArticles": ["256", "278"],
+      "expectedCodes": ["Code général des impôts"],
+      "keywords": ["TVA", "taxe", "valeur ajoutée", "taux"]
+    },
+    {
+      "id": "18",
+      "question": "Quelles sont les obligations déclaratives fiscales ?",
+      "domain": "fiscal",
+      "difficulty": "medium",
+      "expectedArticles": ["170", "175"],
+      "expectedCodes": ["Code général des impôts"],
+      "keywords": ["déclaration", "obligations", "revenus", "délai"]
+    },
+    {
+      "id": "19",
+      "question": "Qu'est-ce que la garde à vue ?",
+      "domain": "procedure",
+      "difficulty": "medium",
+      "expectedArticles": ["62-2", "63"],
+      "expectedCodes": ["Code de procédure pénale"],
+      "keywords": ["garde à vue", "droits", "avocat", "durée"]
+    },
+    {
+      "id": "20",
+      "question": "Quel est le délai d'appel en matière civile ?",
+      "domain": "procedure",
+      "difficulty": "simple",
+      "expectedArticles": ["538", "528"],
+      "expectedCodes": ["Code de procédure civile"],
+      "keywords": ["appel", "délai", "un mois", "jugement"]
+    }
+  ]
+}

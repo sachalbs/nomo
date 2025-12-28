@@ -7,13 +7,19 @@ export const LEGAL_CONCEPTS: Record<string, {
     articles: [
       { code: "Code civil", numbers: ["Article 1240", "Article 1241", "Article 1242", "Article 1243", "Article 1244"] }
     ],
-    keywords: ["responsabilité civile", "fait dommageable", "faute", "dommage", "réparation"]
+    keywords: ["responsabilité civile", "responsabilité délictuelle", "fait dommageable", "faute", "dommage", "réparation", "préjudice", "1240", "quasi-délit"]
   },
   "vices du consentement": {
     articles: [
       { code: "Code civil", numbers: ["Article 1130", "Article 1131", "Article 1132", "Article 1133", "Article 1137", "Article 1139", "Article 1140"] }
     ],
     keywords: ["erreur", "dol", "violence", "consentement"]
+  },
+  "dol": {
+    articles: [
+      { code: "Code civil", numbers: ["Article 1137", "Article 1138", "Article 1139"] }
+    ],
+    keywords: ["dol", "manoeuvres", "mensonge", "réticence dolosive", "tromperie", "intention de tromper"]
   },
   "prescription civile": {
     articles: [
@@ -55,15 +61,21 @@ export const LEGAL_CONCEPTS: Record<string, {
   },
   "cdd": {
     articles: [
-      { code: "Code du travail", numbers: ["Article L1241-1", "Article L1242-1", "Article L1242-2", "Article L1243-1"] }
+      { code: "Code du travail", numbers: ["Article L1241-1", "Article L1242-1", "Article L1242-2", "Article L1242-3", "Article L1242-4", "Article L1242-12", "Article L1243-1"] }
     ],
-    keywords: ["contrat à durée déterminée", "terme", "renouvellement"]
+    keywords: ["CDD", "contrat à durée déterminée", "terme", "renouvellement", "durée déterminée"]
+  },
+  "contrat à durée déterminée": {
+    articles: [
+      { code: "Code du travail", numbers: ["Article L1242-1", "Article L1242-2", "Article L1242-3", "Article L1242-4", "Article L1242-12"] }
+    ],
+    keywords: ["CDD", "contrat à durée déterminée", "terme", "renouvellement", "durée déterminée"]
   },
   "licenciement": {
     articles: [
-      { code: "Code du travail", numbers: ["Article L1232-1", "Article L1232-2", "Article L1234-1", "Article L1234-9"] }
+      { code: "Code du travail", numbers: ["Article L1232-1", "Article L1232-2", "Article L1232-6", "Article L1234-1", "Article L1234-5", "Article L1234-9"] }
     ],
-    keywords: ["rupture", "préavis", "indemnité", "motif"]
+    keywords: ["licenciement", "faute grave", "faute lourde", "préavis", "indemnité", "motif personnel", "cause réelle et sérieuse", "rupture"]
   },
   "faute grave": {
     articles: [
@@ -77,14 +89,14 @@ export const LEGAL_CONCEPTS: Record<string, {
     articles: [
       { code: "Code pénal", numbers: ["Article 314-1", "Article 314-2", "Article 314-3"] }
     ],
-    keywords: ["détournement", "bien remis", "préjudice"]
+    keywords: ["abus de confiance", "détournement", "bien remis", "préjudice", "remettre", "restituer", "usage abusif", "fonds", "valeurs"]
   },
   "abus de biens sociaux": {
     articles: [
-      { code: "Code de commerce", numbers: ["Article L241-3", "Article L242-6"] },
+      { code: "Code de commerce", numbers: ["Article L241-3", "Article L242-6", "Article L244-1"] },
       { code: "Code de procédure pénale", numbers: ["Article 7", "Article 8", "Article 9"] }
     ],
-    keywords: ["dirigeant", "société", "intérêt personnel", "prescription"]
+    keywords: ["abus de biens sociaux", "ABS", "usage abusif", "biens sociaux", "intérêt personnel", "dirigeant", "gérant", "SARL", "SA", "société", "prescription"]
   },
   "prescription pénale": {
     articles: [
@@ -121,9 +133,9 @@ export const LEGAL_CONCEPTS: Record<string, {
   // DROIT COMMERCIAL
   "sarl": {
     articles: [
-      { code: "Code de commerce", numbers: ["Article L223-1", "Article L223-2", "Article L223-3", "Article L223-7"] }
+      { code: "Code de commerce", numbers: ["Article L223-1", "Article L223-2", "Article L223-3", "Article L223-7", "Article L223-18", "Article L223-21"] }
     ],
-    keywords: ["société à responsabilité limitée", "associés", "parts sociales", "gérant"]
+    keywords: ["SARL", "société à responsabilité limitée", "associés", "parts sociales", "gérant"]
   },
   "société anonyme": {
     articles: [
@@ -133,8 +145,8 @@ export const LEGAL_CONCEPTS: Record<string, {
   },
   "sas": {
     articles: [
-      { code: "Code de commerce", numbers: ["Article L227-1", "Article L227-2", "Article L227-5", "Article L227-6"] }
+      { code: "Code de commerce", numbers: ["Article L227-1", "Article L227-2", "Article L227-5", "Article L227-6", "Article L227-9"] }
     ],
-    keywords: ["société par actions simplifiée", "président", "statuts"]
+    keywords: ["SAS", "société par actions simplifiée", "président", "actions", "statuts"]
   }
 };
