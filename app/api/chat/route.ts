@@ -2039,12 +2039,11 @@ export async function POST(request: NextRequest) {
         },
       ];
 
-      const claudeResponse = await anthropic.messages.create({
+      const claudeResponse = await anthropic.beta.messages.create({
         model: "claude-sonnet-4-20250514",
         max_tokens: 8192,
+        betas: ["pdfs-2024-09-25"],
         system: systemPrompt,
-        // @ts-expect-error - citations is a beta feature
-        citations: { enabled: true },
         messages: [
           // Include history if any
           ...historyMessages,
