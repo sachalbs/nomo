@@ -1,0 +1,34 @@
+{
+  "bulletin": {
+    "page": 5,
+    "completed": false
+  },
+  "chambers": {
+    "civ1": {
+      "page": 5,
+      "completed": false
+    },
+    "civ2": {
+      "page": 5,
+      "completed": false
+    },
+    "civ3": {
+      "page": 5,
+      "completed": false
+    },
+    "com": {
+      "page": 5,
+      "completed": false
+    },
+    "soc": {
+      "page": 5,
+      "completed": false
+    },
+    "crim": {
+      "page": 5,
+      "completed": false
+    }
+  },
+  "totalImported": 0,
+  "lastRun": "2025-12-28T17:37:43.020Z"
+}
