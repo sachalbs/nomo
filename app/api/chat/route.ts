@@ -901,6 +901,44 @@ Réponds UNIQUEMENT avec un JSON array de 4 strings:
   }
 }
 
+// Generate hypothetical answer for HyDE (Hypothetical Document Embeddings)
+async function generateHypotheticalAnswer(question: string, anthropic: any): Promise<string> {
+  try {
+    console.log('[HyDE] Generating hypothetical answer...');
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 300,
+      messages: [{
+        role: "user",
+        content: `Tu es un expert en droit français. Génère une réponse juridique HYPOTHÉTIQUE à cette question en utilisant les termes techniques appropriés (articles de loi, concepts juridiques).
+
+Question: "${question.slice(0, 1000)}"
+
+IMPORTANT:
+- Ne cite PAS de numéros d'articles spécifiques (pas de "1240", "L1234-1", etc.)
+- Utilise les TERMES juridiques (responsabilité délictuelle, faute, dommage, contrat d'adhésion, clause abusive, etc.)
+- Réponse courte (200 mots max)
+- Utilise un langage juridique précis
+
+Exemple:
+Question: "Un employeur peut-il licencier un salarié absent pour maladie ?"
+Réponse: "En matière de droit du travail, le licenciement d'un salarié pour absence liée à une maladie pose la question de la protection du salarié malade. Le principe général est l'interdiction de licencier un salarié en raison de son état de santé, ce qui constituerait une discrimination. Toutefois, si l'absence prolongée du salarié désorganise l'entreprise et nécessite son remplacement définitif, l'employeur peut procéder au licenciement pour motif objectif non discriminatoire. La jurisprudence distingue entre le licenciement discriminatoire fondé sur l'état de santé (prohibé) et le licenciement justifié par la nécessité de remplacer le salarié (licite sous conditions). La durée de l'absence, la taille de l'entreprise, et la possibilité de reclassement sont des critères déterminants."
+
+Réponds UNIQUEMENT avec la réponse hypothétique, sans introduction ni conclusion.`
+      }]
+    });
+
+    const hypotheticalAnswer = response.content[0].type === 'text' ? response.content[0].text : '';
+    console.log(`[HyDE] Generated hypothetical answer (${hypotheticalAnswer.length} chars)`);
+
+    return hypotheticalAnswer;
+  } catch (error) {
+    console.error('[HyDE] Error generating hypothetical answer:', error);
+    return '';
+  }
+}
+
 // Reciprocal Rank Fusion for combining multiple search results
 function reciprocalRankFusion(resultSets: any[][], k: number = 60): any[] {
   const scores = new Map<string, number>();
@@ -1230,17 +1268,6 @@ L'utilisateur a explicitement demandé un cas pratique. Tu DOIS structurer ta r�
    - Réponds directement à la question posée
 
 ${CRFPA_COMPLEMENT}
-` : casPratiqueDetection === "uncertain" ? `
-
-DÉTECTION CAS PRATIQUE :
-
-Tu as détecté une situation juridique factuelle, mais ce n'est pas clair si l'utilisateur veut un cas pratique structuré ou une simple explication.
-
-COMMENCE TA RÉPONSE PAR :
-"Il semble que tu me présentes une situation juridique concrète. Souhaites-tu que je structure ma réponse sous forme de cas pratique (avec syllogisme juridique : qualification des faits, problème de droit, majeure, mineure, conclusion) ou préfères-tu une explication simple et directe ?"
-
-PUIS donne une réponse courte et directe à la question en utilisant les sources.
-
 ` : '';
 
   // Build analysis section if provided
@@ -1833,25 +1860,44 @@ export async function POST(request: NextRequest) {
           console.log('[VECTOR SEARCH] No filter → searching all codes');
         }
 
-        // MULTI-QUERY RAG: Generate variations and search in parallel
+        // MULTI-QUERY RAG + HyDE: Generate variations and search in parallel
         let multiQueryResults: LawArticleSource[] = [];
         try {
           const anthropicClient = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
           });
 
+          // Generate query variations
           const queryVariations = await generateQueryVariations(message, anthropicClient);
+
+          // Generate hypothetical answer for HyDE
+          const hypotheticalAnswer = await generateHypotheticalAnswer(message, anthropicClient);
+
+          // Build query list: original + variations + hypothetical (if generated)
           const allQueries = [message, ...queryVariations];
-          console.log(`[MULTI-QUERY] Searching with ${allQueries.length} queries (1 original + ${queryVariations.length} variations)`);
+          if (hypotheticalAnswer) {
+            allQueries.push(hypotheticalAnswer);
+          }
+
+          console.log(`[MULTI-QUERY + HyDE] Searching with ${allQueries.length} queries (1 original + ${queryVariations.length} variations${hypotheticalAnswer ? ' + 1 HyDE' : ''})`);
 
           // Execute searches in parallel for each variation
           const multiQuerySearches = await Promise.all(
-            allQueries.map(async (query) => {
+            allQueries.map(async (query, index) => {
               try {
+                // Determine if this is the HyDE query
+                const isHyDE = hypotheticalAnswer && index === allQueries.length - 1;
+
                 // Generate embedding for this variation
                 const variantEmbedding = await generateEmbedding(query);
+
                 // Use hybridSearch for each variation
                 const results = await hybridSearch(supabase, query, variantEmbedding, relevantCodes, 15);
+
+                if (isHyDE) {
+                  console.log(`[HyDE] Found ${results.length} articles from hypothetical search`);
+                }
+
                 return results;
               } catch (error) {
                 console.error(`[MULTI-QUERY] Error searching for "${query.slice(0, 50)}...":`, error);
@@ -1862,9 +1908,9 @@ export async function POST(request: NextRequest) {
 
           // Fuse results with RRF
           multiQueryResults = reciprocalRankFusion(multiQuerySearches);
-          console.log(`[MULTI-QUERY] Fused ${multiQueryResults.length} unique articles from ${allQueries.length} queries`);
+          console.log(`[MULTI-QUERY + HyDE] Fused ${multiQueryResults.length} unique articles from ${allQueries.length} queries`);
         } catch (error) {
-          console.error('[MULTI-QUERY] Error in multi-query pipeline:', error);
+          console.error('[MULTI-QUERY + HyDE] Error in multi-query pipeline:', error);
           // Continue without multi-query results
         }
 
