@@ -514,7 +514,7 @@ async function generateMarkdownReport(report: InventoryReport) {
   md.push('## RECOMMANDATIONS\n');
   md.push('### Actions prioritaires\n');
 
-  const recommendations: string[] = [];
+  const recommendations: { priority: string; action: string; detail: string }[] = [];
 
   if (!report.articles.article1112.present) {
     recommendations.push({
