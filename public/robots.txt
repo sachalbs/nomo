@@ -1,0 +1,13 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /admin/
+
+# Host
+Host: https://nomo-juridique.fr
+
+# Sitemaps
+Sitemap: https://nomo-juridique.fr/sitemap.xml
