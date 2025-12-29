@@ -17,78 +17,78 @@
       "completed": false
     },
     "licenciement": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "contrat_de_travail": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "société": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "abus_de_confiance": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "obligation": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "nullité": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "résolution": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "dol": {
       "page": 20,
-      "completed": false
+      "completed": true
     },
     "vice_caché": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "propriété": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "divorce": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "succession": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "faute_grave": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "abus_de_biens_sociaux": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "faillite": {
       "page": 20,
-      "completed": false
+      "completed": true
     },
     "escroquerie": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "homicide": {
-      "page": 20,
+      "page": 30,
       "completed": false
     },
     "servitude": {
-      "page": 20,
-      "completed": false
+      "page": 23,
+      "completed": true
     }
   },
-  "totalImported": 1471,
+  "totalImported": 8021,
   "lastRun": "2025-12-28T18:18:15.924Z"
 }
